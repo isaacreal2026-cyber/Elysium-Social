@@ -5,6 +5,7 @@ import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { BottomTabBar } from "@/components/BottomTabBar";
 import { StarField } from "@/components/StarField";
 import { useColors } from "@/hooks/useColors";
 
@@ -15,6 +16,7 @@ interface ScreenShellProps {
   rightAction?: React.ReactNode;
   showBack?: boolean;
   density?: number;
+  showTabBar?: boolean;
 }
 
 export function ScreenShell({
@@ -24,11 +26,12 @@ export function ScreenShell({
   rightAction,
   showBack = true,
   density = 60,
+  showTabBar = true,
 }: ScreenShellProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const isWeb = Platform.OS === "web";
-  const topPad = (isWeb ? Math.max(insets.top, 67) : insets.top) + 8;
+  const topPad = (isWeb ? Math.max(insets.top, 16) : insets.top) + 8;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -54,6 +57,7 @@ export function ScreenShell({
         </View>
       </View>
       <View style={{ flex: 1 }}>{children}</View>
+      {showTabBar ? <BottomTabBar /> : null}
     </View>
   );
 }

@@ -2,11 +2,13 @@ import type {
   ChatMessage,
   Comment,
   DestinyStory,
+  ElysiumNotification,
   ElysiumUser,
   LearnPath,
   MessageThread,
   NexusHub,
   Post,
+  TrendingTag,
   VoiceRoom,
 } from "./types";
 
@@ -26,6 +28,8 @@ export const SEED_USERS: ElysiumUser[] = [
     destinations: ["Lisbon", "AR-2030", "Founders"],
     alignmentScore: 0.82,
     weeklyVisitors: 47,
+    followers: 1284,
+    following: 312,
     online: true,
   },
   {
@@ -41,6 +45,8 @@ export const SEED_USERS: ElysiumUser[] = [
     destinations: ["Berlin", "Sound", "Healing"],
     alignmentScore: 0.78,
     weeklyVisitors: 312,
+    followers: 12482,
+    following: 488,
     online: true,
   },
   {
@@ -56,6 +62,8 @@ export const SEED_USERS: ElysiumUser[] = [
     destinations: ["Seoul", "OSS", "Game-dev"],
     alignmentScore: 0.91,
     weeklyVisitors: 188,
+    followers: 5621,
+    following: 211,
     online: true,
   },
   {
@@ -71,6 +79,8 @@ export const SEED_USERS: ElysiumUser[] = [
     destinations: ["Beirut", "Travel", "Poetry"],
     alignmentScore: 0.74,
     weeklyVisitors: 226,
+    followers: 8421,
+    following: 902,
     online: false,
   },
   {
@@ -86,6 +96,8 @@ export const SEED_USERS: ElysiumUser[] = [
     destinations: ["CDMX", "StartupLife", "Mental-health"],
     alignmentScore: 0.86,
     weeklyVisitors: 401,
+    followers: 18204,
+    following: 642,
     online: true,
   },
   {
@@ -101,7 +113,43 @@ export const SEED_USERS: ElysiumUser[] = [
     destinations: ["Edinburgh", "Sound", "Nature"],
     alignmentScore: 0.69,
     weeklyVisitors: 92,
+    followers: 2104,
+    following: 188,
     online: false,
+  },
+  {
+    id: "u-mira",
+    name: "Mira Okafor",
+    handle: "@mira.frame",
+    avatarColor: "#A78BFA",
+    avatarGlyph: "M",
+    bio: "Filmmaker. Long takes, short films.",
+    introVoiceSeconds: 8,
+    city: "Lagos",
+    tags: ["filmmaker", "patient", "color-obsessed"],
+    destinations: ["Lagos", "Film", "Travel"],
+    alignmentScore: 0.72,
+    weeklyVisitors: 341,
+    followers: 9442,
+    following: 521,
+    online: true,
+  },
+  {
+    id: "u-julien",
+    name: "Julien Marchand",
+    handle: "@julien.chef",
+    avatarColor: "#F97316",
+    avatarGlyph: "J",
+    bio: "Cooking with what's in season and reach.",
+    introVoiceSeconds: 13,
+    city: "Lyon",
+    tags: ["chef", "patient", "host"],
+    destinations: ["Lyon", "Food", "Slow"],
+    alignmentScore: 0.66,
+    weeklyVisitors: 188,
+    followers: 7331,
+    following: 244,
+    online: true,
   },
 ];
 
@@ -117,6 +165,8 @@ export const SEED_POSTS: Post[] = [
     resonance: { spark: 412, flame: 88, echo: 34, sync: 21, resonate: 67, link: 19 },
     energy: 0.86,
     createdAt: now - 1000 * 60 * 12,
+    commentCount: 42,
+    shareCount: 18,
   },
   {
     id: "p-2",
@@ -136,6 +186,8 @@ export const SEED_POSTS: Post[] = [
     energy: 0.74,
     createdAt: now - 1000 * 60 * 38,
     nestedPostIds: ["p-3"],
+    commentCount: 67,
+    shareCount: 24,
   },
   {
     id: "p-3",
@@ -147,6 +199,8 @@ export const SEED_POSTS: Post[] = [
     resonance: { spark: 92, flame: 14, echo: 9, sync: 31, resonate: 5, link: 12 },
     energy: 0.51,
     createdAt: now - 1000 * 60 * 36,
+    commentCount: 11,
+    shareCount: 4,
   },
   {
     id: "p-4",
@@ -158,6 +212,8 @@ export const SEED_POSTS: Post[] = [
     resonance: { spark: 1204, flame: 312, echo: 87, sync: 44, resonate: 188, link: 61 },
     energy: 0.93,
     createdAt: now - 1000 * 60 * 90,
+    commentCount: 188,
+    shareCount: 92,
   },
   {
     id: "p-5",
@@ -176,6 +232,8 @@ export const SEED_POSTS: Post[] = [
     resonance: { spark: 88, flame: 7, echo: 4, sync: 41, resonate: 12, link: 3 },
     energy: 0.42,
     createdAt: now - 1000 * 60 * 60 * 3,
+    commentCount: 31,
+    shareCount: 6,
   },
   {
     id: "p-6",
@@ -187,6 +245,61 @@ export const SEED_POSTS: Post[] = [
     resonance: { spark: 511, flame: 28, echo: 19, sync: 67, resonate: 132, link: 22 },
     energy: 0.81,
     createdAt: now - 1000 * 60 * 60 * 5,
+    commentCount: 224,
+    shareCount: 41,
+  },
+  {
+    id: "p-7",
+    authorId: "u-mira",
+    kind: "media",
+    body: "Three frames from yesterday's golden hour. Every city is two cities — the one you walk through and the one you pay attention to.",
+    mediaTone: "nebula2",
+    destinations: ["Film", "Lagos"],
+    resonance: { spark: 822, flame: 191, echo: 44, sync: 38, resonate: 122, link: 17 },
+    energy: 0.88,
+    createdAt: now - 1000 * 60 * 60 * 2,
+    commentCount: 88,
+    shareCount: 33,
+  },
+  {
+    id: "p-8",
+    authorId: "u-julien",
+    kind: "classic",
+    body: "Today: butter, lemon, anchovies, and someone you haven't seen in a while. That's the recipe.",
+    mediaTone: "none",
+    destinations: ["Food", "Slow"],
+    resonance: { spark: 318, flame: 92, echo: 12, sync: 78, resonate: 41, link: 8 },
+    energy: 0.71,
+    createdAt: now - 1000 * 60 * 60 * 8,
+    commentCount: 47,
+    shareCount: 12,
+  },
+  {
+    id: "p-9",
+    authorId: "u-self",
+    kind: "classic",
+    body: "Started Elysium tonight. Something about a softer internet — small rooms, real signals, less performance.",
+    mediaTone: "none",
+    destinations: ["Lisbon", "Founders"],
+    resonance: { spark: 41, flame: 8, echo: 2, sync: 14, resonate: 6, link: 3 },
+    energy: 0.32,
+    createdAt: now - 1000 * 60 * 60 * 14,
+    commentCount: 9,
+    shareCount: 2,
+  },
+  {
+    id: "p-10",
+    authorId: "u-ines",
+    kind: "voice",
+    body: "30 seconds on why I stopped doing 'quick syncs' — and what I do now.",
+    mediaTone: "nebula3",
+    voiceSeconds: 31,
+    destinations: ["StartupLife"],
+    resonance: { spark: 614, flame: 88, echo: 21, sync: 188, resonate: 54, link: 27 },
+    energy: 0.84,
+    createdAt: now - 1000 * 60 * 60 * 4,
+    commentCount: 92,
+    shareCount: 38,
   },
 ];
 
@@ -249,15 +362,34 @@ export const SEED_COMMENTS: Comment[] = [
     resonance: 88,
     createdAt: now - 1000 * 60 * 3,
   },
+  {
+    id: "c-7",
+    postId: "p-7",
+    authorId: "u-aria",
+    parentId: null,
+    body: "frame two is doing something with the windows that i can hear, somehow.",
+    resonance: 142,
+    createdAt: now - 1000 * 60 * 60,
+  },
+  {
+    id: "c-8",
+    postId: "p-7",
+    authorId: "u-julien",
+    parentId: null,
+    body: "i need a print of the third one above the stove. seriously.",
+    resonance: 88,
+    createdAt: now - 1000 * 60 * 40,
+  },
 ];
 
 export const SEED_STORIES: DestinyStory[] = [
-  { id: "s-1", authorId: "u-aria", caption: "4am, Berlin", destinations: ["Sound"], toneIndex: 0, resonance: 412 },
-  { id: "s-2", authorId: "u-noor", caption: "Corniche walk", destinations: ["Beirut"], toneIndex: 1, resonance: 988 },
-  { id: "s-3", authorId: "u-ines", caption: "Founder Friday", destinations: ["StartupLife"], toneIndex: 2, resonance: 244 },
-  { id: "s-4", authorId: "u-kenji", caption: "Build log #18", destinations: ["Dev"], toneIndex: 0, resonance: 132 },
-  { id: "s-5", authorId: "u-theo", caption: "Forest take", destinations: ["Nature"], toneIndex: 1, resonance: 78 },
-  { id: "s-6", authorId: "u-aria", caption: "Letting it breathe", destinations: ["Healing"], toneIndex: 2, resonance: 301 },
+  { id: "s-1", authorId: "u-aria", caption: "4am, Berlin\nthe city is whispering tonight", destinations: ["Sound"], toneIndex: 0, resonance: 412, viewers: 1842, createdAt: now - 1000 * 60 * 90 },
+  { id: "s-2", authorId: "u-noor", caption: "Corniche walk\nthe sea is a friend who waited up", destinations: ["Beirut"], toneIndex: 1, resonance: 988, viewers: 4302, createdAt: now - 1000 * 60 * 60 * 3 },
+  { id: "s-3", authorId: "u-ines", caption: "Founder Friday\nbring your hardest decision", destinations: ["StartupLife"], toneIndex: 2, resonance: 244, viewers: 1188, createdAt: now - 1000 * 60 * 60 * 5 },
+  { id: "s-4", authorId: "u-kenji", caption: "Build log #18\nthree little experiments", destinations: ["Dev"], toneIndex: 0, resonance: 132, viewers: 822, createdAt: now - 1000 * 60 * 60 * 8 },
+  { id: "s-5", authorId: "u-theo", caption: "Forest take\nbirds on the second beat", destinations: ["Nature"], toneIndex: 1, resonance: 78, viewers: 411, createdAt: now - 1000 * 60 * 60 * 11 },
+  { id: "s-6", authorId: "u-mira", caption: "Color of the day:\namber, before it falls", destinations: ["Film"], toneIndex: 2, resonance: 301, viewers: 1432, createdAt: now - 1000 * 60 * 60 * 13 },
+  { id: "s-7", authorId: "u-julien", caption: "Tonight's table\neight chairs, no phones", destinations: ["Food"], toneIndex: 0, resonance: 188, viewers: 921, createdAt: now - 1000 * 60 * 60 * 15 },
 ];
 
 export const SEED_HUBS: NexusHub[] = [
@@ -291,7 +423,7 @@ export const SEED_HUBS: NexusHub[] = [
     pulse: 0.74,
     toneIndex: 2,
     online: ["u-ines", "u-self", "u-noor"],
-    postIds: ["p-2"],
+    postIds: ["p-2", "p-10"],
     projectMode: true,
   },
   {
@@ -304,6 +436,28 @@ export const SEED_HUBS: NexusHub[] = [
     online: ["u-theo", "u-noor"],
     postIds: ["p-4"],
     projectMode: false,
+  },
+  {
+    id: "h-5",
+    name: "Long Takes",
+    tagline: "Filmmakers, photographers, patient eyes.",
+    members: 6210,
+    pulse: 0.71,
+    toneIndex: 2,
+    online: ["u-mira", "u-noor", "u-self"],
+    postIds: ["p-7"],
+    projectMode: false,
+  },
+  {
+    id: "h-6",
+    name: "Slow Kitchen",
+    tagline: "Cooks who think with their hands.",
+    members: 3812,
+    pulse: 0.58,
+    toneIndex: 0,
+    online: ["u-julien", "u-ines"],
+    postIds: ["p-8"],
+    projectMode: true,
   },
 ];
 
@@ -340,6 +494,22 @@ export const SEED_THREADS: MessageThread[] = [
     voice: false,
     pinned: false,
   },
+  {
+    id: "t-5",
+    participantIds: ["u-self", "u-mira"],
+    lastMessage: "want to shoot a small thing together in lisbon?",
+    unread: 1,
+    voice: false,
+    pinned: false,
+  },
+  {
+    id: "t-6",
+    participantIds: ["u-self", "u-julien"],
+    lastMessage: "table for 4 saturday — bring your appetite",
+    unread: 0,
+    voice: false,
+    pinned: false,
+  },
 ];
 
 export const SEED_CHATS: Record<string, ChatMessage[]> = {
@@ -349,6 +519,10 @@ export const SEED_CHATS: Record<string, ChatMessage[]> = {
     { id: "m-3", threadId: "t-1", authorId: "u-aria", body: "Echoed into the project chat — voice note inside.", voiceSeconds: 9, createdAt: now - 1000 * 60 * 12 },
     { id: "m-4", threadId: "t-1", authorId: "u-aria", body: "I echoed your 4am piece into the project — listen?", createdAt: now - 1000 * 60 * 4 },
   ],
+  "t-2": [
+    { id: "m-5", threadId: "t-2", authorId: "u-ines", body: "Friday voice room — want to co-host?", createdAt: now - 1000 * 60 * 60 * 2 },
+    { id: "m-6", threadId: "t-2", authorId: "u-self", body: "Yes. I'll bring the agenda.", createdAt: now - 1000 * 60 * 60 },
+  ],
 };
 
 export const SEED_VOICE_ROOMS: VoiceRoom[] = [
@@ -356,12 +530,40 @@ export const SEED_VOICE_ROOMS: VoiceRoom[] = [
   { id: "vr-2", topic: "Songs that reset your day", vibe: "Warm", hostId: "u-aria", speakers: ["u-aria", "u-theo", "u-noor"], listeners: 422, live: true },
   { id: "vr-3", topic: "Slow software — show & tell", vibe: "Curious", hostId: "u-kenji", speakers: ["u-kenji"], listeners: 91, live: true },
   { id: "vr-4", topic: "City walks, quietly described", vibe: "Quiet", hostId: "u-noor", speakers: ["u-noor"], listeners: 58, live: false },
+  { id: "vr-5", topic: "Director's commentary, live", vibe: "Curious", hostId: "u-mira", speakers: ["u-mira"], listeners: 142, live: true },
 ];
 
 export const SEED_PATHS: LearnPath[] = [
   { id: "lp-1", title: "Composing for Buildings", curator: "Aria Volkov", modules: 8, progress: 0.42, toneIndex: 0, category: "Sound" },
   { id: "lp-2", title: "Founder Nervous System", curator: "Inés Castro", modules: 12, progress: 0.18, toneIndex: 2, category: "Wellness" },
-  { id: "lp-3", title: "Slow Software, fast ideas", curator: "Kenji Park", modules: 10, progress: 0.71, toneIndex: 1, category: "Craft" },
+  { id: "lp-3", title: "Slow software, fast ideas", curator: "Kenji Park", modules: 10, progress: 0.71, toneIndex: 1, category: "Craft" },
   { id: "lp-4", title: "Cities as Poems", curator: "Noor Hadid", modules: 6, progress: 0.0, toneIndex: 0, category: "Writing" },
   { id: "lp-5", title: "Field Recording 101", curator: "Theo Marsh", modules: 5, progress: 1, toneIndex: 1, category: "Sound" },
+  { id: "lp-6", title: "Color and Light, on a budget", curator: "Mira Okafor", modules: 7, progress: 0.28, toneIndex: 2, category: "Film" },
 ];
+
+export const SEED_NOTIFICATIONS: ElysiumNotification[] = [
+  { id: "n-1", kind: "resonance", actorId: "u-aria", postId: "p-9", body: "resonated with your post", createdAt: now - 1000 * 60 * 4, read: false },
+  { id: "n-2", kind: "comment", actorId: "u-ines", postId: "p-9", body: "commented: \"this is the soft internet i've been waiting for\"", createdAt: now - 1000 * 60 * 9, read: false },
+  { id: "n-3", kind: "follow", actorId: "u-mira", body: "started following you", createdAt: now - 1000 * 60 * 22, read: false },
+  { id: "n-4", kind: "voice_live", actorId: "u-ines", voiceRoomId: "vr-1", body: "is live: \"What stops you from finishing?\"", createdAt: now - 1000 * 60 * 38, read: false },
+  { id: "n-5", kind: "mention", actorId: "u-kenji", postId: "p-3", body: "mentioned you in a project post", createdAt: now - 1000 * 60 * 60, read: true },
+  { id: "n-6", kind: "hub_invite", actorId: "u-noor", hubId: "h-5", body: "invited you to the Long Takes hub", createdAt: now - 1000 * 60 * 60 * 2, read: true },
+  { id: "n-7", kind: "story_view", actorId: "u-julien", body: "viewed your story", createdAt: now - 1000 * 60 * 60 * 3, read: true },
+  { id: "n-8", kind: "resonance", actorId: "u-theo", postId: "p-9", body: "sparked your post", createdAt: now - 1000 * 60 * 60 * 4, read: true },
+  { id: "n-9", kind: "follow", actorId: "u-julien", body: "started following you", createdAt: now - 1000 * 60 * 60 * 8, read: true },
+  { id: "n-10", kind: "comment", actorId: "u-aria", postId: "p-9", body: "commented: \"welcome — drop a voice note when you can\"", createdAt: now - 1000 * 60 * 60 * 14, read: true },
+];
+
+export const SEED_TRENDING: TrendingTag[] = [
+  { tag: "Sound", posts: 1842, delta: 0.34, toneIndex: 0 },
+  { tag: "StartupLife", posts: 922, delta: 0.18, toneIndex: 2 },
+  { tag: "Healing", posts: 1124, delta: 0.41, toneIndex: 1 },
+  { tag: "Berlin", posts: 488, delta: 0.12, toneIndex: 0 },
+  { tag: "Slow", posts: 712, delta: 0.27, toneIndex: 1 },
+  { tag: "Film", posts: 622, delta: 0.22, toneIndex: 2 },
+  { tag: "Founders", posts: 1244, delta: 0.31, toneIndex: 0 },
+  { tag: "Sleep", posts: 311, delta: 0.08, toneIndex: 1 },
+];
+
+export const SEED_FOLLOWING: string[] = ["u-aria", "u-ines", "u-noor"];

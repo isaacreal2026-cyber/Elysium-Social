@@ -31,6 +31,9 @@ function RootLayoutNav() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="orbit" />
+      <Stack.Screen name="search" />
+      <Stack.Screen name="notifications" />
       <Stack.Screen name="feed" />
       <Stack.Screen name="discover" />
       <Stack.Screen name="connections" />
@@ -39,9 +42,12 @@ function RootLayoutNav() {
       <Stack.Screen name="me" />
       <Stack.Screen name="composer" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
       <Stack.Screen name="voice-party" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
+      <Stack.Screen name="story/[id]" options={{ presentation: "fullScreenModal", animation: "fade" }} />
       <Stack.Screen name="post/[id]" />
       <Stack.Screen name="hub/[id]" />
       <Stack.Screen name="messages/[id]" />
+      <Stack.Screen name="profile/[id]" />
+      <Stack.Screen name="tag/[name]" />
     </Stack>
   );
 }

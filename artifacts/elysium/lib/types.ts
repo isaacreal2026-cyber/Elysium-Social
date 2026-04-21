@@ -15,6 +15,8 @@ export interface ElysiumUser {
   destinations: string[];
   alignmentScore: number;
   weeklyVisitors: number;
+  followers: number;
+  following: number;
   online: boolean;
 }
 
@@ -50,6 +52,8 @@ export interface Post {
   energy: number;
   createdAt: number;
   nestedPostIds?: string[];
+  commentCount: number;
+  shareCount: number;
 }
 
 export interface Comment {
@@ -71,6 +75,8 @@ export interface DestinyStory {
   destinations: string[];
   toneIndex: number;
   resonance: number;
+  viewers: number;
+  createdAt: number;
 }
 
 export interface NexusHub {
@@ -121,4 +127,32 @@ export interface LearnPath {
   progress: number;
   toneIndex: number;
   category: string;
+}
+
+export type NotificationKind =
+  | "resonance"
+  | "comment"
+  | "follow"
+  | "mention"
+  | "hub_invite"
+  | "voice_live"
+  | "story_view";
+
+export interface ElysiumNotification {
+  id: string;
+  kind: NotificationKind;
+  actorId: string;
+  postId?: string;
+  hubId?: string;
+  voiceRoomId?: string;
+  body: string;
+  createdAt: number;
+  read: boolean;
+}
+
+export interface TrendingTag {
+  tag: string;
+  posts: number;
+  delta: number;
+  toneIndex: number;
 }
