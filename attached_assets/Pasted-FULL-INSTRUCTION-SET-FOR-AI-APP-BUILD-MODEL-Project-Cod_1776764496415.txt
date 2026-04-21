@@ -1,0 +1,116 @@
+FULL INSTRUCTION SET FOR AI APP BUILD MODEL
+
+Project Code Name: Project Elysium
+Final App Name: ELYSIUM
+Tagline: "Where every connection resonates."
+
+1. Vision & Core Philosophy (Critical for AI to understand intent)
+Build a social platform engineered to reach 1 billion+ downloads within 5–7 years by being emotionally addictive yet mentally healthy, combining the best DNA of Instagram, TikTok, Discord, Tinder, Threads, and LinkedIn — but executed in a completely fresh, non-copycat way that feels like the first next-generation social operating system.
+
+The core differentiator is the Resonance Engine — an advanced behavioral + emotional AI layer that actively stimulates meaningful interactions without being creepy. Every feature must feel alive.
+
+Non-negotiable rules for uniqueness (anti-cloning layer):
+
+Never use standard UI patterns (bottom nav with 5 icons). Use Orbital Navigation (central orb + floating contextual orbs that expand).
+Every interaction must create visible, beautiful ripple/visual feedback in the network.
+Deep nesting: Content is fractal. A post can contain entire sub-worlds.
+2.5D/Depth-first interface (advanced parallax, depth layers, subtle 3D transforms) while remaining buttery smooth on mid-range phones.
+2. Core Features (Detailed Specification)
+A. Navigation & Information Architecture (Unique & Simple)
+Central Orb (home) — taps to expand into 6 contextual orbs: Feed, Discover, Connections, Groups, Gather, Me.
+All features are context-aware. The UI reorganizes itself based on what the user is doing (smart contextual UI).
+B. The Resonance Engine (The "Secret Sauce")
+Advanced AI that understands emotional tone, interest depth, and social energy.
+Predicts "spark moments" and gently nudges users to engage in ways that create real dopamine from connection, not rage.
+Powers smart notifications, suggested replies, group formations, and content distribution.
+C. Feed System (Most Advanced in Market)
+Primary Vibe Feed — algorithmically perfect mix.
+Orbital Feeds (swipe radially):
+Moments (ephemeral)
+Memories (AI-curated past highlights)
+Events (nearby & global)
+Friends Activity
+Learning Feed
+Geo Pulse (location-based)
+D. Posting & Interaction System (Next-Gen)
+Post Types:
+
+Classic, Photo/Video, Voice-First, Live, Destiny Story, Project Post, Poll, Question
+Unique Interaction Buttons (Resonance Set):
+
+Spark (main like — creates energy ripple)
+Flame (deep love/appreciation)
+Echo (repost with credit + option to add your resonance)
+Sync (agree/align — builds public alignment score)
+Resonate (laugh/cry/react with voice note 3-sec burst)
+Link (adds post to your personal "Network Graph" — visible only to you and close circle)
+Comment System:
+
+Deep fractal threading (deeper and cleaner than Threads).
+Voice comments, threaded voice conversations.
+"Laughing Threads" — dedicated humorous sub-threads that can go viral independently.
+E. Destiny Stories
+Stories 2.0 with smart tagging system.
+Users tag "destinations" (life goals, cities, careers, hobbies, events).
+Algorithm targets distribution like ads but user-controlled and transparent.
+Stories can contain mini interactive experiences.
+F. Messaging & Voice (Extremely Strong)
+Standard DM + advanced features:
+Random Voice Party (Tinder-meets-Omegle but high quality, interest-matched, moderated, with exit ramps).
+Organized Voice Rooms (persistent or scheduled).
+Project Chat Mode — turns any chat into a collaborative workspace (brainstorm canvas, shared notes, moodboard, task list).
+G. Groups & Hubs (The Killer Feature)
+Groups are 3D-dynamic digital spaces (implemented as advanced 2.5D layers):
+
+Called Nexus Hubs.
+Posts inside groups can contain nested full posts (fractal content).
+"Windows" system — multiple content layers visible simultaneously like spatial windows.
+Author can turn any post into Project Mode — collaborative canvas for brainstorming, world-building, business planning.
+Strong visual connection between members (avatars orbit the hub when active).
+H. Gather Section (Learning + Growth)
+Learn Path — structured courses created by creators + AI.
+Library — articles, books, deep reads.
+Video Zone — long and short form, with social layering.
+All content can be discussed inside the content itself.
+I. Profile ("Soulprint")
+Rich, beautiful profile with:
+
+Moments timeline
+Weekly Visitors (anonymous count + "who peeked" for close friends)
+Personality tags + hobby tags + life phase tags
+Introduction with voice note option
+Image collection with deep linking
+File library
+Contact info vault (share selectively)
+Network Graph visualization
+Friend Adding:
+
+By personality match
+Geo-location (with strong consent layers)
+Shared tags (school, region, interests, values)
+3. Technical & Future-Proof Requirements
+Core Architecture:
+
+Flutter + Dart (cross-platform excellence)
+Backend: Firebase + custom Node.js/Go microservices for heavy features
+Database: Combination of Firestore + PostgreSQL + Graph database (for Network Graph)
+AI Layer: On-device small models + cloud large models (Resonance Engine)
+Real-time: WebSockets + WebRTC for voice
+Graphics: Heavy use of Rive + custom shaders for beautiful depth and particles
+Future-Proofing:
+
+Designed for AR glasses integration from day one (spatial groups)
+Open protocol layer planned for Year 3 (federation possibility)
+User data ownership — export everything, including interaction graph
+Anti-Steal Protections (Unique Implementations):
+
+Patentable: "Fractal Nested Content System"
+Patentable: "Resonance Propagation Engine"
+Visual language + micro-interactions must be signature (make them extremely distinct)
+"Soulprint" profile architecture
+4. Safety, Ethics & Sustainability
+Advanced AI moderation + human oversight
+Built-in digital wellness (gentle usage insights, not restrictions)
+Strong anti-addiction behavioral design
+Age gating + youth protection modes
+Transparent algorithm (user can see why they saw something)

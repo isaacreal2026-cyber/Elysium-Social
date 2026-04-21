@@ -1,0 +1,142 @@
+1. Vision & Core Identity
+ELYSIUM is the social operating system for the next decade.
+It fuses the virality of TikTok, the intimacy of close friends, the depth of Discord, the discovery of dating apps, and the utility of LinkedIn into one elegant, living ecosystem.
+
+Core Promise: Every interaction creates resonance.
+
+Signature Differentiators (Anti-Cloning Protection):
+
+Orbital Navigation System — No traditional bottom tab bar. Central glowing orb with context-aware floating orbs.
+Resonance Engine — Proprietary AI that actively cultivates meaningful engagement.
+Fractal Content System — Any post can contain fully functional nested posts/worlds.
+Spatial Hubs — Groups feel like 2.5D living rooms with depth, layers, and orbiting elements.
+Soulprint Profiles — Rich, evolving digital identities.
+Tagline: "Where every connection resonates."
+
+2. Information Architecture (Text Diagram)
+text
+
+Central Orb (Home)
+   ├── Feed Orb → Vibe Feed + Orbital Switches (Moments, Memories, Events, Geo Pulse, Learning)
+   ├── Discover Orb → Destiny Stories, Random Voice Party, Trending Hubs
+   ├── Connections Orb → Messages, Voice Rooms, My Network Graph, Add Friends
+   ├── Groups Orb → Nexus Hubs (Spatial)
+   ├── Gather Orb → Learn Paths, Library, Video Zone, Courses
+   └── Me Orb → Soulprint Profile, Moments, Settings
+All orbs expand with beautiful spring physics and particle systems when activated.
+
+3. Feature Prioritization
+MVP (Month 1-4)
+
+Orbital Navigation
+Vibe Feed + basic Resonance
+Posting (media + voice)
+Resonance buttons (Spark, Flame, Echo, Sync, Resonate)
+Deep fractal comments
+DM + Voice messages
+Basic Groups (with nesting)
+Soulprint Profile (basic)
+Destiny Stories
+Random Voice Party (moderated)
+Phase 2 (Month 5-8)
+
+Spatial Nexus Hubs (2.5D)
+Project Chat / Brainstorm Canvas inside posts
+Full Gather section (Learn + Library)
+Advanced Resonance Engine + smart notifications
+Weekly Visitors + personality tagging
+Geo + interest friend finding
+Memories feed (AI generated)
+Phase 3 (Month 9-14)
+
+Full 3-layer fractal nesting
+AR-ready Spatial Hubs
+Personality Weave (long-term AI profile)
+Creator monetization tools
+Federation protocol foundation
+Advanced analytics for users
+4. UI/UX Design System (Signature Style)
+Philosophy: Beautiful, alive, emotional, calm, premium.
+
+Color System: Deep cosmic gradients (deep purples, teals, golds) with reactive glows based on user energy.
+Typography: "Satoshi" or "Neue Montreal" with variable weight.
+Motion: All interactions use spring physics (Flutter's SpringSimulation). Heavy use of particle systems on resonance actions.
+Depth System: Every screen has 4 layers of parallax depth.
+Signature Elements:
+Glowing central orb with breathing animation
+Resonance actions create visible energy ripples that can propagate to friends
+Content cards have "living borders" that react to interaction volume
+Navigation Rule: Everything must feel one or two gestures away.
+
+5. Resonance Engine (Core AI Brain)
+Function:
+
+Analyzes content tone, user emotional history, interest graph, and current energy level.
+Suggests optimal interaction timing and type.
+Creates "Spark Moments" — notifies small groups of people simultaneously to join the same post for collective resonance.
+Powers intelligent feed ranking and notification timing.
+Privacy-First Implementation:
+
+On-device small models for personal data
+Cloud models only on anonymized aggregated data
+User can see "Why am I seeing this?" with full transparency
+6. Database Schema Outline (High Level)
+Key Collections:
+
+Users (Soulprint data, personality weave, network graph)
+Posts (fractal — parent_post_id, depth_level, content_container)
+Resonance_Actions (user_id, post_id, type, energy_value)
+Nexus_Hubs (spatial metadata, member_avatars positions)
+Messages (standard + voice + project_mode)
+Gather_Content (courses with progress paths)
+Use hybrid: Firestore for real-time + PostgreSQL for complex queries + Neo4j for social graph.
+
+7. Detailed Feature Specifications
+Feed:
+
+Infinite scroll with seamless orbital switching
+Each post card shows live resonance count with visual meter
+Posting:
+
+Unified composer with tabs: Visual, Voice-First, Project, Destiny Story
+Ability to "plant" a post inside another post
+Spatial Nexus Hubs (Groups):
+
+2.5D canvas where posts float as 3D-like cards
+Members' avatars orbit active content
+Author can activate "Project Mode" turning the hub into collaborative workspace (shared canvas, tasks, moodboard, voice chat)
+Destiny Stories:
+
+15-second vertical content
+Smart tagging system: #Paris2026 #StartupLife #HealingJourney
+Algorithm respects user-defined targeting "destinations"
+Voice Features:
+
+Random Voice Party: Interest + personality matched, 4-8 people max, easy exit, auto-moderation
+Persistent Voice Rooms inside Hubs
+Profile (Soulprint):
+
+Hero visual with dynamic background based on recent activity
+Sections: Introduction (voice + text), Tags, Moments Timeline, Weekly Visitors (privacy controlled), Image Garden, File Vault, Links
+Add Friends:
+
+Multiple intelligent ways: Personality match, Geo (opt-in), Shared tags, "Resonate with me" QR/code
+8. Technical Stack
+Frontend: Flutter 3.24+ (single codebase)
+State Management: Riverpod + Signals
+Animations: Rive + Custom shaders (impeller)
+Backend: Firebase (auth, storage, basic realtime) + Supabase/PostgreSQL + Custom Go services for Resonance Engine
+AI: TensorFlow Lite (on-device) + Grok/Claude API layer (cloud)
+Real-time Voice: WebRTC + Agora fallback
+Analytics: Mixpanel + custom privacy-first tracking
+9. Monetization (Billion-Download Scale)
+Freemium model
+Creator tools + subscriptions
+Sponsored "Destiny" placements (ethical)
+Virtual gifts during resonance moments
+Enterprise hubs for companies/communities
+10. Safety & Ethics
+Multi-layer moderation (AI + community + human)
+Built-in 21-day "Resonance Reset" gentle usage coach
+Strict anti-harassment system using emotional tone detection
+Age-appropriate modes

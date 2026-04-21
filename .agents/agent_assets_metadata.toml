@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "4SpaDPJVEmTmoeX5fhTnP"
+uri = "file://artifacts/elysium/assets/images/icon.png"
+type = "image"
+title = "elysium cosmic orb icon"
+
+[[generated]]
+id = "QjnmSBPWLobuLUsQCBW98"
+uri = "file://artifacts/elysium/assets/images/nebula1.png"
+type = "image"
+title = "nebula gradient one"
+
+[[generated]]
+id = "gicpIRy4bKC9u-8x7vcve"
+uri = "file://artifacts/elysium/assets/images/nebula2.png"
+type = "image"
+title = "aurora ripple two"
+
+[[generated]]
+id = "F5NpzF7VgJQaNFErU1bGa"
+uri = "file://artifacts/elysium/assets/images/nebula3.png"
+type = "image"
+title = "liquid orb three"
