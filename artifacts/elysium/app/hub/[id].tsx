@@ -117,7 +117,7 @@ function Orbiter({ color, glyph, index, total }: { color: string; glyph: string;
     };
   });
   return (
-    <Animated.View style={[styles.orbiter, { backgroundColor: color, shadowColor: color }, style]}>
+    <Animated.View style={[styles.orbiter, { backgroundColor: color }, style]}>
       <Text style={styles.orbiterText}>{glyph}</Text>
     </Animated.View>
   );
@@ -156,8 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
-    shadowOpacity: 0.9,
-    shadowRadius: 12,
     borderWidth: 2,
     borderColor: "rgba(255,255,255,0.3)",
   },

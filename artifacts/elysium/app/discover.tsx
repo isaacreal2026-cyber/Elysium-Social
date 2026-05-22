@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,255,255,0.6)",
   },
   storyAvatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 12 },
-  liveDot: { width: 7, height: 7, borderRadius: 4, shadowColor: "#FFD56B", shadowOpacity: 1, shadowRadius: 6 },
+  liveDot: { width: 7, height: 7, borderRadius: 4 },
   storyBottom: { position: "absolute", bottom: 12, left: 12, right: 12 },
   storyCap: { color: "#fff", fontFamily: "Inter_600SemiBold", fontSize: 13, lineHeight: 17 },
   storyDest: { fontSize: 10, fontFamily: "Inter_500Medium" },

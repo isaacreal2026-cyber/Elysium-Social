@@ -1,99 +1,172 @@
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { PostCard } from "@/components/PostCard";
 import { ScreenShell } from "@/components/ScreenShell";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
 
+const TABS = [
+  { key: "moments", label: "Moments", icon: "feather" as const },
+  { key: "saved", label: "Saved", icon: "bookmark" as const },
+  { key: "profile", label: "Profile", icon: "user" as const },
+];
+
 export default function MeScreen() {
   const colors = useColors();
-  const { userById, selfId, posts } = useResonance();
+  const { userById, selfId, posts, bookmarks } = useResonance();
   const me = userById(selfId)!;
   const myMoments = posts.filter((p) => p.authorId === selfId);
+  const savedPosts = posts.filter((p) => bookmarks[p.id]);
+  const [tab, setTab] = useState<"moments" | "saved" | "profile">("moments");
+
+  const totalResonance = myMoments.reduce((acc, p) => {
+    return acc + Object.values(p.resonance).reduce((a, b) => a + b, 0);
+  }, 0);
 
   return (
-    <ScreenShell title="Soulprint" subtitle="your living portrait">
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
-        <View style={styles.heroWrap}>
+    <ScreenShell title="My Soulprint" subtitle="your living portrait" showBack={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 130 }}>
+        {/* Cover */}
+        <View style={styles.coverWrap}>
           <Image source={require("@/assets/images/nebula3.png")} style={StyleSheet.absoluteFill} contentFit="cover" />
-          <LinearGradient colors={["rgba(7,2,26,0.2)", "rgba(7,2,26,0.95)"]} style={StyleSheet.absoluteFill} />
-          <View style={styles.heroInner}>
-            <View style={[styles.heroAvatar, { backgroundColor: me.avatarColor }]}>
-              <Text style={styles.heroAvatarText}>{me.avatarGlyph}</Text>
+          <LinearGradient colors={["rgba(7,2,26,0.15)", "rgba(7,2,26,0.92)"]} style={StyleSheet.absoluteFill} />
+          <View style={styles.coverInner}>
+            <View style={[styles.avatar, { backgroundColor: me.avatarColor, borderColor: colors.background }]}>
+              <Text style={styles.avatarText}>{me.avatarGlyph}</Text>
+              <View style={[styles.onlineDot, { backgroundColor: colors.emerald, borderColor: colors.background }]} />
             </View>
-            <Text style={styles.heroName}>{me.name}</Text>
-            <Text style={styles.heroHandle}>{me.handle} · {me.city}</Text>
-            <Text style={styles.heroBio}>{me.bio}</Text>
-            <View style={styles.heroVoice}>
-              <Feather name="play" size={12} color="#0E0524" />
-              <Text style={styles.heroVoiceText}>intro · {me.introVoiceSeconds}s</Text>
+            <Text style={[styles.name, { color: "#fff" }]}>{me.name}</Text>
+            <Text style={[styles.handle, { color: "rgba(245,240,255,0.7)" }]}>{me.handle} · {me.city}</Text>
+            <Text style={[styles.bio, { color: "rgba(245,240,255,0.85)" }]}>{me.bio}</Text>
+
+            {/* Voice intro pill */}
+            <View style={styles.voicePill}>
+              <View style={[styles.voicePlay, { backgroundColor: colors.gold }]}>
+                <Feather name="play" size={10} color="#0E0524" />
+              </View>
+              <View style={styles.miniWave}>
+                {Array.from({ length: 18 }).map((_, i) => (
+                  <View key={i} style={[styles.miniBar, { height: 3 + Math.abs(Math.sin(i * 0.6)) * 12, backgroundColor: colors.gold }]} />
+                ))}
+              </View>
+              <Text style={[styles.voiceTime, { color: colors.gold }]}>intro · {me.introVoiceSeconds}s</Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.statsRow}>
-          <Stat label="alignment" value={`${Math.round(me.alignmentScore * 100)}`} color={colors.primary} />
-          <Stat label="visitors / wk" value={`${me.weeklyVisitors}`} color={colors.gold} />
-          <Stat label="moments" value={`${myMoments.length}`} color={colors.teal} />
+        {/* Stats bar */}
+        <View style={[styles.statsBar, { borderColor: colors.border, backgroundColor: colors.card }]}>
+          <StatCell label="Followers" value={me.followers >= 1000 ? `${(me.followers / 1000).toFixed(1)}k` : String(me.followers)} color={colors.primary} />
+          <View style={[styles.statDiv, { backgroundColor: colors.border }]} />
+          <StatCell label="Following" value={String(me.following)} color={colors.teal} />
+          <View style={[styles.statDiv, { backgroundColor: colors.border }]} />
+          <StatCell label="Resonance" value={totalResonance >= 1000 ? `${(totalResonance / 1000).toFixed(1)}k` : String(totalResonance)} color={colors.gold} />
+          <View style={[styles.statDiv, { backgroundColor: colors.border }]} />
+          <StatCell label="Alignment" value={`${Math.round(me.alignmentScore * 100)}%`} color={colors.magenta} />
         </View>
 
-        <Section title="Personality" icon="user">
-          <View style={styles.tagRow}>
-            {me.tags.map((t) => (
-              <View key={t} style={[styles.tag, { borderColor: colors.border, backgroundColor: "rgba(181,123,255,0.08)" }]}>
-                <Text style={[styles.tagText, { color: colors.primary }]}>{t}</Text>
-              </View>
-            ))}
-          </View>
-        </Section>
+        {/* Actions */}
+        <View style={styles.actionsRow}>
+          <Pressable
+            onPress={() => router.push("/composer" as never)}
+            style={[styles.actionBtn, { backgroundColor: colors.primary, flex: 2 }]}
+          >
+            <Feather name="plus" size={15} color="#fff" />
+            <Text style={styles.actionBtnText}>Compose</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/orbit" as never)}
+            style={[styles.actionBtn, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, flex: 1 }]}
+          >
+            <Feather name="grid" size={15} color={colors.text} />
+            <Text style={[styles.actionBtnText, { color: colors.text }]}>Orbit</Text>
+          </Pressable>
+        </View>
 
-        <Section title="Destinations" icon="navigation">
-          <View style={styles.tagRow}>
-            {me.destinations.map((t) => (
-              <View key={t} style={[styles.tag, { borderColor: colors.border, backgroundColor: "rgba(255,213,107,0.08)" }]}>
-                <Text style={[styles.tagText, { color: colors.gold }]}>↗ {t}</Text>
-              </View>
-            ))}
-          </View>
-        </Section>
+        {/* Tabs */}
+        <View style={[styles.tabRow, { borderColor: colors.border }]}>
+          {TABS.map((t) => {
+            const active = t.key === tab;
+            return (
+              <Pressable
+                key={t.key}
+                onPress={() => setTab(t.key as typeof tab)}
+                style={[styles.tab, { borderBottomColor: active ? colors.primary : "transparent" }]}
+              >
+                <Feather name={t.icon} size={14} color={active ? colors.primary : colors.mutedForeground} />
+                <Text style={[styles.tabText, { color: active ? colors.primary : colors.mutedForeground }]}>
+                  {t.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
 
-        <Section title="Weekly Visitors" icon="eye">
-          <View style={[styles.visitorBox, { borderColor: colors.border, backgroundColor: colors.card }]}>
-            <Text style={[styles.visitorBig, { color: colors.text }]}>{me.weeklyVisitors}</Text>
-            <Text style={[styles.visitorCaption, { color: colors.mutedForeground }]}>
-              soulprint visits over the past 7 days · 4 close friends peeked
-            </Text>
-          </View>
-        </Section>
-
-        <Section title="Moments" icon="image">
-          {myMoments.length === 0 ? (
-            <View style={[styles.empty, { borderColor: colors.border }]}>
-              <Feather name="feather" size={24} color={colors.mutedForeground} />
-              <Text style={{ color: colors.mutedForeground, marginTop: 8, fontFamily: "Inter_500Medium" }}>
-                you haven't posted yet — drop a voice note from the composer
-              </Text>
-            </View>
+        {/* Tab content */}
+        <View style={{ paddingHorizontal: 16 }}>
+          {tab === "moments" ? (
+            myMoments.length === 0 ? (
+              <EmptyState icon="feather" text="no moments yet — compose your first" />
+            ) : (
+              myMoments.map((p) => <PostCard key={p.id} post={p} />)
+            )
+          ) : tab === "saved" ? (
+            savedPosts.length === 0 ? (
+              <EmptyState icon="bookmark" text="nothing saved yet" />
+            ) : (
+              savedPosts.map((p) => <PostCard key={p.id} post={p} />)
+            )
           ) : (
-            <View style={{ paddingHorizontal: 16 }}>
-              {myMoments.map((m) => (
-                <PostCard key={m.id} post={m} />
-              ))}
+            /* Profile tab */
+            <View style={{ gap: 16, paddingTop: 16 }}>
+              <Section title="Personality" icon="smile">
+                <View style={styles.chipRow}>
+                  {me.tags.map((t) => (
+                    <View key={t} style={[styles.chip, { borderColor: colors.border, backgroundColor: colors.primary + "12" }]}>
+                      <Text style={[styles.chipText, { color: colors.primary }]}>{t}</Text>
+                    </View>
+                  ))}
+                </View>
+              </Section>
+
+              <Section title="Destinations" icon="navigation">
+                <View style={styles.chipRow}>
+                  {me.destinations.map((d) => (
+                    <Pressable
+                      key={d}
+                      onPress={() => router.push(`/tag/${d}` as never)}
+                      style={[styles.chip, { borderColor: colors.gold + "55", backgroundColor: colors.gold + "12" }]}
+                    >
+                      <Feather name="navigation" size={10} color={colors.gold} />
+                      <Text style={[styles.chipText, { color: colors.gold }]}>{d}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </Section>
+
+              <Section title="Activity" icon="bar-chart-2">
+                <View style={[styles.activityCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <ActivityRow label="Weekly visitors" value={me.weeklyVisitors} color={colors.teal} />
+                  <ActivityRow label="Moments shared" value={myMoments.length} color={colors.primary} />
+                  <ActivityRow label="Alignment score" value={`${Math.round(me.alignmentScore * 100)}%`} color={colors.gold} />
+                </View>
+              </Section>
             </View>
           )}
-        </Section>
+        </View>
       </ScrollView>
     </ScreenShell>
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: string; color: string }) {
+function StatCell({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <View style={styles.stat}>
+    <View style={styles.statCell}>
       <Text style={[styles.statValue, { color }]}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
@@ -101,78 +174,136 @@ function Stat({ label, value, color }: { label: string; value: string; color: st
 }
 
 function Section({ title, icon, children }: { title: string; icon: React.ComponentProps<typeof Feather>["name"]; children: React.ReactNode }) {
+  const colors = useColors();
   return (
-    <View style={{ marginTop: 22 }}>
-      <View style={styles.sectionHeader}>
-        <Feather name={icon} size={12} color="#A89AC8" />
-        <Text style={styles.sectionTitle}>{title.toUpperCase()}</Text>
+    <View>
+      <View style={styles.sectionHead}>
+        <Feather name={icon} size={12} color={colors.mutedForeground} />
+        <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>{title.toUpperCase()}</Text>
       </View>
-      <View style={{ paddingHorizontal: 16 }}>{children}</View>
+      {children}
+    </View>
+  );
+}
+
+function ActivityRow({ label, value, color }: { label: string; value: string | number; color: string }) {
+  const colors = useColors();
+  return (
+    <View style={styles.activityRow}>
+      <Text style={[styles.activityLabel, { color: colors.mutedForeground }]}>{label}</Text>
+      <Text style={[styles.activityValue, { color }]}>{value}</Text>
+    </View>
+  );
+}
+
+function EmptyState({ icon, text }: { icon: React.ComponentProps<typeof Feather>["name"]; text: string }) {
+  const colors = useColors();
+  return (
+    <View style={[styles.empty, { borderColor: colors.border }]}>
+      <Feather name={icon} size={22} color={colors.mutedForeground} />
+      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13 }}>{text}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  heroWrap: {
-    height: 280,
-    overflow: "hidden",
-    margin: 16,
-    borderRadius: 24,
-  },
-  heroInner: { padding: 22, paddingTop: 36, gap: 6, flex: 1, justifyContent: "flex-end" },
-  heroAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+  coverWrap: { height: 240, position: "relative" },
+  coverInner: { position: "absolute", bottom: 0, left: 0, right: 0, padding: 20, gap: 4 },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: "rgba(255,255,255,0.4)",
+    marginBottom: 8,
+    position: "relative",
   },
-  heroAvatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 24 },
-  heroName: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 26, letterSpacing: -0.5, marginTop: 6 },
-  heroHandle: { color: "#A89AC8", fontFamily: "Inter_500Medium", fontSize: 13 },
-  heroBio: { color: "#F5F0FF", fontFamily: "Inter_400Regular", fontSize: 14, lineHeight: 20, marginTop: 4 },
-  heroVoice: {
+  avatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 28 },
+  onlineDot: { position: "absolute", bottom: 2, right: 2, width: 14, height: 14, borderRadius: 7, borderWidth: 2 },
+  name: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.5 },
+  handle: { fontFamily: "Inter_400Regular", fontSize: 13 },
+  bio: { fontFamily: "Inter_400Regular", fontSize: 14, lineHeight: 20, marginTop: 4 },
+  voicePill: {
     flexDirection: "row",
-    alignSelf: "flex-start",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#FFD56B",
+    alignSelf: "flex-start",
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 999,
-    marginTop: 10,
+    backgroundColor: "rgba(255,213,107,0.12)",
+    marginTop: 8,
   },
-  heroVoiceText: { color: "#0E0524", fontFamily: "Inter_600SemiBold", fontSize: 11 },
-  statsRow: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    gap: 10,
-  },
-  stat: {
-    flex: 1,
-    padding: 14,
-    backgroundColor: "rgba(245,240,255,0.04)",
-    borderRadius: 16,
-    alignItems: "center",
-  },
-  statValue: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.4 },
-  statLabel: { fontFamily: "Inter_500Medium", fontSize: 10, color: "#A89AC8", marginTop: 4, letterSpacing: 0.4, textTransform: "uppercase" },
-  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 20, marginBottom: 8 },
-  sectionTitle: { color: "#A89AC8", fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 1.2 },
-  tagRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  tag: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1 },
-  tagText: { fontFamily: "Inter_600SemiBold", fontSize: 12 },
-  visitorBox: { padding: 16, borderRadius: 18, borderWidth: 1 },
-  visitorBig: { fontFamily: "Inter_700Bold", fontSize: 32 },
-  visitorCaption: { fontFamily: "Inter_400Regular", fontSize: 12, marginTop: 6 },
-  empty: {
-    margin: 16,
-    padding: 24,
+  voicePlay: { width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  miniWave: { flexDirection: "row", alignItems: "center", gap: 2, height: 16 },
+  miniBar: { width: 2, borderRadius: 1 },
+  voiceTime: { fontFamily: "Inter_700Bold", fontSize: 11 },
+  statsBar: {
+    marginHorizontal: 14,
+    marginTop: 14,
     borderRadius: 18,
+    borderWidth: 1,
+    flexDirection: "row",
+    paddingVertical: 14,
+  },
+  statCell: { flex: 1, alignItems: "center" },
+  statValue: { fontFamily: "Inter_700Bold", fontSize: 16 },
+  statLabel: { color: "#A89AC8", fontFamily: "Inter_500Medium", fontSize: 10, marginTop: 2, letterSpacing: 0.3 },
+  statDiv: { width: 1, alignSelf: "stretch", marginVertical: 4 },
+  actionsRow: { flexDirection: "row", gap: 10, paddingHorizontal: 14, marginTop: 14 },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingVertical: 11,
+    borderRadius: 999,
+  },
+  actionBtnText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13 },
+  tabRow: { flexDirection: "row", marginTop: 18, marginHorizontal: 14, borderBottomWidth: 1 },
+  tab: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    gap: 5,
+    borderBottomWidth: 2,
+  },
+  tabText: { fontFamily: "Inter_600SemiBold", fontSize: 12 },
+  sectionHead: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 10 },
+  sectionTitle: { fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 1.1 },
+  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 7 },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  chipText: { fontFamily: "Inter_600SemiBold", fontSize: 12 },
+  activityCard: { borderRadius: 16, borderWidth: 1, overflow: "hidden" },
+  activityRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "rgba(245,240,255,0.06)",
+  },
+  activityLabel: { fontFamily: "Inter_500Medium", fontSize: 13 },
+  activityValue: { fontFamily: "Inter_700Bold", fontSize: 14 },
+  empty: {
+    marginTop: 16,
+    padding: 28,
+    borderRadius: 16,
     borderWidth: 1,
     borderStyle: "dashed",
     alignItems: "center",
+    gap: 8,
   },
 });

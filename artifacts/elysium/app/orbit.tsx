@@ -26,6 +26,7 @@ interface OrbDef {
   icon: React.ComponentProps<typeof Feather>["name"];
   route: string;
   colors: [string, string];
+  count?: string;
 }
 
 const ORBS: OrbDef[] = [
@@ -37,7 +38,7 @@ const ORBS: OrbDef[] = [
   { key: "me", label: "Me", icon: "user", route: "/me", colors: ["#A78BFA", "#F472B6"] },
 ];
 
-const RADIUS = 130;
+const RADIUS = 128;
 
 export default function OrbitConstellation() {
   const colors = useColors();
@@ -49,81 +50,86 @@ export default function OrbitConstellation() {
 
   useEffect(() => {
     expand.value = withDelay(
-      300,
-      withSpring(expanded ? 1 : 0, { damping: 12, stiffness: 110 }),
+      200,
+      withSpring(expanded ? 1 : 0, { damping: 14, stiffness: 105 }),
     );
   }, [expanded, expand]);
 
   const livePost = posts.reduce((a, b) => (a.energy > b.energy ? a : b), posts[0]!);
-  const liveAuthor = userById(livePost.authorId);
+  const liveAuthor = userById(livePost?.authorId ?? "");
   const liveRoom = voiceRooms.find((v) => v.live);
 
-  const isWeb = Platform.OS === "web";
-  const topPad = (isWeb ? Math.max(insets.top, 16) : insets.top) + 8;
+  const topPad = (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 8;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <LinearGradient colors={["#150A2E", "#07021A"]} style={StyleSheet.absoluteFill} />
-      <StarField density={140} seed={11} />
+      <StarField density={90} seed={11} />
 
+      {/* Header */}
       <View style={[styles.topRow, { paddingTop: topPad }]}>
-        <Pressable onPress={() => router.back()} style={styles.iconBtn}>
-          <Feather name="chevron-down" size={22} color={colors.text} />
+        <Pressable onPress={() => router.back()} style={[styles.iconBtn, { backgroundColor: "rgba(245,240,255,0.06)", borderColor: colors.border }]}>
+          <Feather name="chevron-down" size={20} color={colors.text} />
         </Pressable>
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text style={[styles.tinyLabel, { color: colors.gold }]}>ORBITAL LAUNCHER</Text>
-          <Text style={[styles.greetingName, { color: colors.text }]}>welcome back, {me?.name?.toLowerCase() ?? "you"}</Text>
+          <Text style={[styles.greetName, { color: colors.text }]}>
+            {me?.name?.split(" ")[0]?.toLowerCase() ?? "you"}'s cosmos
+          </Text>
         </View>
         <Pressable
           onPress={() => router.push("/composer" as never)}
-          style={styles.iconBtn}
+          style={[styles.iconBtn, { backgroundColor: colors.primary + "22", borderColor: colors.primary + "44" }]}
         >
-          <Feather name="plus" size={20} color={colors.text} />
+          <Feather name="plus" size={20} color={colors.primary} />
         </Pressable>
       </View>
 
+      {/* Constellation */}
       <View style={styles.center}>
         <View style={styles.constellation}>
           {ORBS.map((orb, i) => (
             <FloatingOrb key={orb.key} orb={orb} index={i} expand={expand} />
           ))}
-          <Pressable onPress={() => setExpanded((e) => !e)}>
-            <GlowOrb
-              size={108}
-              colors={["#B57BFF", "#5EEAD4"]}
-              glyph="✦"
-              intensity={1.4}
-            />
+
+          {/* Center orb */}
+          <Pressable onPress={() => setExpanded((e) => !e)} style={styles.centerPressable}>
+            <GlowOrb size={104} colors={[colors.primary, "#5EEAD4"]} glyph="✦" intensity={1.3} />
           </Pressable>
         </View>
-        <Text style={[styles.tagline, { color: colors.mutedForeground }]}>
-          tap an orb · pull on a thread · let it resonate
+
+        <Text style={[styles.tagline, { color: colors.subtle }]}>
+          tap an orb · press center to collapse
         </Text>
       </View>
 
-      <View style={[styles.bottomDeck, { paddingBottom: insets.bottom + 16 }]}>
-        <Pressable
-          onPress={() => router.push(`/post/${livePost.id}` as never)}
-          style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-        >
-          <View style={styles.deckHeader}>
-            <View style={[styles.dot, { backgroundColor: colors.gold }]} />
-            <Text style={[styles.deckLabel, { color: colors.gold }]}>SPARK MOMENT</Text>
-          </View>
-          <Text style={[styles.deckTitle, { color: colors.text }]} numberOfLines={3}>
-            {liveAuthor?.name} just lit up the feed — {livePost.body.slice(0, 70)}…
-          </Text>
-        </Pressable>
+      {/* Live deck */}
+      <View style={[styles.deck, { paddingBottom: insets.bottom + 18 }]}>
+        {livePost ? (
+          <Pressable
+            onPress={() => router.push(`/post/${livePost.id}` as never)}
+            style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
+            <View style={styles.deckHead}>
+              <View style={[styles.deckDot, { backgroundColor: colors.gold }]} />
+              <Text style={[styles.deckTag, { color: colors.gold }]}>MOMENT</Text>
+            </View>
+            <Text style={[styles.deckBody, { color: colors.text }]} numberOfLines={2}>
+              {liveAuthor?.name} — {livePost.body.slice(0, 64)}
+            </Text>
+          </Pressable>
+        ) : null}
+
         {liveRoom ? (
           <Pressable
             onPress={() => router.push("/voice-party" as never)}
             style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
           >
-            <View style={styles.deckHeader}>
-              <View style={[styles.dot, { backgroundColor: colors.teal }]} />
-              <Text style={[styles.deckLabel, { color: colors.teal }]}>VOICE · LIVE</Text>
+            <View style={styles.deckHead}>
+              <View style={[styles.deckDot, { backgroundColor: colors.rose }]} />
+              <Text style={[styles.deckTag, { color: colors.rose }]}>LIVE</Text>
             </View>
-            <Text style={[styles.deckTitle, { color: colors.text }]} numberOfLines={2}>
+            <Text style={[styles.deckBody, { color: colors.text }]} numberOfLines={2}>
               {liveRoom.topic}
             </Text>
             <Text style={[styles.deckMeta, { color: colors.mutedForeground }]}>
@@ -131,18 +137,24 @@ export default function OrbitConstellation() {
             </Text>
           </Pressable>
         ) : null}
-        <Pressable
-          onPress={() => router.push("/groups" as never)}
-          style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-        >
-          <View style={styles.deckHeader}>
-            <View style={[styles.dot, { backgroundColor: colors.magenta }]} />
-            <Text style={[styles.deckLabel, { color: colors.magenta }]}>NEXUS PULSE</Text>
-          </View>
-          <Text style={[styles.deckTitle, { color: colors.text }]} numberOfLines={3}>
-            {hubs[0]?.name} — {hubs[0]?.online.length} orbiting
-          </Text>
-        </Pressable>
+
+        {hubs[0] ? (
+          <Pressable
+            onPress={() => router.push("/groups" as never)}
+            style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          >
+            <View style={styles.deckHead}>
+              <View style={[styles.deckDot, { backgroundColor: colors.teal }]} />
+              <Text style={[styles.deckTag, { color: colors.teal }]}>HUB</Text>
+            </View>
+            <Text style={[styles.deckBody, { color: colors.text }]} numberOfLines={2}>
+              {hubs[0].name}
+            </Text>
+            <Text style={[styles.deckMeta, { color: colors.mutedForeground }]}>
+              {hubs[0].online.length} orbiting now
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );
@@ -163,27 +175,28 @@ function FloatingOrb({
   const float = useSharedValue(0);
 
   useEffect(() => {
+    const dur = 2000 + index * 180;
     float.value = withDelay(
-      index * 120,
+      index * 160,
       withSequence(
-        withTiming(1, { duration: 1800 + index * 80, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 1800 + index * 80, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: dur, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: dur, easing: Easing.inOut(Easing.ease) }),
       ),
     );
     const id = setInterval(() => {
       float.value = withSequence(
-        withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: 2200, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: dur, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration: dur, easing: Easing.inOut(Easing.ease) }),
       );
-    }, 4400);
+    }, dur * 2 + 80);
     return () => clearInterval(id);
   }, [index, float]);
 
   const aStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: x * expand.value },
-      { translateY: y * expand.value + (float.value - 0.5) * 8 },
-      { scale: 0.4 + expand.value * 0.6 },
+      { translateY: y * expand.value + (float.value - 0.5) * 9 },
+      { scale: 0.35 + expand.value * 0.65 },
     ],
     opacity: expand.value,
   }));
@@ -192,15 +205,10 @@ function FloatingOrb({
     <Animated.View style={[styles.floatingOrb, aStyle]}>
       <Pressable
         onPress={() => router.push(orb.route as never)}
-        style={{ alignItems: "center" }}
+        style={styles.orbPress}
       >
-        <GlowOrb
-          size={56}
-          colors={orb.colors}
-          glyph=""
-          intensity={0.7}
-        />
-        <View style={styles.orbIcon} pointerEvents="none">
+        <GlowOrb size={52} colors={orb.colors} glyph="" intensity={0.65} />
+        <View style={[styles.orbIcon, { pointerEvents: "none" } as any]}>
           <Feather name={orb.icon} size={20} color="#FFFFFF" />
         </View>
         <Text style={styles.orbLabel}>{orb.label}</Text>
@@ -223,26 +231,75 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(245,240,255,0.06)",
+    borderWidth: 1,
   },
-  tinyLabel: { fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 1.4 },
-  greetingName: { fontFamily: "Inter_700Bold", fontSize: 16, marginTop: 4, letterSpacing: -0.3 },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", marginTop: -20 },
+  tinyLabel: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 9,
+    letterSpacing: 1.4,
+    marginBottom: 3,
+  },
+  greetName: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 15,
+    letterSpacing: -0.3,
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   constellation: {
     width: RADIUS * 2 + 80,
     height: RADIUS * 2 + 80,
     alignItems: "center",
     justifyContent: "center",
   },
-  floatingOrb: { position: "absolute", alignItems: "center", justifyContent: "center" },
-  orbIcon: { position: "absolute", top: 0, width: 89, height: 89, alignItems: "center", justifyContent: "center" },
-  orbLabel: { marginTop: 8, fontFamily: "Inter_500Medium", fontSize: 11, color: "#F5F0FF", letterSpacing: 0.4 },
-  tagline: { marginTop: 32, fontFamily: "Inter_400Regular", fontSize: 12, letterSpacing: 0.4, textAlign: "center", paddingHorizontal: 40 },
-  bottomDeck: { paddingHorizontal: 16, flexDirection: "row", gap: 10 },
-  deckCard: { flex: 1, padding: 14, borderRadius: 18, borderWidth: 1, minHeight: 96 },
-  deckHeader: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  deckLabel: { fontFamily: "Inter_600SemiBold", fontSize: 9, letterSpacing: 1 },
-  deckTitle: { fontFamily: "Inter_500Medium", fontSize: 12, lineHeight: 16 },
-  deckMeta: { marginTop: 6, fontFamily: "Inter_400Regular", fontSize: 10 },
+  centerPressable: { alignItems: "center", justifyContent: "center" },
+  floatingOrb: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  orbPress: { alignItems: "center" },
+  orbIcon: {
+    position: "absolute",
+    width: 83,
+    height: 83,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  orbLabel: {
+    marginTop: 6,
+    fontFamily: "Inter_500Medium",
+    fontSize: 11,
+    color: "#F5F0FF",
+    letterSpacing: 0.4,
+  },
+  tagline: {
+    marginTop: 28,
+    fontFamily: "Inter_400Regular",
+    fontSize: 12,
+    letterSpacing: 0.3,
+    textAlign: "center",
+    paddingHorizontal: 40,
+  },
+  deck: {
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    gap: 10,
+  },
+  deckCard: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    minHeight: 88,
+    gap: 4,
+  },
+  deckHead: { flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 3 },
+  deckDot: { width: 5, height: 5, borderRadius: 3 },
+  deckTag: { fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 1.1 },
+  deckBody: { fontFamily: "Inter_500Medium", fontSize: 12, lineHeight: 17 },
+  deckMeta: { fontFamily: "Inter_400Regular", fontSize: 10, marginTop: 2 },
 });

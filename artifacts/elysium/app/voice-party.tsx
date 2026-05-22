@@ -2,7 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -64,7 +64,7 @@ export default function VoicePartyScreen() {
 
         <View style={styles.controls}>
           <Pressable style={[styles.ctrl, { borderColor: colors.border, backgroundColor: colors.card }]}>
-            <Feather name="hand" size={20} color={colors.text} />
+            <Feather name="thumbs-up" size={20} color={colors.text} />
           </Pressable>
           <Pressable style={[styles.ctrlMain, { backgroundColor: colors.primary }]}>
             <Feather name="mic" size={26} color="#fff" />
@@ -120,11 +120,11 @@ function SpeakingOrb({
       <Animated.View
         style={[
           styles.speakerRing,
-          { borderColor: color, shadowColor: color },
+          { borderColor: color },
           ringStyle,
         ]}
       />
-      <View style={[styles.speaker, { backgroundColor: color, shadowColor: color }]}>
+      <View style={[styles.speaker, { backgroundColor: color }]}>
         <Text style={styles.speakerGlyph}>{glyph}</Text>
       </View>
       <Text style={styles.speakerName}>{name.split(" ")[0]}</Text>
@@ -158,8 +158,6 @@ const styles = StyleSheet.create({
     height: 84,
     borderRadius: 42,
     borderWidth: 2,
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
   },
   speaker: {
     width: 64,
@@ -167,8 +165,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",
-    shadowOpacity: 0.9,
-    shadowRadius: 20,
     elevation: 12,
   },
   speakerGlyph: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 22 },
@@ -207,9 +203,9 @@ const styles = StyleSheet.create({
     borderRadius: 38,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#B57BFF",
-    shadowOpacity: 0.9,
-    shadowRadius: 24,
+    ...(Platform.OS === "web"
+      ? { boxShadow: "0 0 24px #B57BFF99" }
+      : { shadowColor: "#B57BFF", shadowOpacity: 0.9, shadowRadius: 24 }),
   },
   exitHelp: { fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center" },
 });

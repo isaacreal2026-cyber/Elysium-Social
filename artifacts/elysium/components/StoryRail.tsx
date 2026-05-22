@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React from "react";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
@@ -18,13 +19,16 @@ export function StoryRail() {
   const { stories, userById, selfId, isStoryViewed } = useResonance();
   const me = userById(selfId);
 
-  const data = [{ id: "create", isCreate: true }, ...stories.map((s) => ({ ...s, isCreate: false as const }))];
+  const items: Array<{ id: string; isCreate: boolean } | (typeof stories[number] & { isCreate: false })> = [
+    { id: "__create__", isCreate: true },
+    ...stories.map((s) => ({ ...s, isCreate: false as const })),
+  ];
 
   return (
     <FlatList
       horizontal
       showsHorizontalScrollIndicator={false}
-      data={data as any[]}
+      data={items}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.row}
       renderItem={({ item }) => {
@@ -35,48 +39,52 @@ export function StoryRail() {
               style={styles.cell}
             >
               <View style={[styles.createRing, { borderColor: colors.border }]}>
-                <View style={[styles.avatar, { backgroundColor: me?.avatarColor }]}>
-                  <Text style={styles.avatarText}>{me?.avatarGlyph}</Text>
+                <View style={[styles.createAvatar, { backgroundColor: me?.avatarColor }]}>
+                  <Text style={styles.createAvatarText}>{me?.avatarGlyph}</Text>
                 </View>
-                <View style={[styles.plusBadge, { backgroundColor: colors.primary }]}>
-                  <Feather name="plus" size={10} color="#fff" />
+                <View style={[styles.plusBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}>
+                  <Feather name="plus" size={9} color="#fff" />
                 </View>
               </View>
-              <Text style={[styles.label, { color: colors.text }]} numberOfLines={1}>your story</Text>
+              <Text style={[styles.label, { color: colors.mutedForeground }]} numberOfLines={1}>
+                your story
+              </Text>
             </Pressable>
           );
         }
-        const story = item;
+
+        const story = item as typeof stories[number];
         const author = userById(story.authorId);
         const viewed = isStoryViewed(story.id);
+
         return (
           <Pressable
             onPress={() => router.push(`/story/${story.id}` as never)}
             style={styles.cell}
           >
-            <View
-              style={[
-                styles.ring,
-                viewed ? { borderColor: colors.border } : null,
-              ]}
-            >
+            <View style={styles.ringWrap}>
               {!viewed ? (
-                <View style={styles.gradientRing}>
-                  <View style={[styles.gradientFill, { backgroundColor: colors.primary }]} />
-                  <View style={[styles.gradientFill, { backgroundColor: colors.gold, top: -34, left: 28 }]} />
-                  <View style={[styles.gradientFill, { backgroundColor: colors.teal, top: 28, left: -28 }]} />
-                </View>
-              ) : null}
-              <Image
-                source={NEBULAS[story.toneIndex]}
-                style={styles.thumb}
-                contentFit="cover"
-              />
-              <View style={[styles.avatarMini, { backgroundColor: author?.avatarColor }]}>
+                <LinearGradient
+                  colors={[colors.primary, colors.gold, colors.teal]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.gradientRing}
+                />
+              ) : (
+                <View style={[styles.gradientRing, { backgroundColor: colors.border }]} />
+              )}
+              <View style={[styles.ringInner, { backgroundColor: colors.background }]}>
+                <Image
+                  source={NEBULAS[story.toneIndex % 3]}
+                  style={styles.thumb}
+                  contentFit="cover"
+                />
+              </View>
+              <View style={[styles.avatarMini, { backgroundColor: author?.avatarColor, borderColor: colors.background }]}>
                 <Text style={styles.avatarMiniText}>{author?.avatarGlyph}</Text>
               </View>
             </View>
-            <Text style={[styles.label, { color: colors.text }]} numberOfLines={1}>
+            <Text style={[styles.label, { color: viewed ? colors.subtle : colors.text }]} numberOfLines={1}>
               {author?.name?.split(" ")[0]?.toLowerCase() ?? ""}
             </Text>
           </Pressable>
@@ -87,37 +95,34 @@ export function StoryRail() {
 }
 
 const styles = StyleSheet.create({
-  row: { paddingHorizontal: 12, paddingVertical: 8, gap: 12 },
-  cell: { alignItems: "center", width: 72 },
-  ring: {
+  row: { paddingHorizontal: 14, paddingVertical: 10, gap: 12 },
+  cell: { alignItems: "center", width: 68 },
+  ringWrap: {
     width: 64,
     height: 64,
     borderRadius: 32,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
-    borderWidth: 2,
-    borderColor: "transparent",
     position: "relative",
   },
   gradientRing: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 32,
-    overflow: "hidden",
-  },
-  gradientFill: {
     position: "absolute",
-    width: 50,
-    height: 50,
-    borderRadius: 30,
-    opacity: 0.85,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+  },
+  ringInner: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
   thumb: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    borderWidth: 2,
-    borderColor: "#0E0524",
   },
   avatarMini: {
     position: "absolute",
@@ -129,9 +134,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#0E0524",
   },
-  avatarMiniText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 9 },
+  avatarMiniText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 8 },
   createRing: {
     width: 64,
     height: 64,
@@ -142,14 +146,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "relative",
   },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  createAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 18 },
+  createAvatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 20 },
   plusBadge: {
     position: "absolute",
     bottom: -2,
@@ -160,7 +164,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#0E0524",
   },
   label: {
     marginTop: 6,

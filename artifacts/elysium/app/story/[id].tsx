@@ -83,7 +83,7 @@ export default function StoryViewer() {
         locations={[0, 0.4, 1]}
       />
 
-      <View style={[styles.tapZones]} pointerEvents="box-none">
+      <View style={[styles.tapZones, { pointerEvents: "box-none" } as any]}>
         <Pressable onPress={() => tap("left")} style={styles.tapLeft} />
         <Pressable onPress={() => tap("right")} style={styles.tapRight} />
       </View>

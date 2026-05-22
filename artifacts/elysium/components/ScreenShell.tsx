@@ -25,37 +25,37 @@ export function ScreenShell({
   children,
   rightAction,
   showBack = true,
-  density = 60,
+  density = 50,
   showTabBar = true,
 }: ScreenShellProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const isWeb = Platform.OS === "web";
-  const topPad = (isWeb ? Math.max(insets.top, 16) : insets.top) + 8;
+  const topPad = (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 10;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <LinearGradient
-        colors={["#150A2E", "#07021A"]}
-        style={StyleSheet.absoluteFill}
-      />
+      <LinearGradient colors={["#160B30", "#07021A"]} style={StyleSheet.absoluteFill} />
       <StarField density={density} seed={title.charCodeAt(0) || 7} />
+
       <View style={[styles.header, { paddingTop: topPad }]}>
-        <View style={styles.headerRow}>
+        <View style={styles.row}>
           {showBack ? (
-            <Pressable onPress={() => router.back()} style={styles.backBtn}>
-              <Feather name="chevron-left" size={22} color={colors.text} />
+            <Pressable onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: "rgba(245,240,255,0.06)", borderColor: colors.border }]}>
+              <Feather name="chevron-left" size={20} color={colors.text} />
             </Pressable>
           ) : (
             <View style={styles.backBtn} />
           )}
           <View style={{ flex: 1 }}>
             <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-            {subtitle ? <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>{subtitle}</Text> : null}
+            {subtitle ? (
+              <Text style={[styles.subtitle, { color: colors.subtle }]}>{subtitle}</Text>
+            ) : null}
           </View>
-          <View style={styles.rightSlot}>{rightAction}</View>
+          <View style={styles.right}>{rightAction ?? <View style={{ width: 36 }} />}</View>
         </View>
       </View>
+
       <View style={{ flex: 1 }}>{children}</View>
       {showTabBar ? <BottomTabBar /> : null}
     </View>
@@ -65,31 +65,33 @@ export function ScreenShell({
 const styles = StyleSheet.create({
   root: { flex: 1 },
   header: {
-    paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
   },
-  headerRow: {
+  row: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
   },
   backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(245,240,255,0.06)",
+    borderWidth: 1,
+    flexShrink: 0,
   },
   title: {
     fontFamily: "Inter_700Bold",
     fontSize: 22,
     letterSpacing: -0.4,
+    lineHeight: 28,
   },
   subtitle: {
     fontFamily: "Inter_400Regular",
     fontSize: 12,
-    marginTop: 2,
+    marginTop: 1,
   },
-  rightSlot: { minWidth: 36, alignItems: "flex-end" },
+  right: { minWidth: 34, alignItems: "flex-end", flexShrink: 0 },
 });

@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   projectChipText: { fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 1 },
   pulse: { flexDirection: "row", alignItems: "center", gap: 6 },
-  pulseDot: { width: 6, height: 6, borderRadius: 3, shadowColor: "#FFD56B", shadowOpacity: 1, shadowRadius: 6 },
+  pulseDot: { width: 6, height: 6, borderRadius: 3 },
   pulseText: { color: "#F5F0FF", fontFamily: "Inter_500Medium", fontSize: 11, letterSpacing: 0.4 },
   hubName: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.4 },
   hubTagline: { color: "#A89AC8", fontFamily: "Inter_400Regular", fontSize: 13, marginTop: 2 },

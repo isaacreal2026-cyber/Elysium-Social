@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
+  Animated as RNAnimated,
   FlatList,
   Platform,
   Pressable,
@@ -21,11 +22,11 @@ import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
 
 const FILTERS = [
-  { key: "for-you", label: "For You", icon: "star" as const },
-  { key: "following", label: "Following", icon: "users" as const },
-  { key: "voice", label: "Voice", icon: "mic" as const },
-  { key: "destiny", label: "Destiny", icon: "navigation" as const },
-  { key: "near", label: "Near You", icon: "map-pin" as const },
+  { key: "for-you", label: "For You" },
+  { key: "following", label: "Following" },
+  { key: "voice", label: "Voice" },
+  { key: "destiny", label: "Destiny" },
+  { key: "near", label: "Near You" },
 ];
 
 export default function HomeFeed() {
@@ -34,113 +35,108 @@ export default function HomeFeed() {
   const { posts, following, unreadNotifications, unreadMessages, voiceRooms } = useResonance();
   const [filter, setFilter] = useState("for-you");
   const [refreshing, setRefreshing] = useState(false);
+  const scrollY = useRef(new RNAnimated.Value(0)).current;
 
   const liveRoom = voiceRooms.find((v) => v.live);
 
   const sortedPosts = useMemo(() => {
     const list = [...posts];
     if (filter === "following") {
-      return list.filter((p) => following[p.authorId]).sort((a, b) => b.createdAt - a.createdAt);
+      const f = list.filter((p) => following[p.authorId]);
+      return f.length ? f.sort((a, b) => b.createdAt - a.createdAt) : list.sort((a, b) => b.createdAt - a.createdAt);
     }
-    if (filter === "voice") return list.filter((p) => p.kind === "voice").sort((a, b) => b.energy - a.energy);
-    if (filter === "destiny") return list.filter((p) => p.kind === "destiny").sort((a, b) => b.energy - a.energy);
+    if (filter === "voice") return list.filter((p) => p.kind === "voice" || p.kind === "question").sort((a, b) => b.energy - a.energy);
+    if (filter === "destiny") return list.filter((p) => p.kind === "destiny" || p.kind === "media").sort((a, b) => b.energy - a.energy);
     if (filter === "near") return list.sort((a, b) => b.resonance.spark - a.resonance.spark);
-    return list.sort((a, b) => b.energy * 2 + b.createdAt / 1e10 - (a.energy * 2 + a.createdAt / 1e10));
+    return list.sort((a, b) => b.energy * 1.5 + b.createdAt / 1e10 - (a.energy * 1.5 + a.createdAt / 1e10));
   }, [posts, filter, following]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
+    setTimeout(() => setRefreshing(false), 700);
   };
 
-  const isWeb = Platform.OS === "web";
-  const topPad = (isWeb ? Math.max(insets.top, 16) : insets.top) + 8;
+  const topPad = (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 8;
+
+  const headerOpacity = scrollY.interpolate({ inputRange: [0, 60], outputRange: [0, 1], extrapolate: "clamp" });
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={["#150A2E", "#07021A"]} style={StyleSheet.absoluteFill} />
-      <StarField density={70} seed={11} />
+      <LinearGradient colors={["#140928", "#07021A"]} style={StyleSheet.absoluteFill} />
+      <StarField density={55} seed={42} />
+
+      {/* Scroll-driven sticky header border */}
+      <RNAnimated.View
+        style={[styles.stickyBorder, { borderBottomColor: colors.border, opacity: headerOpacity }, { pointerEvents: "none" } as any]}
+      />
 
       <FlatList
         data={sortedPosts}
         keyExtractor={(p) => p.id}
         renderItem={({ item }) => <PostCard post={item} />}
-        contentContainerStyle={{ paddingHorizontal: 14, paddingBottom: 120 }}
+        contentContainerStyle={{ paddingHorizontal: 14, paddingBottom: 130 }}
         showsVerticalScrollIndicator={false}
+        onScroll={RNAnimated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
+        scrollEventThrottle={16}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
         ListHeaderComponent={
           <View>
+            {/* Top bar */}
             <View style={[styles.topBar, { paddingTop: topPad }]}>
-              <View style={styles.brandRow}>
-                <View style={[styles.brandOrb, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
-                  <Text style={styles.brandGlyph}>✦</Text>
-                </View>
-                <Text style={[styles.brand, { color: colors.text }]}>Elysium</Text>
-              </View>
-              <View style={styles.iconsRow}>
-                <Pressable
-                  onPress={() => router.push("/orbit" as never)}
-                  style={[styles.iconBtn, { borderColor: colors.border }]}
+              <Pressable onPress={() => router.push("/orbit" as never)} style={styles.brandRow}>
+                <LinearGradient
+                  colors={[colors.primary, colors.magenta]}
+                  style={styles.brandOrb}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                 >
-                  <Feather name="grid" size={18} color={colors.text} />
-                </Pressable>
+                  <Text style={styles.brandGlyph}>✦</Text>
+                </LinearGradient>
+                <Text style={[styles.brand, { color: colors.text }]}>Elysium</Text>
+              </Pressable>
+              <View style={styles.iconsRow}>
                 <Pressable
                   onPress={() => router.push("/connections" as never)}
                   style={[styles.iconBtn, { borderColor: colors.border }]}
                 >
                   <Feather name="message-circle" size={18} color={colors.text} />
-                  {unreadMessages > 0 ? (
-                    <View style={[styles.dotBadge, { backgroundColor: colors.rose }]}>
-                      <Text style={styles.dotBadgeText}>{unreadMessages}</Text>
-                    </View>
-                  ) : null}
+                  {unreadMessages > 0 ? <NotifDot n={unreadMessages} /> : null}
                 </Pressable>
                 <Pressable
                   onPress={() => router.push("/notifications" as never)}
                   style={[styles.iconBtn, { borderColor: colors.border }]}
                 >
                   <Feather name="bell" size={18} color={colors.text} />
-                  {unreadNotifications > 0 ? (
-                    <View style={[styles.dotBadge, { backgroundColor: colors.rose }]}>
-                      <Text style={styles.dotBadgeText}>{unreadNotifications}</Text>
-                    </View>
-                  ) : null}
+                  {unreadNotifications > 0 ? <NotifDot n={unreadNotifications} /> : null}
                 </Pressable>
               </View>
             </View>
 
+            {/* Stories */}
             <StoryRail />
 
+            {/* Live voice banner */}
             {liveRoom ? (
               <Pressable
                 onPress={() => router.push("/voice-party" as never)}
-                style={[styles.liveBanner, { borderColor: colors.rose + "55" }]}
+                style={[styles.liveBanner, { borderColor: colors.rose + "44", backgroundColor: colors.rose + "0C" }]}
               >
-                <LinearGradient
-                  colors={[colors.rose + "44", "transparent"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                <View style={[styles.liveDot, { backgroundColor: colors.rose }]} />
+                <View style={[styles.livePulse, { backgroundColor: colors.rose }]} />
+                <Text style={[styles.liveLabel, { color: colors.rose }]}>LIVE</Text>
                 <Text style={[styles.liveText, { color: colors.text }]} numberOfLines={1}>
-                  <Text style={{ color: colors.rose, fontFamily: "Inter_700Bold" }}>LIVE</Text>
-                  <Text style={{ color: colors.mutedForeground }}>  ·  </Text>
                   {liveRoom.topic}
                 </Text>
-                <Text style={[styles.liveMeta, { color: colors.mutedForeground }]}>
-                  {liveRoom.listeners}
-                </Text>
-                <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                <View style={[styles.liveCount, { backgroundColor: colors.rose + "22" }]}>
+                  <Feather name="headphones" size={10} color={colors.rose} />
+                  <Text style={[styles.liveCountText, { color: colors.rose }]}>{liveRoom.listeners}</Text>
+                </View>
+                <Feather name="chevron-right" size={15} color={colors.rose} />
               </Pressable>
             ) : null}
 
+            {/* Feed filters */}
             <FlatList
               horizontal
               data={FILTERS}
@@ -156,11 +152,10 @@ export default function HomeFeed() {
                       styles.filter,
                       {
                         borderColor: active ? colors.primary : colors.border,
-                        backgroundColor: active ? colors.primary + "22" : "rgba(245,240,255,0.04)",
+                        backgroundColor: active ? colors.primary + "1E" : "rgba(245,240,255,0.03)",
                       },
                     ]}
                   >
-                    <Feather name={item.icon} size={12} color={active ? colors.primary : colors.mutedForeground} />
                     <Text style={[styles.filterText, { color: active ? colors.primary : colors.mutedForeground }]}>
                       {item.label}
                     </Text>
@@ -172,10 +167,12 @@ export default function HomeFeed() {
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Feather name="users" size={28} color={colors.mutedForeground} />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>quiet here</Text>
+            <View style={[styles.emptyOrb, { backgroundColor: colors.primary + "22" }]}>
+              <Feather name="users" size={26} color={colors.primary} />
+            </View>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>quiet in here</Text>
             <Text style={[styles.emptyMeta, { color: colors.mutedForeground }]}>
-              follow a few people to fill this stream
+              follow people to fill this stream with their signal
             </Text>
             <Pressable
               onPress={() => router.push("/search" as never)}
@@ -186,16 +183,34 @@ export default function HomeFeed() {
           </View>
         }
       />
+
       <BottomTabBar />
+    </View>
+  );
+}
+
+function NotifDot({ n }: { n: number }) {
+  return (
+    <View style={[styles.dotBadge, { backgroundColor: "#FB7185" }]}>
+      <Text style={styles.dotBadgeText}>{n > 9 ? "9+" : n}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+  stickyBorder: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    borderBottomWidth: 1,
+    zIndex: 10,
+  },
   topBar: {
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -207,11 +222,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    shadowOpacity: 0.7,
-    shadowRadius: 12,
   },
   brandGlyph: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 14 },
-  brand: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.5 },
+  brand: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.6 },
   iconsRow: { flexDirection: "row", gap: 8 },
   iconBtn: {
     width: 38,
@@ -225,8 +238,8 @@ const styles = StyleSheet.create({
   },
   dotBadge: {
     position: "absolute",
-    top: 4,
-    right: 4,
+    top: 5,
+    right: 5,
     minWidth: 14,
     height: 14,
     borderRadius: 7,
@@ -237,33 +250,32 @@ const styles = StyleSheet.create({
   dotBadgeText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 9 },
   liveBanner: {
     marginHorizontal: 14,
-    marginBottom: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 14,
     borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    overflow: "hidden",
   },
-  liveDot: { width: 8, height: 8, borderRadius: 4 },
+  livePulse: { width: 7, height: 7, borderRadius: 3.5 },
+  liveLabel: { fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 1 },
   liveText: { flex: 1, fontFamily: "Inter_500Medium", fontSize: 13 },
-  liveMeta: { fontFamily: "Inter_500Medium", fontSize: 12 },
-  filterRow: { paddingHorizontal: 14, paddingTop: 4, paddingBottom: 12, gap: 8 },
+  liveCount: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
+  liveCountText: { fontFamily: "Inter_700Bold", fontSize: 11 },
+  filterRow: { paddingHorizontal: 14, paddingTop: 6, paddingBottom: 12, gap: 8 },
   filter: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 999,
     borderWidth: 1,
   },
   filterText: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 0.3 },
-  empty: { alignItems: "center", paddingTop: 80, paddingHorizontal: 24, gap: 12 },
-  emptyTitle: { fontFamily: "Inter_700Bold", fontSize: 18 },
-  emptyMeta: { fontFamily: "Inter_400Regular", fontSize: 13, textAlign: "center" },
-  emptyBtn: { marginTop: 8, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 999 },
+  empty: { alignItems: "center", paddingTop: 60, paddingHorizontal: 24, gap: 14 },
+  emptyOrb: { width: 64, height: 64, borderRadius: 32, alignItems: "center", justifyContent: "center" },
+  emptyTitle: { fontFamily: "Inter_700Bold", fontSize: 20 },
+  emptyMeta: { fontFamily: "Inter_400Regular", fontSize: 14, textAlign: "center", lineHeight: 20 },
+  emptyBtn: { marginTop: 4, paddingHorizontal: 20, paddingVertical: 11, borderRadius: 999 },
   emptyBtnText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13 },
 });

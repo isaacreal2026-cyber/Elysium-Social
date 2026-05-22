@@ -1,6 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Platform, StyleSheet, Text, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -18,6 +18,17 @@ interface GlowOrbProps {
   intensity?: number;
   style?: ViewStyle;
 }
+
+const shadow = (color: string, radius: number) =>
+  Platform.OS === "web"
+    ? ({ boxShadow: `0 0 ${radius}px ${color}88` } as object)
+    : {
+        shadowColor: color,
+        shadowOpacity: 0.8,
+        shadowRadius: radius,
+        shadowOffset: { width: 0, height: 0 },
+        elevation: 12,
+      };
 
 export function GlowOrb({
   size,
@@ -41,7 +52,7 @@ export function GlowOrb({
 
   const haloStyle = useAnimatedStyle(() => ({
     transform: [{ scale: 1 + breath.value * 0.18 * intensity }],
-    opacity: 0.55 + breath.value * 0.35 * intensity,
+    opacity: 0.45 + breath.value * 0.35 * intensity,
   }));
 
   const innerStyle = useAnimatedStyle(() => ({
@@ -58,7 +69,7 @@ export function GlowOrb({
             height: size * 1.6,
             borderRadius: size,
             backgroundColor: colors[0],
-            opacity: 0.25,
+            opacity: 0.22,
           },
           haloStyle,
         ]}
@@ -68,18 +79,16 @@ export function GlowOrb({
           colors={colors}
           start={{ x: 0.1, y: 0.1 }}
           end={{ x: 0.9, y: 0.9 }}
-          style={{
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: colors[0],
-            shadowOpacity: 0.8,
-            shadowRadius: size * 0.4,
-            shadowOffset: { width: 0, height: 0 },
-            elevation: 12,
-          }}
+          style={[
+            {
+              width: size,
+              height: size,
+              borderRadius: size / 2,
+              alignItems: "center",
+              justifyContent: "center",
+            },
+            shadow(colors[0], size * 0.4),
+          ]}
         >
           <View
             style={{
@@ -90,12 +99,12 @@ export function GlowOrb({
               height: size * 0.18,
               borderRadius: size * 0.18,
               backgroundColor: "rgba(255,255,255,0.55)",
-              opacity: 0.7,
+              opacity: 0.65,
               transform: [{ rotate: "-20deg" }],
             }}
           />
           {glyph ? (
-            <Text style={[styles.glyph, { fontSize: size * 0.42 }]}>{glyph}</Text>
+            <Text style={[styles.glyph, { fontSize: size * 0.4 }]}>{glyph}</Text>
           ) : null}
         </LinearGradient>
       </Animated.View>
