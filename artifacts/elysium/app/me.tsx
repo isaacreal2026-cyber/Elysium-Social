@@ -87,6 +87,23 @@ export default function MeScreen() {
             <Text style={[styles.actionBtnText, { color: colors.text }]}>Orbit</Text>
           </Pressable>
         </View>
+        {/* AI + Upgrade row */}
+        <View style={[styles.actionsRow, { marginTop: 8 }]}>
+          <Pressable
+            onPress={() => router.push("/ai-chat" as never)}
+            style={[styles.actionBtn, { backgroundColor: "#B57BFF22", borderColor: "#B57BFF55", borderWidth: 1, flex: 1 }]}
+          >
+            <Feather name="cpu" size={15} color="#B57BFF" />
+            <Text style={[styles.actionBtnText, { color: "#B57BFF" }]}>AI Assistant</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/payment" as never)}
+            style={[styles.actionBtn, { backgroundColor: "#FFD56B22", borderColor: "#FFD56B55", borderWidth: 1, flex: 1 }]}
+          >
+            <Feather name="zap" size={15} color="#FFD56B" />
+            <Text style={[styles.actionBtnText, { color: "#FFD56B" }]}>Upgrade</Text>
+          </Pressable>
+        </View>
 
         {/* Tabs */}
         <View style={[styles.tabRow, { borderColor: colors.border }]}>

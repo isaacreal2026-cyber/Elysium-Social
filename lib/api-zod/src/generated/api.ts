@@ -14,3 +14,135 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary List all conversations
+ */
+export const ListOpenaiConversationsResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListOpenaiConversationsResponse = zod.array(
+  ListOpenaiConversationsResponseItem,
+);
+
+/**
+ * @summary Create a new conversation
+ */
+export const CreateOpenaiConversationBody = zod.object({
+  title: zod.string(),
+});
+
+/**
+ * @summary Get conversation with messages
+ */
+export const GetOpenaiConversationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetOpenaiConversationResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  createdAt: zod.coerce.date(),
+  messages: zod.array(
+    zod.object({
+      id: zod.number(),
+      conversationId: zod.number(),
+      role: zod.string(),
+      content: zod.string(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Delete a conversation
+ */
+export const DeleteOpenaiConversationParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary List messages in a conversation
+ */
+export const ListOpenaiMessagesParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const ListOpenaiMessagesResponseItem = zod.object({
+  id: zod.number(),
+  conversationId: zod.number(),
+  role: zod.string(),
+  content: zod.string(),
+  createdAt: zod.coerce.date(),
+});
+export const ListOpenaiMessagesResponse = zod.array(
+  ListOpenaiMessagesResponseItem,
+);
+
+/**
+ * @summary Send a text message and receive a streaming text response
+ */
+export const SendOpenaiMessageParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const SendOpenaiMessageBody = zod.object({
+  content: zod.string(),
+});
+
+/**
+ * @summary Send an SMS message
+ */
+export const SendSmsBody = zod.object({
+  to: zod
+    .string()
+    .describe("Recipient phone number in E.164 format (e.g. +15551234567)"),
+  message: zod.string().describe("The SMS message body"),
+});
+
+export const SendSmsResponse = zod.object({
+  success: zod.boolean(),
+  sid: zod.string(),
+  status: zod.string(),
+});
+
+/**
+ * @summary Create a Stripe payment intent
+ */
+export const createPaymentIntentBodyCurrencyDefault = `usd`;
+
+export const CreatePaymentIntentBody = zod.object({
+  amount: zod.number().describe("Amount in cents (e.g. 999 = $9.99)"),
+  currency: zod.string().default(createPaymentIntentBodyCurrencyDefault),
+  description: zod.string().optional(),
+});
+
+export const CreatePaymentIntentResponse = zod.object({
+  clientSecret: zod.string(),
+  paymentIntentId: zod.string(),
+  amount: zod.number(),
+  currency: zod.string(),
+});
+
+/**
+ * @summary Handle Stripe webhook events
+ */
+export const StripeWebhookResponse = zod.object({
+  received: zod.boolean(),
+});
+
+/**
+ * @summary List payment history
+ */
+export const ListPaymentsResponseItem = zod.object({
+  id: zod.number(),
+  stripePaymentIntentId: zod.string(),
+  amount: zod.number(),
+  currency: zod.string(),
+  status: zod.string(),
+  description: zod.string().optional(),
+  createdAt: zod.coerce.date(),
+});
+export const ListPaymentsResponse = zod.array(ListPaymentsResponseItem);

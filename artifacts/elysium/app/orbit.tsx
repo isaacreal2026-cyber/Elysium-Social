@@ -34,7 +34,7 @@ const ORBS: OrbDef[] = [
   { key: "discover", label: "Discover", icon: "compass", route: "/discover", colors: ["#5EEAD4", "#0EA5E9"] },
   { key: "connect", label: "Connect", icon: "users", route: "/connections", colors: ["#F472B6", "#FB7185"] },
   { key: "groups", label: "Hubs", icon: "hexagon", route: "/groups", colors: ["#FFD56B", "#F97316"] },
-  { key: "gather", label: "Gather", icon: "book-open", route: "/gather", colors: ["#34D399", "#06B6D4"] },
+  { key: "ai", label: "AI", icon: "cpu", route: "/ai-chat", colors: ["#B57BFF", "#5EEAD4"] },
   { key: "me", label: "Me", icon: "user", route: "/me", colors: ["#A78BFA", "#F472B6"] },
 ];
 

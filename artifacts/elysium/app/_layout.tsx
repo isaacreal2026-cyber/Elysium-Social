@@ -48,6 +48,8 @@ function RootLayoutNav() {
       <Stack.Screen name="messages/[id]" />
       <Stack.Screen name="profile/[id]" />
       <Stack.Screen name="tag/[name]" />
+      <Stack.Screen name="ai-chat" />
+      <Stack.Screen name="payment" />
     </Stack>
   );
 }

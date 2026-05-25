@@ -8,3 +8,77 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface OpenaiConversation {
+  id: number;
+  title: string;
+  createdAt: string;
+}
+
+export interface OpenaiMessage {
+  id: number;
+  conversationId: number;
+  role: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface OpenaiConversationInput {
+  title: string;
+}
+
+export interface OpenaiMessageInput {
+  content: string;
+}
+
+export interface OpenaiConversationWithMessages {
+  id: number;
+  title: string;
+  createdAt: string;
+  messages: OpenaiMessage[];
+}
+
+export interface SmsInput {
+  /** Recipient phone number in E.164 format (e.g. +15551234567) */
+  to: string;
+  /** The SMS message body */
+  message: string;
+}
+
+export interface SmsResult {
+  success: boolean;
+  sid: string;
+  status: string;
+}
+
+export interface PaymentIntentInput {
+  /** Amount in cents (e.g. 999 = $9.99) */
+  amount: number;
+  currency?: string;
+  description?: string;
+}
+
+export interface PaymentIntentResult {
+  clientSecret: string;
+  paymentIntentId: string;
+  amount: number;
+  currency: string;
+}
+
+export interface PaymentRecord {
+  id: number;
+  stripePaymentIntentId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface WebhookResult {
+  received: boolean;
+}
+
+export interface ApiError {
+  error: string;
+}
