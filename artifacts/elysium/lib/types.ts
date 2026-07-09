@@ -1,4 +1,10 @@
-export type ResonanceKind = "spark" | "flame" | "echo" | "sync" | "resonate" | "link";
+export type ResonanceKind =
+  | "spark"
+  | "flame"
+  | "echo"
+  | "sync"
+  | "resonate"
+  | "link";
 
 export type PersonalityTag = string;
 

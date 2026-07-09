@@ -26,7 +26,10 @@ export default function VoicePartyScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={["#1A0B3A", "#07021A"]} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={["#1A0B3A", "#07021A"]}
+        style={StyleSheet.absoluteFill}
+      />
       <StarField density={140} seed={43} />
 
       <View style={[styles.header, { marginTop: insets.top + 8 }]}>
@@ -34,8 +37,15 @@ export default function VoicePartyScreen() {
           <Feather name="chevron-down" size={22} color={colors.text} />
         </Pressable>
         <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={[styles.label, { color: colors.gold }]}>VOICE ROOM · LIVE</Text>
-          <Text style={[styles.topic, { color: colors.text }]} numberOfLines={2}>{room.topic}</Text>
+          <Text style={[styles.label, { color: colors.gold }]}>
+            VOICE ROOM · LIVE
+          </Text>
+          <Text
+            style={[styles.topic, { color: colors.text }]}
+            numberOfLines={2}
+          >
+            {room.topic}
+          </Text>
         </View>
         <Pressable style={styles.iconBtn}>
           <Feather name="more-horizontal" size={22} color={colors.text} />
@@ -58,20 +68,38 @@ export default function VoicePartyScreen() {
       <View style={styles.bottom}>
         <View style={[styles.metaPill, { borderColor: colors.border }]}>
           <View style={[styles.dot, { backgroundColor: colors.rose }]} />
-          <Text style={[styles.metaText, { color: colors.text }]}>{room.listeners} listening</Text>
-          <Text style={[styles.metaSubText, { color: colors.mutedForeground }]}> · {room.vibe.toLowerCase()} vibe</Text>
+          <Text style={[styles.metaText, { color: colors.text }]}>
+            {room.listeners} listening
+          </Text>
+          <Text style={[styles.metaSubText, { color: colors.mutedForeground }]}>
+            {" "}
+            · {room.vibe.toLowerCase()} vibe
+          </Text>
         </View>
 
         <View style={styles.controls}>
-          <Pressable style={[styles.ctrl, { borderColor: colors.border, backgroundColor: colors.card }]}>
+          <Pressable
+            style={[
+              styles.ctrl,
+              { borderColor: colors.border, backgroundColor: colors.card },
+            ]}
+          >
             <Feather name="thumbs-up" size={20} color={colors.text} />
           </Pressable>
-          <Pressable style={[styles.ctrlMain, { backgroundColor: colors.primary }]}>
+          <Pressable
+            style={[styles.ctrlMain, { backgroundColor: colors.primary }]}
+          >
             <Feather name="mic" size={26} color="#fff" />
           </Pressable>
           <Pressable
             onPress={() => router.back()}
-            style={[styles.ctrl, { borderColor: colors.destructive, backgroundColor: colors.destructive + "22" }]}
+            style={[
+              styles.ctrl,
+              {
+                borderColor: colors.destructive,
+                backgroundColor: colors.destructive + "22",
+              },
+            ]}
           >
             <Feather name="log-out" size={20} color={colors.destructive} />
           </Pressable>
@@ -106,7 +134,11 @@ function SpeakingOrb({
   useEffect(() => {
     ring.value = withDelay(
       index * 400,
-      withRepeat(withTiming(1, { duration: 1800, easing: Easing.out(Easing.ease) }), -1, false),
+      withRepeat(
+        withTiming(1, { duration: 1800, easing: Easing.out(Easing.ease) }),
+        -1,
+        false,
+      ),
     );
   }, [ring, index]);
 
@@ -116,13 +148,14 @@ function SpeakingOrb({
   }));
 
   return (
-    <View style={[styles.speakerWrap, { transform: [{ translateX: x }, { translateY: y }] }]}>
+    <View
+      style={[
+        styles.speakerWrap,
+        { transform: [{ translateX: x }, { translateY: y }] },
+      ]}
+    >
       <Animated.View
-        style={[
-          styles.speakerRing,
-          { borderColor: color },
-          ringStyle,
-        ]}
+        style={[styles.speakerRing, { borderColor: color }, ringStyle]}
       />
       <View style={[styles.speaker, { backgroundColor: color }]}>
         <Text style={styles.speakerGlyph}>{glyph}</Text>
@@ -149,9 +182,19 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(245,240,255,0.06)",
   },
   label: { fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 1.5 },
-  topic: { fontFamily: "Inter_700Bold", fontSize: 16, marginTop: 4, textAlign: "center", letterSpacing: -0.3 },
+  topic: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 16,
+    marginTop: 4,
+    textAlign: "center",
+    letterSpacing: -0.3,
+  },
   stage: { flex: 1, alignItems: "center", justifyContent: "center" },
-  speakerWrap: { position: "absolute", alignItems: "center", justifyContent: "center" },
+  speakerWrap: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   speakerRing: {
     position: "absolute",
     width: 84,
@@ -174,7 +217,12 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     fontSize: 11,
   },
-  bottom: { paddingHorizontal: 24, paddingBottom: 32, alignItems: "center", gap: 16 },
+  bottom: {
+    paddingHorizontal: 24,
+    paddingBottom: 32,
+    alignItems: "center",
+    gap: 16,
+  },
   metaPill: {
     flexDirection: "row",
     alignItems: "center",
@@ -207,5 +255,9 @@ const styles = StyleSheet.create({
       ? { boxShadow: "0 0 24px #B57BFF99" }
       : { shadowColor: "#B57BFF", shadowOpacity: 0.9, shadowRadius: 24 }),
   },
-  exitHelp: { fontFamily: "Inter_400Regular", fontSize: 11, textAlign: "center" },
+  exitHelp: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 11,
+    textAlign: "center",
+  },
 });

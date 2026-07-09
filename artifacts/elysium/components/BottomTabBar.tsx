@@ -19,20 +19,62 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { key: "home", icon: "home", label: "Home", route: "/", match: (p) => p === "/" || p === "/feed" || p === "/discover" },
-  { key: "search", icon: "search", label: "Search", route: "/search", match: (p) => p.startsWith("/search") },
-  { key: "compose", icon: "plus", label: "Create", route: "/composer", match: () => false },
-  { key: "notifications", icon: "bell", label: "Activity", route: "/notifications", match: (p) => p.startsWith("/notifications") },
-  { key: "me", icon: "user", label: "Me", route: "/me", match: (p) => p === "/me" || p.startsWith("/profile") },
+  {
+    key: "home",
+    icon: "home",
+    label: "Home",
+    route: "/",
+    match: (p) => p === "/" || p === "/feed" || p === "/discover",
+  },
+  {
+    key: "search",
+    icon: "search",
+    label: "Search",
+    route: "/search",
+    match: (p) => p.startsWith("/search"),
+  },
+  {
+    key: "compose",
+    icon: "plus",
+    label: "Create",
+    route: "/composer",
+    match: () => false,
+  },
+  {
+    key: "notifications",
+    icon: "bell",
+    label: "Activity",
+    route: "/notifications",
+    match: (p) => p.startsWith("/notifications"),
+  },
+  {
+    key: "me",
+    icon: "user",
+    label: "Me",
+    route: "/me",
+    match: (p) => p === "/me" || p.startsWith("/profile"),
+  },
 ];
 
-const composeBtnShadow = Platform.OS === "web"
-  ? ({ boxShadow: "0 6px 18px rgba(181,123,255,0.55)" } as object)
-  : { shadowColor: "#B57BFF", shadowOpacity: 0.65, shadowRadius: 14, shadowOffset: { width: 0, height: 4 } };
+const composeBtnShadow =
+  Platform.OS === "web"
+    ? ({ boxShadow: "0 6px 18px rgba(181,123,255,0.55)" } as object)
+    : {
+        shadowColor: "#B57BFF",
+        shadowOpacity: 0.65,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 4 },
+      };
 
-const barShadow = Platform.OS === "web"
-  ? ({ boxShadow: "0 -8px 32px rgba(7,2,26,0.7)" } as object)
-  : { shadowColor: "#000", shadowOpacity: 0.5, shadowRadius: 16, shadowOffset: { width: 0, height: -4 } };
+const barShadow =
+  Platform.OS === "web"
+    ? ({ boxShadow: "0 -8px 32px rgba(7,2,26,0.7)" } as object)
+    : {
+        shadowColor: "#000",
+        shadowOpacity: 0.5,
+        shadowRadius: 16,
+        shadowOffset: { width: 0, height: -4 },
+      };
 
 export function BottomTabBar() {
   const colors = useColors();
@@ -46,12 +88,25 @@ export function BottomTabBar() {
         colors={["transparent", "rgba(7,2,26,0.88)", "#07021A"]}
         style={[StyleSheet.absoluteFill, { pointerEvents: "none" } as any]}
       />
-      <View style={[styles.bar, { backgroundColor: "rgba(21,10,46,0.94)", borderColor: colors.border }, barShadow]}>
+      <View
+        style={[
+          styles.bar,
+          {
+            backgroundColor: "rgba(21,10,46,0.94)",
+            borderColor: colors.border,
+          },
+          barShadow,
+        ]}
+      >
         {TABS.map((tab) => {
           const active = tab.match(pathname);
           const isCompose = tab.key === "compose";
           const badge =
-            tab.key === "notifications" ? unreadNotifications : tab.key === "home" ? unreadMessages : 0;
+            tab.key === "notifications"
+              ? unreadNotifications
+              : tab.key === "home"
+                ? unreadMessages
+                : 0;
           return (
             <Pressable
               key={tab.key}
@@ -69,7 +124,12 @@ export function BottomTabBar() {
                 </LinearGradient>
               ) : (
                 <View style={styles.iconWrap}>
-                  <View style={[styles.iconInner, active && { backgroundColor: colors.primary + "18" }]}>
+                  <View
+                    style={[
+                      styles.iconInner,
+                      active && { backgroundColor: colors.primary + "18" },
+                    ]}
+                  >
                     <Feather
                       name={tab.icon}
                       size={20}
@@ -77,14 +137,23 @@ export function BottomTabBar() {
                     />
                   </View>
                   {badge > 0 ? (
-                    <View style={[styles.badge, { backgroundColor: colors.rose }]}>
-                      <Text style={styles.badgeText}>{badge > 9 ? "9+" : badge}</Text>
+                    <View
+                      style={[styles.badge, { backgroundColor: colors.rose }]}
+                    >
+                      <Text style={styles.badgeText}>
+                        {badge > 9 ? "9+" : badge}
+                      </Text>
                     </View>
                   ) : null}
                 </View>
               )}
               {!isCompose ? (
-                <Text style={[styles.label, { color: active ? colors.primary : colors.mutedForeground }]}>
+                <Text
+                  style={[
+                    styles.label,
+                    { color: active ? colors.primary : colors.mutedForeground },
+                  ]}
+                >
                   {tab.label}
                 </Text>
               ) : null}
@@ -123,7 +192,11 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     minHeight: 46,
   },
-  iconWrap: { position: "relative", alignItems: "center", justifyContent: "center" },
+  iconWrap: {
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   iconInner: {
     width: 38,
     height: 30,

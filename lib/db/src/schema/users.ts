@@ -8,7 +8,9 @@ export const users = pgTable("users", {
   email: text("email").unique(),
   displayName: text("display_name").notNull(),
   avatarUrl: text("avatar_url"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({

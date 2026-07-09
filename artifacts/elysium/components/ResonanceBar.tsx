@@ -14,23 +14,63 @@ import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
 import type { ResonanceKind } from "@/lib/types";
 
-const KIND_META: Record<ResonanceKind, { label: string; icon: React.ReactNode; color: string }> = {
-  spark: { label: "Spark", icon: <Feather name="zap" size={15} color="#FFD56B" />, color: "#FFD56B" },
-  flame: { label: "Flame", icon: <MaterialCommunityIcons name="fire" size={15} color="#FB7185" />, color: "#FB7185" },
-  echo: { label: "Echo", icon: <Feather name="repeat" size={15} color="#5EEAD4" />, color: "#5EEAD4" },
-  sync: { label: "Sync", icon: <Feather name="check-circle" size={15} color="#B57BFF" />, color: "#B57BFF" },
-  resonate: { label: "Resonate", icon: <Feather name="mic" size={15} color="#F472B6" />, color: "#F472B6" },
-  link: { label: "Link", icon: <Feather name="git-branch" size={15} color="#34D399" />, color: "#34D399" },
+const KIND_META: Record<
+  ResonanceKind,
+  { label: string; icon: React.ReactNode; color: string }
+> = {
+  spark: {
+    label: "Spark",
+    icon: <Feather name="zap" size={15} color="#FFD56B" />,
+    color: "#FFD56B",
+  },
+  flame: {
+    label: "Flame",
+    icon: <MaterialCommunityIcons name="fire" size={15} color="#FB7185" />,
+    color: "#FB7185",
+  },
+  echo: {
+    label: "Echo",
+    icon: <Feather name="repeat" size={15} color="#5EEAD4" />,
+    color: "#5EEAD4",
+  },
+  sync: {
+    label: "Sync",
+    icon: <Feather name="check-circle" size={15} color="#B57BFF" />,
+    color: "#B57BFF",
+  },
+  resonate: {
+    label: "Resonate",
+    icon: <Feather name="mic" size={15} color="#F472B6" />,
+    color: "#F472B6",
+  },
+  link: {
+    label: "Link",
+    icon: <Feather name="git-branch" size={15} color="#34D399" />,
+    color: "#34D399",
+  },
 };
 
-const ORDER: ResonanceKind[] = ["spark", "flame", "echo", "sync", "resonate", "link"];
+const ORDER: ResonanceKind[] = [
+  "spark",
+  "flame",
+  "echo",
+  "sync",
+  "resonate",
+  "link",
+];
 
 function format(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
   return String(n);
 }
 
-export function ResonanceBar({ postId, energy }: { postId: string; energy: number }) {
+export function ResonanceBar({
+  postId,
+  energy,
+}: {
+  postId: string;
+  energy: number;
+}) {
   const colors = useColors();
   const { posts, resonate, hasResonated } = useResonance();
   const post = posts.find((p) => p.id === postId);
@@ -82,11 +122,16 @@ function ResonanceButton({
       withTiming(1, { duration: 110 }),
     );
     ring.value = 0;
-    ring.value = withTiming(1, { duration: 650, easing: Easing.out(Easing.ease) });
+    ring.value = withTiming(1, {
+      duration: 650,
+      easing: Easing.out(Easing.ease),
+    });
     onPress();
   };
 
-  const buttonStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  const buttonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
   const ringStyle = useAnimatedStyle(() => ({
     transform: [{ scale: 1 + ring.value * 1.5 }],
     opacity: 1 - ring.value,
@@ -94,7 +139,13 @@ function ResonanceButton({
 
   return (
     <Pressable onPress={handlePress} style={styles.btnWrap}>
-      <Animated.View style={[styles.btn, active && { backgroundColor: color + "22", borderColor: color }, buttonStyle]}>
+      <Animated.View
+        style={[
+          styles.btn,
+          active && { backgroundColor: color + "22", borderColor: color },
+          buttonStyle,
+        ]}
+      >
         <Animated.View
           style={[
             styles.ring,
@@ -104,7 +155,9 @@ function ResonanceButton({
           ]}
         />
         {icon}
-        <Text style={[styles.btnLabel, active && { color }]}>{format(count)}</Text>
+        <Text style={[styles.btnLabel, active && { color }]}>
+          {format(count)}
+        </Text>
       </Animated.View>
     </Pressable>
   );
@@ -115,14 +168,24 @@ function EnergyMeter({ energy, color }: { energy: number; color: string }) {
   const shimmer = useSharedValue(0);
 
   useEffect(() => {
-    w.value = withTiming(Math.max(0.02, Math.min(1, energy)), { duration: 800, easing: Easing.out(Easing.cubic) });
-    shimmer.value = withRepeat(withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.ease) }), -1, true);
+    w.value = withTiming(Math.max(0.02, Math.min(1, energy)), {
+      duration: 800,
+      easing: Easing.out(Easing.cubic),
+    });
+    shimmer.value = withRepeat(
+      withTiming(1, { duration: 1800, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
   }, [energy, w, shimmer]);
 
-  const fillStyle = useAnimatedStyle(() => ({ width: `${w.value * 100}%` as any }));
-  const dotShadow = Platform.OS === "web"
-    ? ({ boxShadow: `0 0 6px ${color}` } as object)
-    : { shadowColor: color, shadowOpacity: 0.9, shadowRadius: 6 };
+  const fillStyle = useAnimatedStyle(() => ({
+    width: `${w.value * 100}%` as any,
+  }));
+  const dotShadow =
+    Platform.OS === "web"
+      ? ({ boxShadow: `0 0 6px ${color}` } as object)
+      : { shadowColor: color, shadowOpacity: 0.9, shadowRadius: 6 };
 
   const dotStyle = useAnimatedStyle(() => ({
     opacity: 0.5 + shimmer.value * 0.5,
@@ -131,8 +194,17 @@ function EnergyMeter({ energy, color }: { energy: number; color: string }) {
 
   return (
     <View style={styles.meterTrack}>
-      <Animated.View style={[styles.meterFill, { backgroundColor: color }, fillStyle]} />
-      <Animated.View style={[styles.meterDot, { backgroundColor: color }, dotShadow, dotStyle]} />
+      <Animated.View
+        style={[styles.meterFill, { backgroundColor: color }, fillStyle]}
+      />
+      <Animated.View
+        style={[
+          styles.meterDot,
+          { backgroundColor: color },
+          dotShadow,
+          dotStyle,
+        ]}
+      />
     </View>
   );
 }

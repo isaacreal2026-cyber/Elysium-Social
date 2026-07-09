@@ -29,79 +29,188 @@ export default function MeScreen() {
   }, 0);
 
   return (
-    <ScreenShell title="My Soulprint" subtitle="your living portrait" showBack={false}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 130 }}>
+    <ScreenShell
+      title="My Soulprint"
+      subtitle="your living portrait"
+      showBack={false}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 130 }}
+      >
         {/* Cover */}
         <View style={styles.coverWrap}>
-          <Image source={require("@/assets/images/nebula3.png")} style={StyleSheet.absoluteFill} contentFit="cover" />
-          <LinearGradient colors={["rgba(7,2,26,0.15)", "rgba(7,2,26,0.92)"]} style={StyleSheet.absoluteFill} />
+          <Image
+            source={require("@/assets/images/nebula3.png")}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={["rgba(7,2,26,0.15)", "rgba(7,2,26,0.92)"]}
+            style={StyleSheet.absoluteFill}
+          />
           <View style={styles.coverInner}>
-            <View style={[styles.avatar, { backgroundColor: me.avatarColor, borderColor: colors.background }]}>
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: me.avatarColor,
+                  borderColor: colors.background,
+                },
+              ]}
+            >
               <Text style={styles.avatarText}>{me.avatarGlyph}</Text>
-              <View style={[styles.onlineDot, { backgroundColor: colors.emerald, borderColor: colors.background }]} />
+              <View
+                style={[
+                  styles.onlineDot,
+                  {
+                    backgroundColor: colors.emerald,
+                    borderColor: colors.background,
+                  },
+                ]}
+              />
             </View>
             <Text style={[styles.name, { color: "#fff" }]}>{me.name}</Text>
-            <Text style={[styles.handle, { color: "rgba(245,240,255,0.7)" }]}>{me.handle} · {me.city}</Text>
-            <Text style={[styles.bio, { color: "rgba(245,240,255,0.85)" }]}>{me.bio}</Text>
+            <Text style={[styles.handle, { color: "rgba(245,240,255,0.7)" }]}>
+              {me.handle} · {me.city}
+            </Text>
+            <Text style={[styles.bio, { color: "rgba(245,240,255,0.85)" }]}>
+              {me.bio}
+            </Text>
 
             {/* Voice intro pill */}
             <View style={styles.voicePill}>
-              <View style={[styles.voicePlay, { backgroundColor: colors.gold }]}>
+              <View
+                style={[styles.voicePlay, { backgroundColor: colors.gold }]}
+              >
                 <Feather name="play" size={10} color="#0E0524" />
               </View>
               <View style={styles.miniWave}>
                 {Array.from({ length: 18 }).map((_, i) => (
-                  <View key={i} style={[styles.miniBar, { height: 3 + Math.abs(Math.sin(i * 0.6)) * 12, backgroundColor: colors.gold }]} />
+                  <View
+                    key={i}
+                    style={[
+                      styles.miniBar,
+                      {
+                        height: 3 + Math.abs(Math.sin(i * 0.6)) * 12,
+                        backgroundColor: colors.gold,
+                      },
+                    ]}
+                  />
                 ))}
               </View>
-              <Text style={[styles.voiceTime, { color: colors.gold }]}>intro · {me.introVoiceSeconds}s</Text>
+              <Text style={[styles.voiceTime, { color: colors.gold }]}>
+                intro · {me.introVoiceSeconds}s
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Stats bar */}
-        <View style={[styles.statsBar, { borderColor: colors.border, backgroundColor: colors.card }]}>
-          <StatCell label="Followers" value={me.followers >= 1000 ? `${(me.followers / 1000).toFixed(1)}k` : String(me.followers)} color={colors.primary} />
+        <View
+          style={[
+            styles.statsBar,
+            { borderColor: colors.border, backgroundColor: colors.card },
+          ]}
+        >
+          <StatCell
+            label="Followers"
+            value={
+              me.followers >= 1000
+                ? `${(me.followers / 1000).toFixed(1)}k`
+                : String(me.followers)
+            }
+            color={colors.primary}
+          />
           <View style={[styles.statDiv, { backgroundColor: colors.border }]} />
-          <StatCell label="Following" value={String(me.following)} color={colors.teal} />
+          <StatCell
+            label="Following"
+            value={String(me.following)}
+            color={colors.teal}
+          />
           <View style={[styles.statDiv, { backgroundColor: colors.border }]} />
-          <StatCell label="Resonance" value={totalResonance >= 1000 ? `${(totalResonance / 1000).toFixed(1)}k` : String(totalResonance)} color={colors.gold} />
+          <StatCell
+            label="Resonance"
+            value={
+              totalResonance >= 1000
+                ? `${(totalResonance / 1000).toFixed(1)}k`
+                : String(totalResonance)
+            }
+            color={colors.gold}
+          />
           <View style={[styles.statDiv, { backgroundColor: colors.border }]} />
-          <StatCell label="Alignment" value={`${Math.round(me.alignmentScore * 100)}%`} color={colors.magenta} />
+          <StatCell
+            label="Alignment"
+            value={`${Math.round(me.alignmentScore * 100)}%`}
+            color={colors.magenta}
+          />
         </View>
 
         {/* Actions */}
         <View style={styles.actionsRow}>
           <Pressable
             onPress={() => router.push("/composer" as never)}
-            style={[styles.actionBtn, { backgroundColor: colors.primary, flex: 2 }]}
+            style={[
+              styles.actionBtn,
+              { backgroundColor: colors.primary, flex: 2 },
+            ]}
           >
             <Feather name="plus" size={15} color="#fff" />
             <Text style={styles.actionBtnText}>Compose</Text>
           </Pressable>
           <Pressable
             onPress={() => router.push("/orbit" as never)}
-            style={[styles.actionBtn, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1, flex: 1 }]}
+            style={[
+              styles.actionBtn,
+              {
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+                borderWidth: 1,
+                flex: 1,
+              },
+            ]}
           >
             <Feather name="grid" size={15} color={colors.text} />
-            <Text style={[styles.actionBtnText, { color: colors.text }]}>Orbit</Text>
+            <Text style={[styles.actionBtnText, { color: colors.text }]}>
+              Orbit
+            </Text>
           </Pressable>
         </View>
         {/* AI + Upgrade row */}
         <View style={[styles.actionsRow, { marginTop: 8 }]}>
           <Pressable
             onPress={() => router.push("/ai-chat" as never)}
-            style={[styles.actionBtn, { backgroundColor: "#B57BFF22", borderColor: "#B57BFF55", borderWidth: 1, flex: 1 }]}
+            style={[
+              styles.actionBtn,
+              {
+                backgroundColor: "#B57BFF22",
+                borderColor: "#B57BFF55",
+                borderWidth: 1,
+                flex: 1,
+              },
+            ]}
           >
             <Feather name="cpu" size={15} color="#B57BFF" />
-            <Text style={[styles.actionBtnText, { color: "#B57BFF" }]}>AI Assistant</Text>
+            <Text style={[styles.actionBtnText, { color: "#B57BFF" }]}>
+              AI Assistant
+            </Text>
           </Pressable>
           <Pressable
             onPress={() => router.push("/payment" as never)}
-            style={[styles.actionBtn, { backgroundColor: "#FFD56B22", borderColor: "#FFD56B55", borderWidth: 1, flex: 1 }]}
+            style={[
+              styles.actionBtn,
+              {
+                backgroundColor: "#FFD56B22",
+                borderColor: "#FFD56B55",
+                borderWidth: 1,
+                flex: 1,
+              },
+            ]}
           >
             <Feather name="zap" size={15} color="#FFD56B" />
-            <Text style={[styles.actionBtnText, { color: "#FFD56B" }]}>Upgrade</Text>
+            <Text style={[styles.actionBtnText, { color: "#FFD56B" }]}>
+              Upgrade
+            </Text>
           </Pressable>
         </View>
 
@@ -113,10 +222,24 @@ export default function MeScreen() {
               <Pressable
                 key={t.key}
                 onPress={() => setTab(t.key as typeof tab)}
-                style={[styles.tab, { borderBottomColor: active ? colors.primary : "transparent" }]}
+                style={[
+                  styles.tab,
+                  {
+                    borderBottomColor: active ? colors.primary : "transparent",
+                  },
+                ]}
               >
-                <Feather name={t.icon} size={14} color={active ? colors.primary : colors.mutedForeground} />
-                <Text style={[styles.tabText, { color: active ? colors.primary : colors.mutedForeground }]}>
+                <Feather
+                  name={t.icon}
+                  size={14}
+                  color={active ? colors.primary : colors.mutedForeground}
+                />
+                <Text
+                  style={[
+                    styles.tabText,
+                    { color: active ? colors.primary : colors.mutedForeground },
+                  ]}
+                >
                   {t.label}
                 </Text>
               </Pressable>
@@ -128,7 +251,10 @@ export default function MeScreen() {
         <View style={{ paddingHorizontal: 16 }}>
           {tab === "moments" ? (
             myMoments.length === 0 ? (
-              <EmptyState icon="feather" text="no moments yet — compose your first" />
+              <EmptyState
+                icon="feather"
+                text="no moments yet — compose your first"
+              />
             ) : (
               myMoments.map((p) => <PostCard key={p.id} post={p} />)
             )
@@ -144,8 +270,21 @@ export default function MeScreen() {
               <Section title="Personality" icon="smile">
                 <View style={styles.chipRow}>
                   {me.tags.map((t) => (
-                    <View key={t} style={[styles.chip, { borderColor: colors.border, backgroundColor: colors.primary + "12" }]}>
-                      <Text style={[styles.chipText, { color: colors.primary }]}>{t}</Text>
+                    <View
+                      key={t}
+                      style={[
+                        styles.chip,
+                        {
+                          borderColor: colors.border,
+                          backgroundColor: colors.primary + "12",
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.chipText, { color: colors.primary }]}
+                      >
+                        {t}
+                      </Text>
                     </View>
                   ))}
                 </View>
@@ -157,20 +296,52 @@ export default function MeScreen() {
                     <Pressable
                       key={d}
                       onPress={() => router.push(`/tag/${d}` as never)}
-                      style={[styles.chip, { borderColor: colors.gold + "55", backgroundColor: colors.gold + "12" }]}
+                      style={[
+                        styles.chip,
+                        {
+                          borderColor: colors.gold + "55",
+                          backgroundColor: colors.gold + "12",
+                        },
+                      ]}
                     >
-                      <Feather name="navigation" size={10} color={colors.gold} />
-                      <Text style={[styles.chipText, { color: colors.gold }]}>{d}</Text>
+                      <Feather
+                        name="navigation"
+                        size={10}
+                        color={colors.gold}
+                      />
+                      <Text style={[styles.chipText, { color: colors.gold }]}>
+                        {d}
+                      </Text>
                     </Pressable>
                   ))}
                 </View>
               </Section>
 
               <Section title="Activity" icon="bar-chart-2">
-                <View style={[styles.activityCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
-                  <ActivityRow label="Weekly visitors" value={me.weeklyVisitors} color={colors.teal} />
-                  <ActivityRow label="Moments shared" value={myMoments.length} color={colors.primary} />
-                  <ActivityRow label="Alignment score" value={`${Math.round(me.alignmentScore * 100)}%`} color={colors.gold} />
+                <View
+                  style={[
+                    styles.activityCard,
+                    {
+                      borderColor: colors.border,
+                      backgroundColor: colors.card,
+                    },
+                  ]}
+                >
+                  <ActivityRow
+                    label="Weekly visitors"
+                    value={me.weeklyVisitors}
+                    color={colors.teal}
+                  />
+                  <ActivityRow
+                    label="Moments shared"
+                    value={myMoments.length}
+                    color={colors.primary}
+                  />
+                  <ActivityRow
+                    label="Alignment score"
+                    value={`${Math.round(me.alignmentScore * 100)}%`}
+                    color={colors.gold}
+                  />
                 </View>
               </Section>
             </View>
@@ -181,7 +352,15 @@ export default function MeScreen() {
   );
 }
 
-function StatCell({ label, value, color }: { label: string; value: string; color: string }) {
+function StatCell({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
   return (
     <View style={styles.statCell}>
       <Text style={[styles.statValue, { color }]}>{value}</Text>
@@ -190,42 +369,83 @@ function StatCell({ label, value, color }: { label: string; value: string; color
   );
 }
 
-function Section({ title, icon, children }: { title: string; icon: React.ComponentProps<typeof Feather>["name"]; children: React.ReactNode }) {
+function Section({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ComponentProps<typeof Feather>["name"];
+  children: React.ReactNode;
+}) {
   const colors = useColors();
   return (
     <View>
       <View style={styles.sectionHead}>
         <Feather name={icon} size={12} color={colors.mutedForeground} />
-        <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>{title.toUpperCase()}</Text>
+        <Text style={[styles.sectionTitle, { color: colors.mutedForeground }]}>
+          {title.toUpperCase()}
+        </Text>
       </View>
       {children}
     </View>
   );
 }
 
-function ActivityRow({ label, value, color }: { label: string; value: string | number; color: string }) {
+function ActivityRow({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string | number;
+  color: string;
+}) {
   const colors = useColors();
   return (
     <View style={styles.activityRow}>
-      <Text style={[styles.activityLabel, { color: colors.mutedForeground }]}>{label}</Text>
+      <Text style={[styles.activityLabel, { color: colors.mutedForeground }]}>
+        {label}
+      </Text>
       <Text style={[styles.activityValue, { color }]}>{value}</Text>
     </View>
   );
 }
 
-function EmptyState({ icon, text }: { icon: React.ComponentProps<typeof Feather>["name"]; text: string }) {
+function EmptyState({
+  icon,
+  text,
+}: {
+  icon: React.ComponentProps<typeof Feather>["name"];
+  text: string;
+}) {
   const colors = useColors();
   return (
     <View style={[styles.empty, { borderColor: colors.border }]}>
       <Feather name={icon} size={22} color={colors.mutedForeground} />
-      <Text style={{ color: colors.mutedForeground, fontFamily: "Inter_500Medium", fontSize: 13 }}>{text}</Text>
+      <Text
+        style={{
+          color: colors.mutedForeground,
+          fontFamily: "Inter_500Medium",
+          fontSize: 13,
+        }}
+      >
+        {text}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   coverWrap: { height: 240, position: "relative" },
-  coverInner: { position: "absolute", bottom: 0, left: 0, right: 0, padding: 20, gap: 4 },
+  coverInner: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 20,
+    gap: 4,
+  },
   avatar: {
     width: 72,
     height: 72,
@@ -237,10 +457,23 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   avatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 28 },
-  onlineDot: { position: "absolute", bottom: 2, right: 2, width: 14, height: 14, borderRadius: 7, borderWidth: 2 },
+  onlineDot: {
+    position: "absolute",
+    bottom: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 2,
+  },
   name: { fontFamily: "Inter_700Bold", fontSize: 22, letterSpacing: -0.5 },
   handle: { fontFamily: "Inter_400Regular", fontSize: 13 },
-  bio: { fontFamily: "Inter_400Regular", fontSize: 14, lineHeight: 20, marginTop: 4 },
+  bio: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 4,
+  },
   voicePill: {
     flexDirection: "row",
     alignItems: "center",
@@ -252,7 +485,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,213,107,0.12)",
     marginTop: 8,
   },
-  voicePlay: { width: 20, height: 20, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  voicePlay: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   miniWave: { flexDirection: "row", alignItems: "center", gap: 2, height: 16 },
   miniBar: { width: 2, borderRadius: 1 },
   voiceTime: { fontFamily: "Inter_700Bold", fontSize: 11 },
@@ -266,9 +505,20 @@ const styles = StyleSheet.create({
   },
   statCell: { flex: 1, alignItems: "center" },
   statValue: { fontFamily: "Inter_700Bold", fontSize: 16 },
-  statLabel: { color: "#A89AC8", fontFamily: "Inter_500Medium", fontSize: 10, marginTop: 2, letterSpacing: 0.3 },
+  statLabel: {
+    color: "#A89AC8",
+    fontFamily: "Inter_500Medium",
+    fontSize: 10,
+    marginTop: 2,
+    letterSpacing: 0.3,
+  },
   statDiv: { width: 1, alignSelf: "stretch", marginVertical: 4 },
-  actionsRow: { flexDirection: "row", gap: 10, paddingHorizontal: 14, marginTop: 14 },
+  actionsRow: {
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 14,
+    marginTop: 14,
+  },
   actionBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -278,7 +528,12 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   actionBtnText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13 },
-  tabRow: { flexDirection: "row", marginTop: 18, marginHorizontal: 14, borderBottomWidth: 1 },
+  tabRow: {
+    flexDirection: "row",
+    marginTop: 18,
+    marginHorizontal: 14,
+    borderBottomWidth: 1,
+  },
   tab: {
     flex: 1,
     flexDirection: "row",
@@ -289,8 +544,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
   },
   tabText: { fontFamily: "Inter_600SemiBold", fontSize: 12 },
-  sectionHead: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 10 },
-  sectionTitle: { fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 1.1 },
+  sectionHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 10,
+  },
+  sectionTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    letterSpacing: 1.1,
+  },
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 7 },
   chip: {
     flexDirection: "row",

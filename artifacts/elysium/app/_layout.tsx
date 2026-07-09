@@ -40,9 +40,18 @@ function RootLayoutNav() {
       <Stack.Screen name="groups" />
       <Stack.Screen name="gather" />
       <Stack.Screen name="me" />
-      <Stack.Screen name="composer" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
-      <Stack.Screen name="voice-party" options={{ presentation: "modal", animation: "slide_from_bottom" }} />
-      <Stack.Screen name="story/[id]" options={{ presentation: "fullScreenModal", animation: "fade" }} />
+      <Stack.Screen
+        name="composer"
+        options={{ presentation: "modal", animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen
+        name="voice-party"
+        options={{ presentation: "modal", animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen
+        name="story/[id]"
+        options={{ presentation: "fullScreenModal", animation: "fade" }}
+      />
       <Stack.Screen name="post/[id]" />
       <Stack.Screen name="hub/[id]" />
       <Stack.Screen name="messages/[id]" />

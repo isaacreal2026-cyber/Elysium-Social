@@ -79,8 +79,18 @@ interface ResonanceCtx extends State {
   unreadNotifications: number;
   unreadMessages: number;
   markAllNotificationsRead: () => void;
-  addPost: (input: { body: string; kind: Post["kind"]; destinations?: string[]; nestedPostId?: string }) => string;
-  addComment: (input: { postId: string; parentId: string | null; body: string; laughThread?: boolean }) => void;
+  addPost: (input: {
+    body: string;
+    kind: Post["kind"];
+    destinations?: string[];
+    nestedPostId?: string;
+  }) => string;
+  addComment: (input: {
+    postId: string;
+    parentId: string | null;
+    body: string;
+    laughThread?: boolean;
+  }) => void;
   addStory: (input: { caption: string; destinations: string[] }) => void;
   sendMessage: (threadId: string, body: string) => void;
   toggleHubProjectMode: (hubId: string) => void;
@@ -106,7 +116,9 @@ const initialState: State = {
   trending: SEED_TRENDING,
   myResonances: {},
   bookmarks: {},
-  following: Object.fromEntries(SEED_FOLLOWING.map((id) => [id, true as const])),
+  following: Object.fromEntries(
+    SEED_FOLLOWING.map((id) => [id, true as const]),
+  ),
   viewedStories: {},
   pulses: [],
   selfId: "u-self",
@@ -172,7 +184,10 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
             p.id === postId
               ? {
                   ...p,
-                  resonance: { ...p.resonance, [kind]: Math.max(0, p.resonance[kind] + delta) },
+                  resonance: {
+                    ...p.resonance,
+                    [kind]: Math.max(0, p.resonance[kind] + delta),
+                  },
                   energy: Math.min(1, p.energy + (already ? -0.01 : 0.02)),
                 }
               : p,
@@ -180,12 +195,17 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
           myResonances: {
             ...s.myResonances,
             [postId]: already
-              ? Object.fromEntries(Object.entries(mine).filter(([k]) => k !== kind))
+              ? Object.fromEntries(
+                  Object.entries(mine).filter(([k]) => k !== kind),
+                )
               : { ...mine, [kind]: true },
           },
           pulses: already
             ? s.pulses
-            : [...s.pulses, { id: makeId("pulse"), kind, postId, startedAt: Date.now() }].slice(-10),
+            : [
+                ...s.pulses,
+                { id: makeId("pulse"), kind, postId, startedAt: Date.now() },
+              ].slice(-10),
         };
       });
     },
@@ -193,50 +213,81 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
   );
 
   const hasResonated = useCallback(
-    (postId: string, kind: ResonanceKind) => Boolean(state.myResonances[postId]?.[kind]),
+    (postId: string, kind: ResonanceKind) =>
+      Boolean(state.myResonances[postId]?.[kind]),
     [state.myResonances],
   );
 
-  const toggleBookmark = useCallback<ResonanceCtx["toggleBookmark"]>((postId) => {
-    lightHaptic();
-    setState((s) => {
-      const next = { ...s.bookmarks };
-      if (next[postId]) delete next[postId];
-      else next[postId] = true;
-      return { ...s, bookmarks: next };
-    });
-  }, [lightHaptic]);
+  const toggleBookmark = useCallback<ResonanceCtx["toggleBookmark"]>(
+    (postId) => {
+      lightHaptic();
+      setState((s) => {
+        const next = { ...s.bookmarks };
+        if (next[postId]) delete next[postId];
+        else next[postId] = true;
+        return { ...s, bookmarks: next };
+      });
+    },
+    [lightHaptic],
+  );
 
-  const isBookmarked = useCallback((postId: string) => Boolean(state.bookmarks[postId]), [state.bookmarks]);
+  const isBookmarked = useCallback(
+    (postId: string) => Boolean(state.bookmarks[postId]),
+    [state.bookmarks],
+  );
 
-  const toggleFollow = useCallback<ResonanceCtx["toggleFollow"]>((userId) => {
-    lightHaptic();
-    setState((s) => {
-      const next = { ...s.following };
-      const wasFollowing = Boolean(next[userId]);
-      if (wasFollowing) delete next[userId];
-      else next[userId] = true;
-      return {
+  const toggleFollow = useCallback<ResonanceCtx["toggleFollow"]>(
+    (userId) => {
+      lightHaptic();
+      setState((s) => {
+        const next = { ...s.following };
+        const wasFollowing = Boolean(next[userId]);
+        if (wasFollowing) delete next[userId];
+        else next[userId] = true;
+        return {
+          ...s,
+          following: next,
+          users: s.users.map((u) =>
+            u.id === userId
+              ? {
+                  ...u,
+                  followers: Math.max(0, u.followers + (wasFollowing ? -1 : 1)),
+                }
+              : u.id === s.selfId
+                ? {
+                    ...u,
+                    following: Math.max(
+                      0,
+                      u.following + (wasFollowing ? -1 : 1),
+                    ),
+                  }
+                : u,
+          ),
+        };
+      });
+    },
+    [lightHaptic],
+  );
+
+  const isFollowing = useCallback(
+    (userId: string) => Boolean(state.following[userId]),
+    [state.following],
+  );
+
+  const markStoryViewed = useCallback<ResonanceCtx["markStoryViewed"]>(
+    (storyId) => {
+      setState((s) => ({
         ...s,
-        following: next,
-        users: s.users.map((u) =>
-          u.id === userId
-            ? { ...u, followers: Math.max(0, u.followers + (wasFollowing ? -1 : 1)) }
-            : u.id === s.selfId
-              ? { ...u, following: Math.max(0, u.following + (wasFollowing ? -1 : 1)) }
-              : u,
-        ),
-      };
-    });
-  }, [lightHaptic]);
+        viewedStories: { ...s.viewedStories, [storyId]: true },
+      }));
+    },
+    [],
+  );
 
-  const isFollowing = useCallback((userId: string) => Boolean(state.following[userId]), [state.following]);
-
-  const markStoryViewed = useCallback<ResonanceCtx["markStoryViewed"]>((storyId) => {
-    setState((s) => ({ ...s, viewedStories: { ...s.viewedStories, [storyId]: true } }));
-  }, []);
-
-  const isStoryViewed = useCallback((storyId: string) => Boolean(state.viewedStories[storyId]), [state.viewedStories]);
+  const isStoryViewed = useCallback(
+    (storyId: string) => Boolean(state.viewedStories[storyId]),
+    [state.viewedStories],
+  );
 
   const unreadNotifications = useMemo(
     () => state.notifications.filter((n) => !n.read).length,
@@ -267,10 +318,20 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
             authorId: s.selfId,
             kind,
             body,
-            mediaTone: kind === "destiny" || kind === "media" || kind === "voice" ? tones[Math.floor(Math.random() * tones.length)] : "none",
+            mediaTone:
+              kind === "destiny" || kind === "media" || kind === "voice"
+                ? tones[Math.floor(Math.random() * tones.length)]
+                : "none",
             destinations: destinations ?? [],
             voiceSeconds: kind === "voice" ? 14 : undefined,
-            resonance: { spark: 0, flame: 0, echo: 0, sync: 0, resonate: 0, link: 0 },
+            resonance: {
+              spark: 0,
+              flame: 0,
+              echo: 0,
+              sync: 0,
+              resonate: 0,
+              link: 0,
+            },
             energy: 0.05,
             createdAt: Date.now(),
             nestedPostIds: nestedPostId ? [nestedPostId] : undefined,
@@ -285,87 +346,116 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  const addComment = useCallback<ResonanceCtx["addComment"]>(({ postId, parentId, body, laughThread }) => {
-    setState((s) => ({
-      ...s,
-      comments: [
-        ...s.comments,
-        {
-          id: makeId("c"),
-          postId,
-          parentId,
-          authorId: s.selfId,
-          body,
-          laughThread,
-          resonance: 0,
-          createdAt: Date.now(),
-        },
-      ],
-      posts: s.posts.map((p) => (p.id === postId ? { ...p, commentCount: p.commentCount + 1 } : p)),
-    }));
-  }, []);
-
-  const addStory = useCallback<ResonanceCtx["addStory"]>(({ caption, destinations }) => {
-    setState((s) => ({
-      ...s,
-      stories: [
-        {
-          id: makeId("s"),
-          authorId: s.selfId,
-          caption,
-          destinations,
-          toneIndex: Math.floor(Math.random() * 3),
-          resonance: 0,
-          viewers: 0,
-          createdAt: Date.now(),
-        },
-        ...s.stories,
-      ],
-    }));
-  }, []);
-
-  const sendMessage = useCallback<ResonanceCtx["sendMessage"]>((threadId, body) => {
-    setState((s) => ({
-      ...s,
-      chats: {
-        ...s.chats,
-        [threadId]: [
-          ...(s.chats[threadId] ?? []),
-          { id: makeId("m"), threadId, authorId: s.selfId, body, createdAt: Date.now() },
+  const addComment = useCallback<ResonanceCtx["addComment"]>(
+    ({ postId, parentId, body, laughThread }) => {
+      setState((s) => ({
+        ...s,
+        comments: [
+          ...s.comments,
+          {
+            id: makeId("c"),
+            postId,
+            parentId,
+            authorId: s.selfId,
+            body,
+            laughThread,
+            resonance: 0,
+            createdAt: Date.now(),
+          },
         ],
-      },
-      threads: s.threads.map((t) =>
-        t.id === threadId ? { ...t, lastMessage: body, unread: 0 } : t,
+        posts: s.posts.map((p) =>
+          p.id === postId ? { ...p, commentCount: p.commentCount + 1 } : p,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const addStory = useCallback<ResonanceCtx["addStory"]>(
+    ({ caption, destinations }) => {
+      setState((s) => ({
+        ...s,
+        stories: [
+          {
+            id: makeId("s"),
+            authorId: s.selfId,
+            caption,
+            destinations,
+            toneIndex: Math.floor(Math.random() * 3),
+            resonance: 0,
+            viewers: 0,
+            createdAt: Date.now(),
+          },
+          ...s.stories,
+        ],
+      }));
+    },
+    [],
+  );
+
+  const sendMessage = useCallback<ResonanceCtx["sendMessage"]>(
+    (threadId, body) => {
+      setState((s) => ({
+        ...s,
+        chats: {
+          ...s.chats,
+          [threadId]: [
+            ...(s.chats[threadId] ?? []),
+            {
+              id: makeId("m"),
+              threadId,
+              authorId: s.selfId,
+              body,
+              createdAt: Date.now(),
+            },
+          ],
+        },
+        threads: s.threads.map((t) =>
+          t.id === threadId ? { ...t, lastMessage: body, unread: 0 } : t,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const toggleHubProjectMode = useCallback<
+    ResonanceCtx["toggleHubProjectMode"]
+  >((hubId) => {
+    setState((s) => ({
+      ...s,
+      hubs: s.hubs.map((h) =>
+        h.id === hubId ? { ...h, projectMode: !h.projectMode } : h,
       ),
     }));
   }, []);
 
-  const toggleHubProjectMode = useCallback<ResonanceCtx["toggleHubProjectMode"]>((hubId) => {
-    setState((s) => ({
-      ...s,
-      hubs: s.hubs.map((h) => (h.id === hubId ? { ...h, projectMode: !h.projectMode } : h)),
-    }));
-  }, []);
+  const togglePathProgress = useCallback<ResonanceCtx["togglePathProgress"]>(
+    (pathId) => {
+      setState((s) => ({
+        ...s,
+        paths: s.paths.map((p) => {
+          if (p.id !== pathId) return p;
+          const step = 1 / Math.max(1, p.modules);
+          const next = p.progress + step;
+          return { ...p, progress: next > 1 ? 0 : next };
+        }),
+      }));
+    },
+    [],
+  );
 
-  const togglePathProgress = useCallback<ResonanceCtx["togglePathProgress"]>((pathId) => {
-    setState((s) => ({
-      ...s,
-      paths: s.paths.map((p) => {
-        if (p.id !== pathId) return p;
-        const step = 1 / Math.max(1, p.modules);
-        const next = p.progress + step;
-        return { ...p, progress: next > 1 ? 0 : next };
-      }),
-    }));
-  }, []);
-
-  const sharePost = useCallback<ResonanceCtx["sharePost"]>((postId) => {
-    lightHaptic();
-    setState((s) => ({
-      ...s,
-      posts: s.posts.map((p) => (p.id === postId ? { ...p, shareCount: p.shareCount + 1 } : p)),
-    }));
-  }, [lightHaptic]);
+  const sharePost = useCallback<ResonanceCtx["sharePost"]>(
+    (postId) => {
+      lightHaptic();
+      setState((s) => ({
+        ...s,
+        posts: s.posts.map((p) =>
+          p.id === postId ? { ...p, shareCount: p.shareCount + 1 } : p,
+        ),
+      }));
+    },
+    [lightHaptic],
+  );
 
   // garbage collect old pulses
   useEffect(() => {
@@ -431,6 +521,7 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
 
 export function useResonance() {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useResonance must be used within ResonanceProvider");
+  if (!ctx)
+    throw new Error("useResonance must be used within ResonanceProvider");
   return ctx;
 }

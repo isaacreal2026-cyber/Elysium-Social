@@ -60,7 +60,17 @@ export function GlowOrb({
   }));
 
   return (
-    <View style={[{ alignItems: "center", justifyContent: "center", width: size * 1.6, height: size * 1.6 }, style]}>
+    <View
+      style={[
+        {
+          alignItems: "center",
+          justifyContent: "center",
+          width: size * 1.6,
+          height: size * 1.6,
+        },
+        style,
+      ]}
+    >
       <Animated.View
         style={[
           {
@@ -104,7 +114,9 @@ export function GlowOrb({
             }}
           />
           {glyph ? (
-            <Text style={[styles.glyph, { fontSize: size * 0.4 }]}>{glyph}</Text>
+            <Text style={[styles.glyph, { fontSize: size * 0.4 }]}>
+              {glyph}
+            </Text>
           ) : null}
         </LinearGradient>
       </Animated.View>

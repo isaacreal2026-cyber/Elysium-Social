@@ -52,7 +52,7 @@ export default function AiChatScreen() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: "ELYSIUM AI Session" }),
       });
-      const data = await res.json() as Conversation;
+      const data = (await res.json()) as Conversation;
       setConversation(data);
       setMessages([
         {
@@ -91,7 +91,7 @@ export default function AiChatScreen() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content: userText }),
-        }
+        },
       );
 
       if (!res.body) throw new Error("No stream body");
@@ -108,15 +108,18 @@ export default function AiChatScreen() {
         for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           try {
-            const json = JSON.parse(line.slice(6)) as { content?: string; done?: boolean };
+            const json = JSON.parse(line.slice(6)) as {
+              content?: string;
+              done?: boolean;
+            };
             if (json.done) break;
             if (json.content) {
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === assistantId
                     ? { ...m, content: m.content + json.content }
-                    : m
-                )
+                    : m,
+                ),
               );
             }
           } catch {
@@ -135,16 +138,29 @@ export default function AiChatScreen() {
 
   useEffect(() => {
     if (messages.length > 0) {
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+      setTimeout(
+        () => flatListRef.current?.scrollToEnd({ animated: true }),
+        100,
+      );
     }
   }, [messages]);
 
   function renderMessage({ item }: { item: Message }) {
     const isUser = item.role === "user";
     return (
-      <View style={[styles.msgRow, isUser ? styles.msgRowUser : styles.msgRowAI]}>
+      <View
+        style={[styles.msgRow, isUser ? styles.msgRowUser : styles.msgRowAI]}
+      >
         {!isUser && (
-          <View style={[styles.aiAvatar, { backgroundColor: colors.primaryDeep + "88", borderColor: colors.primary + "55" }]}>
+          <View
+            style={[
+              styles.aiAvatar,
+              {
+                backgroundColor: colors.primaryDeep + "88",
+                borderColor: colors.primary + "55",
+              },
+            ]}
+          >
             <Text style={styles.aiAvatarText}>✦</Text>
           </View>
         )}
@@ -153,13 +169,21 @@ export default function AiChatScreen() {
             styles.bubble,
             isUser
               ? [styles.bubbleUser, { backgroundColor: colors.primaryDeep }]
-              : [styles.bubbleAI, { backgroundColor: colors.card, borderColor: colors.border }],
+              : [
+                  styles.bubbleAI,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ],
           ]}
         >
           {item.content === "" && item.role === "assistant" ? (
             <ActivityIndicator size="small" color={colors.primary} />
           ) : (
-            <Text style={[styles.bubbleText, { color: isUser ? "#fff" : colors.text }]}>
+            <Text
+              style={[
+                styles.bubbleText,
+                { color: isUser ? "#fff" : colors.text },
+              ]}
+            >
               {item.content}
             </Text>
           )}
@@ -169,7 +193,11 @@ export default function AiChatScreen() {
   }
 
   return (
-    <ScreenShell title="AI Assistant" subtitle="powered by ELYSIUM intelligence" showTabBar={false}>
+    <ScreenShell
+      title="AI Assistant"
+      subtitle="powered by ELYSIUM intelligence"
+      showTabBar={false}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -185,15 +213,40 @@ export default function AiChatScreen() {
         />
 
         {error && (
-          <View style={[styles.errorBar, { backgroundColor: colors.destructive + "22", borderColor: colors.destructive + "55" }]}>
+          <View
+            style={[
+              styles.errorBar,
+              {
+                backgroundColor: colors.destructive + "22",
+                borderColor: colors.destructive + "55",
+              },
+            ]}
+          >
             <Feather name="alert-circle" size={13} color={colors.destructive} />
-            <Text style={[styles.errorText, { color: colors.destructive }]}>{error}</Text>
+            <Text style={[styles.errorText, { color: colors.destructive }]}>
+              {error}
+            </Text>
           </View>
         )}
 
-        <View style={[styles.inputBar, { borderTopColor: colors.border, paddingBottom: Math.max(insets.bottom, 8) }]}>
+        <View
+          style={[
+            styles.inputBar,
+            {
+              borderTopColor: colors.border,
+              paddingBottom: Math.max(insets.bottom, 8),
+            },
+          ]}
+        >
           <TextInput
-            style={[styles.input, { color: colors.text, backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
             value={input}
             onChangeText={setInput}
             placeholder="Ask anything…"
@@ -232,7 +285,12 @@ export default function AiChatScreen() {
 
 const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingTop: 8 },
-  msgRow: { flexDirection: "row", marginVertical: 6, alignItems: "flex-end", gap: 8 },
+  msgRow: {
+    flexDirection: "row",
+    marginVertical: 6,
+    alignItems: "flex-end",
+    gap: 8,
+  },
   msgRowUser: { justifyContent: "flex-end" },
   msgRowAI: { justifyContent: "flex-start" },
   aiAvatar: {
@@ -252,7 +310,14 @@ const styles = StyleSheet.create({
     borderRadius: 18,
   },
   bubbleUser: { borderBottomRightRadius: 4 },
-  bubbleAI: { borderWidth: 1, borderBottomLeftRadius: 4, minWidth: 40, minHeight: 36, alignItems: "center", justifyContent: "center" },
+  bubbleAI: {
+    borderWidth: 1,
+    borderBottomLeftRadius: 4,
+    minWidth: 40,
+    minHeight: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   bubbleText: { fontFamily: "Inter_400Regular", fontSize: 15, lineHeight: 22 },
   errorBar: {
     flexDirection: "row",

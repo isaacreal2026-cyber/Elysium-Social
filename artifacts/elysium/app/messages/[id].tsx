@@ -36,36 +36,64 @@ export default function MessageThreadScreen() {
   return (
     <ScreenShell
       title={other?.name ?? "Thread"}
-      subtitle={other ? `${other.handle} · ${other.online ? "tuned in now" : "drifting"}` : undefined}
+      subtitle={
+        other
+          ? `${other.handle} · ${other.online ? "tuned in now" : "drifting"}`
+          : undefined
+      }
       rightAction={
         <Pressable
-          style={[styles.callBtn, { borderColor: colors.border, backgroundColor: colors.card }]}
+          style={[
+            styles.callBtn,
+            { borderColor: colors.border, backgroundColor: colors.card },
+          ]}
         >
           <Feather name="mic" size={16} color={colors.teal} />
         </Pressable>
       }
     >
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
+      >
         <View style={[styles.projectBanner, { borderColor: colors.border }]}>
           <Feather name="layers" size={12} color={colors.teal} />
           <Text style={[styles.projectText, { color: colors.text }]}>
-            <Text style={{ color: colors.teal, fontFamily: "Inter_600SemiBold" }}>project mode</Text>
-            <Text style={{ color: colors.mutedForeground }}>  ·  shared canvas, voice notes, tasks</Text>
+            <Text
+              style={{ color: colors.teal, fontFamily: "Inter_600SemiBold" }}
+            >
+              project mode
+            </Text>
+            <Text style={{ color: colors.mutedForeground }}>
+              {" "}
+              · shared canvas, voice notes, tasks
+            </Text>
           </Text>
-          <Feather name="chevron-right" size={14} color={colors.mutedForeground} />
+          <Feather
+            name="chevron-right"
+            size={14}
+            color={colors.mutedForeground}
+          />
         </View>
 
         <FlatList
           data={[...messages].reverse()}
           inverted
           keyExtractor={(m) => m.id}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, gap: 10 }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            gap: 10,
+          }}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive"
           renderItem={({ item }) => {
             const mine = item.authorId === selfId;
             return (
-              <View style={[styles.bubbleWrap, mine && { alignItems: "flex-end" }]}>
+              <View
+                style={[styles.bubbleWrap, mine && { alignItems: "flex-end" }]}
+              >
                 <View
                   style={[
                     styles.bubble,
@@ -79,7 +107,11 @@ export default function MessageThreadScreen() {
                 >
                   {item.voiceSeconds ? (
                     <View style={styles.voiceBubble}>
-                      <Feather name="play" size={14} color={mine ? "#fff" : colors.text} />
+                      <Feather
+                        name="play"
+                        size={14}
+                        color={mine ? "#fff" : colors.text}
+                      />
                       <View style={styles.voiceWaveform}>
                         {Array.from({ length: 18 }).map((_, i) => (
                           <View
@@ -88,18 +120,32 @@ export default function MessageThreadScreen() {
                               styles.voiceBar,
                               {
                                 height: 4 + Math.abs(Math.sin(i * 0.6)) * 14,
-                                backgroundColor: mine ? "rgba(255,255,255,0.85)" : colors.text,
+                                backgroundColor: mine
+                                  ? "rgba(255,255,255,0.85)"
+                                  : colors.text,
                               },
                             ]}
                           />
                         ))}
                       </View>
-                      <Text style={[styles.bubbleText, { color: mine ? "#fff" : colors.text }]}>
+                      <Text
+                        style={[
+                          styles.bubbleText,
+                          { color: mine ? "#fff" : colors.text },
+                        ]}
+                      >
                         {item.voiceSeconds}s
                       </Text>
                     </View>
                   ) : (
-                    <Text style={[styles.bubbleText, { color: mine ? "#fff" : colors.text }]}>{item.body}</Text>
+                    <Text
+                      style={[
+                        styles.bubbleText,
+                        { color: mine ? "#fff" : colors.text },
+                      ]}
+                    >
+                      {item.body}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -107,8 +153,18 @@ export default function MessageThreadScreen() {
           }}
         />
 
-        <View style={[styles.inputBar, { borderTopColor: colors.border, backgroundColor: colors.background }]}>
-          <Pressable style={[styles.iconCircle, { borderColor: colors.border }]}>
+        <View
+          style={[
+            styles.inputBar,
+            {
+              borderTopColor: colors.border,
+              backgroundColor: colors.background,
+            },
+          ]}
+        >
+          <Pressable
+            style={[styles.iconCircle, { borderColor: colors.border }]}
+          >
             <Feather name="mic" size={18} color={colors.teal} />
           </Pressable>
           <TextInput
@@ -116,9 +172,24 @@ export default function MessageThreadScreen() {
             onChangeText={setDraft}
             placeholder="type · or hold mic to record"
             placeholderTextColor={colors.subtle}
-            style={[styles.input, { color: colors.text, backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
           />
-          <Pressable onPress={send} style={[styles.sendBtn, { backgroundColor: draft.trim() ? colors.primary : colors.border }]}>
+          <Pressable
+            onPress={send}
+            style={[
+              styles.sendBtn,
+              {
+                backgroundColor: draft.trim() ? colors.primary : colors.border,
+              },
+            ]}
+          >
             <Feather name="arrow-up" size={18} color="#fff" />
           </Pressable>
         </View>

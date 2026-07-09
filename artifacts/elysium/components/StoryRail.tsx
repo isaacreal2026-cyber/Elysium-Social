@@ -19,7 +19,10 @@ export function StoryRail() {
   const { stories, userById, selfId, isStoryViewed } = useResonance();
   const me = userById(selfId);
 
-  const items: Array<{ id: string; isCreate: boolean } | (typeof stories[number] & { isCreate: false })> = [
+  const items: Array<
+    | { id: string; isCreate: boolean }
+    | ((typeof stories)[number] & { isCreate: false })
+  > = [
     { id: "__create__", isCreate: true },
     ...stories.map((s) => ({ ...s, isCreate: false as const })),
   ];
@@ -35,25 +38,46 @@ export function StoryRail() {
         if (item.isCreate) {
           return (
             <Pressable
-              onPress={() => router.push({ pathname: "/composer", params: { kind: "destiny" } } as never)}
+              onPress={() =>
+                router.push({
+                  pathname: "/composer",
+                  params: { kind: "destiny" },
+                } as never)
+              }
               style={styles.cell}
             >
               <View style={[styles.createRing, { borderColor: colors.border }]}>
-                <View style={[styles.createAvatar, { backgroundColor: me?.avatarColor }]}>
+                <View
+                  style={[
+                    styles.createAvatar,
+                    { backgroundColor: me?.avatarColor },
+                  ]}
+                >
                   <Text style={styles.createAvatarText}>{me?.avatarGlyph}</Text>
                 </View>
-                <View style={[styles.plusBadge, { backgroundColor: colors.primary, borderColor: colors.background }]}>
+                <View
+                  style={[
+                    styles.plusBadge,
+                    {
+                      backgroundColor: colors.primary,
+                      borderColor: colors.background,
+                    },
+                  ]}
+                >
                   <Feather name="plus" size={9} color="#fff" />
                 </View>
               </View>
-              <Text style={[styles.label, { color: colors.mutedForeground }]} numberOfLines={1}>
+              <Text
+                style={[styles.label, { color: colors.mutedForeground }]}
+                numberOfLines={1}
+              >
                 your story
               </Text>
             </Pressable>
           );
         }
 
-        const story = item as typeof stories[number];
+        const story = item as (typeof stories)[number];
         const author = userById(story.authorId);
         const viewed = isStoryViewed(story.id);
 
@@ -71,20 +95,44 @@ export function StoryRail() {
                   style={styles.gradientRing}
                 />
               ) : (
-                <View style={[styles.gradientRing, { backgroundColor: colors.border }]} />
+                <View
+                  style={[
+                    styles.gradientRing,
+                    { backgroundColor: colors.border },
+                  ]}
+                />
               )}
-              <View style={[styles.ringInner, { backgroundColor: colors.background }]}>
+              <View
+                style={[
+                  styles.ringInner,
+                  { backgroundColor: colors.background },
+                ]}
+              >
                 <Image
                   source={NEBULAS[story.toneIndex % 3]}
                   style={styles.thumb}
                   contentFit="cover"
                 />
               </View>
-              <View style={[styles.avatarMini, { backgroundColor: author?.avatarColor, borderColor: colors.background }]}>
+              <View
+                style={[
+                  styles.avatarMini,
+                  {
+                    backgroundColor: author?.avatarColor,
+                    borderColor: colors.background,
+                  },
+                ]}
+              >
                 <Text style={styles.avatarMiniText}>{author?.avatarGlyph}</Text>
               </View>
             </View>
-            <Text style={[styles.label, { color: viewed ? colors.subtle : colors.text }]} numberOfLines={1}>
+            <Text
+              style={[
+                styles.label,
+                { color: viewed ? colors.subtle : colors.text },
+              ]}
+              numberOfLines={1}
+            >
               {author?.name?.split(" ")[0]?.toLowerCase() ?? ""}
             </Text>
           </Pressable>
@@ -153,7 +201,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  createAvatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 20 },
+  createAvatarText: {
+    color: "#fff",
+    fontFamily: "Inter_700Bold",
+    fontSize: 20,
+  },
   plusBadge: {
     position: "absolute",
     bottom: -2,

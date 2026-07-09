@@ -14,7 +14,10 @@ const TABS: { key: "all" | "mentions" | "follows"; label: string }[] = [
   { key: "follows", label: "Follows" },
 ];
 
-const KIND_ICON: Record<NotificationKind, React.ComponentProps<typeof Feather>["name"]> = {
+const KIND_ICON: Record<
+  NotificationKind,
+  React.ComponentProps<typeof Feather>["name"]
+> = {
   resonance: "zap",
   comment: "message-circle",
   follow: "user-plus",
@@ -57,7 +60,13 @@ function groupBySection(items: ElysiumNotification[]) {
 
 export default function NotificationsScreen() {
   const colors = useColors();
-  const { notifications, userById, markAllNotificationsRead, isFollowing, toggleFollow } = useResonance();
+  const {
+    notifications,
+    userById,
+    markAllNotificationsRead,
+    isFollowing,
+    toggleFollow,
+  } = useResonance();
   const [tab, setTab] = useState<"all" | "mentions" | "follows">("all");
 
   useEffect(() => {
@@ -66,12 +75,19 @@ export default function NotificationsScreen() {
   }, [markAllNotificationsRead]);
 
   const filtered = useMemo(() => {
-    if (tab === "mentions") return notifications.filter((n) => n.kind === "mention" || n.kind === "comment");
-    if (tab === "follows") return notifications.filter((n) => n.kind === "follow");
+    if (tab === "mentions")
+      return notifications.filter(
+        (n) => n.kind === "mention" || n.kind === "comment",
+      );
+    if (tab === "follows")
+      return notifications.filter((n) => n.kind === "follow");
     return notifications;
   }, [notifications, tab]);
 
-  const { today, earlier } = useMemo(() => groupBySection(filtered), [filtered]);
+  const { today, earlier } = useMemo(
+    () => groupBySection(filtered),
+    [filtered],
+  );
 
   return (
     <ScreenShell title="Activity" subtitle="resonance from across the cosmos">
@@ -86,11 +102,18 @@ export default function NotificationsScreen() {
                 styles.tab,
                 {
                   borderColor: active ? colors.primary : colors.border,
-                  backgroundColor: active ? colors.primary + "22" : "rgba(245,240,255,0.04)",
+                  backgroundColor: active
+                    ? colors.primary + "22"
+                    : "rgba(245,240,255,0.04)",
                 },
               ]}
             >
-              <Text style={[styles.tabText, { color: active ? colors.primary : colors.mutedForeground }]}>
+              <Text
+                style={[
+                  styles.tabText,
+                  { color: active ? colors.primary : colors.mutedForeground },
+                ]}
+              >
                 {t.label}
               </Text>
             </Pressable>
@@ -100,12 +123,18 @@ export default function NotificationsScreen() {
 
       <FlatList
         data={[
-          ...(today.length ? [{ kind: "section" as const, label: "Today" }] : []),
+          ...(today.length
+            ? [{ kind: "section" as const, label: "Today" }]
+            : []),
           ...today.map((n) => ({ kind: "item" as const, n })),
-          ...(earlier.length ? [{ kind: "section" as const, label: "Earlier" }] : []),
+          ...(earlier.length
+            ? [{ kind: "section" as const, label: "Earlier" }]
+            : []),
           ...earlier.map((n) => ({ kind: "item" as const, n })),
         ]}
-        keyExtractor={(item, i) => (item.kind === "section" ? `s-${i}-${item.label}` : item.n.id)}
+        keyExtractor={(item, i) =>
+          item.kind === "section" ? `s-${i}-${item.label}` : item.n.id
+        }
         contentContainerStyle={{ paddingHorizontal: 14, paddingBottom: 120 }}
         renderItem={({ item }) => {
           if (item.kind === "section") {
@@ -121,7 +150,8 @@ export default function NotificationsScreen() {
             if (n.postId) router.push(`/post/${n.postId}` as never);
             else if (n.hubId) router.push(`/hub/${n.hubId}` as never);
             else if (n.voiceRoomId) router.push("/voice-party" as never);
-            else if (n.kind === "follow" && actor) router.push(`/profile/${actor.id}` as never);
+            else if (n.kind === "follow" && actor)
+              router.push(`/profile/${actor.id}` as never);
           };
           const following = isFollowing(n.actorId);
           return (
@@ -131,25 +161,44 @@ export default function NotificationsScreen() {
                 styles.row,
                 {
                   borderColor: colors.border,
-                  backgroundColor: n.read ? "transparent" : colors.primary + "0F",
+                  backgroundColor: n.read
+                    ? "transparent"
+                    : colors.primary + "0F",
                 },
               ]}
             >
               <View style={{ position: "relative" }}>
-                <View style={[styles.avatar, { backgroundColor: actor?.avatarColor }]}>
+                <View
+                  style={[
+                    styles.avatar,
+                    { backgroundColor: actor?.avatarColor },
+                  ]}
+                >
                   <Text style={styles.avatarText}>{actor?.avatarGlyph}</Text>
                 </View>
-                <View style={[styles.iconBadge, { backgroundColor: KIND_COLOR[n.kind] }]}>
+                <View
+                  style={[
+                    styles.iconBadge,
+                    { backgroundColor: KIND_COLOR[n.kind] },
+                  ]}
+                >
                   <Feather name={KIND_ICON[n.kind]} size={10} color="#0E0524" />
                 </View>
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.rowText, { color: colors.text }]}>
-                  <Text style={{ fontFamily: "Inter_700Bold" }}>{actor?.name}</Text>
-                  {" "}
-                  <Text style={{ color: colors.mutedForeground }}>{n.body}</Text>
+                  <Text style={{ fontFamily: "Inter_700Bold" }}>
+                    {actor?.name}
+                  </Text>{" "}
+                  <Text style={{ color: colors.mutedForeground }}>
+                    {n.body}
+                  </Text>
                 </Text>
-                <Text style={[styles.rowTime, { color: colors.mutedForeground }]}>{timeAgo(n.createdAt)}</Text>
+                <Text
+                  style={[styles.rowTime, { color: colors.mutedForeground }]}
+                >
+                  {timeAgo(n.createdAt)}
+                </Text>
               </View>
               {n.kind === "follow" ? (
                 <Pressable
@@ -160,17 +209,29 @@ export default function NotificationsScreen() {
                   style={[
                     styles.followBtn,
                     {
-                      backgroundColor: following ? "transparent" : colors.primary,
+                      backgroundColor: following
+                        ? "transparent"
+                        : colors.primary,
                       borderColor: following ? colors.border : colors.primary,
                     },
                   ]}
                 >
-                  <Text style={[styles.followText, { color: following ? colors.text : "#fff" }]}>
+                  <Text
+                    style={[
+                      styles.followText,
+                      { color: following ? colors.text : "#fff" },
+                    ]}
+                  >
                     {following ? "Following" : "Follow"}
                   </Text>
                 </Pressable>
               ) : !n.read ? (
-                <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />
+                <View
+                  style={[
+                    styles.unreadDot,
+                    { backgroundColor: colors.primary },
+                  ]}
+                />
               ) : null}
             </Pressable>
           );
@@ -178,7 +239,9 @@ export default function NotificationsScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <Feather name="bell" size={28} color={colors.mutedForeground} />
-            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>nothing new — yet</Text>
+            <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+              nothing new — yet
+            </Text>
           </View>
         }
       />
@@ -187,10 +250,31 @@ export default function NotificationsScreen() {
 }
 
 const styles = StyleSheet.create({
-  tabRow: { flexDirection: "row", gap: 8, paddingHorizontal: 16, paddingVertical: 12 },
-  tab: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, borderWidth: 1 },
-  tabText: { fontFamily: "Inter_600SemiBold", fontSize: 12, letterSpacing: 0.3 },
-  section: { fontFamily: "Inter_700Bold", fontSize: 11, letterSpacing: 1.2, marginTop: 14, marginBottom: 8, paddingHorizontal: 4 },
+  tabRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  tab: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  tabText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 12,
+    letterSpacing: 0.3,
+  },
+  section: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 11,
+    letterSpacing: 1.2,
+    marginTop: 14,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
   row: {
     padding: 12,
     borderRadius: 14,
