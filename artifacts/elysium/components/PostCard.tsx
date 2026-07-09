@@ -51,9 +51,16 @@ const KIND_LABELS: Record<Post["kind"], string> = {
   media: "Media",
 };
 
-export function PostCard({ post, nested = false }: { post: Post; nested?: boolean }) {
+export function PostCard({
+  post,
+  nested = false,
+}: {
+  post: Post;
+  nested?: boolean;
+}) {
   const colors = useColors();
-  const { userById, posts, toggleBookmark, isBookmarked, sharePost } = useResonance();
+  const { userById, posts, toggleBookmark, isBookmarked, sharePost } =
+    useResonance();
   const author = userById(post.authorId);
   const nestedPosts = (post.nestedPostIds ?? [])
     .map((id) => posts.find((p) => p.id === id))
@@ -62,9 +69,15 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
   const bookmarked = isBookmarked(post.id);
   const kindColor = KIND_COLORS[post.kind];
 
-  const cardShadow = Platform.OS === "web"
-    ? {} as object
-    : { shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } };
+  const cardShadow =
+    Platform.OS === "web"
+      ? ({} as object)
+      : {
+          shadowColor: "#000",
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 2 },
+        };
 
   return (
     <Pressable
@@ -86,23 +99,56 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
             e.stopPropagation?.();
             if (author) router.push(`/profile/${author.id}` as never);
           }}
-          style={[styles.avatar, { backgroundColor: author?.avatarColor ?? colors.primary }]}
+          style={[
+            styles.avatar,
+            { backgroundColor: author?.avatarColor ?? colors.primary },
+          ]}
         >
           <Text style={styles.avatarText}>{author?.avatarGlyph ?? "?"}</Text>
           {author?.online ? (
-            <View style={[styles.onlineDot, { backgroundColor: colors.emerald, borderColor: colors.card }]} />
+            <View
+              style={[
+                styles.onlineDot,
+                { backgroundColor: colors.emerald, borderColor: colors.card },
+              ]}
+            />
           ) : null}
         </Pressable>
         <View style={{ flex: 1, gap: 1 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
-            <Text style={[styles.name, { color: colors.text }]}>{author?.name}</Text>
-            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>·</Text>
-            <Text style={[styles.time, { color: colors.mutedForeground }]}>{timeAgo(post.createdAt)}</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 5,
+              flexWrap: "wrap",
+            }}
+          >
+            <Text style={[styles.name, { color: colors.text }]}>
+              {author?.name}
+            </Text>
+            <Text style={{ color: colors.mutedForeground, fontSize: 12 }}>
+              ·
+            </Text>
+            <Text style={[styles.time, { color: colors.mutedForeground }]}>
+              {timeAgo(post.createdAt)}
+            </Text>
           </View>
-          <Text style={[styles.handle, { color: colors.subtle }]}>{author?.handle} · {author?.city}</Text>
+          <Text style={[styles.handle, { color: colors.subtle }]}>
+            {author?.handle} · {author?.city}
+          </Text>
         </View>
-        <View style={[styles.kindPill, { borderColor: kindColor + "44", backgroundColor: kindColor + "12" }]}>
-          <Text style={[styles.kindText, { color: kindColor }]}>{KIND_LABELS[post.kind]}</Text>
+        <View
+          style={[
+            styles.kindPill,
+            {
+              borderColor: kindColor + "44",
+              backgroundColor: kindColor + "12",
+            },
+          ]}
+        >
+          <Text style={[styles.kindText, { color: kindColor }]}>
+            {KIND_LABELS[post.kind]}
+          </Text>
         </View>
       </View>
 
@@ -111,7 +157,13 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
       {post.destinations && post.destinations.length > 0 ? (
         <View style={styles.destRow}>
           {post.destinations.map((d) => (
-            <Pressable key={d} onPress={(e) => { e.stopPropagation?.(); router.push(`/tag/${d}` as never); }}>
+            <Pressable
+              key={d}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                router.push(`/tag/${d}` as never);
+              }}
+            >
               <Text style={[styles.hashtag, { color: colors.gold }]}>#{d}</Text>
             </Pressable>
           ))}
@@ -119,23 +171,45 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
       ) : null}
 
       {post.mediaTone && post.mediaTone !== "none" ? (
-        <View style={[styles.mediaWrap, { borderRadius: (colors.radius as number) - 6 }]}>
-          <Image source={TONE_IMAGES[post.mediaTone]} style={StyleSheet.absoluteFill} contentFit="cover" />
-          <LinearGradient colors={["transparent", "rgba(7,2,26,0.88)"]} style={StyleSheet.absoluteFill} />
+        <View
+          style={[
+            styles.mediaWrap,
+            { borderRadius: (colors.radius as number) - 6 },
+          ]}
+        >
+          <Image
+            source={TONE_IMAGES[post.mediaTone]}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={["transparent", "rgba(7,2,26,0.88)"]}
+            style={StyleSheet.absoluteFill}
+          />
           {post.kind === "voice" ? (
             <View style={styles.voiceOverlay}>
-              <View style={[styles.voicePlay, { backgroundColor: colors.teal }]}>
+              <View
+                style={[styles.voicePlay, { backgroundColor: colors.teal }]}
+              >
                 <Feather name="play" size={14} color="#0E0524" />
               </View>
               <View style={styles.waveform}>
                 {Array.from({ length: 28 }).map((_, i) => (
                   <View
                     key={i}
-                    style={[styles.wavebar, { height: 5 + Math.abs(Math.sin(i * 0.7)) * 18, backgroundColor: "rgba(255,255,255,0.85)" }]}
+                    style={[
+                      styles.wavebar,
+                      {
+                        height: 5 + Math.abs(Math.sin(i * 0.7)) * 18,
+                        backgroundColor: "rgba(255,255,255,0.85)",
+                      },
+                    ]}
                   />
                 ))}
               </View>
-              <Text style={styles.voiceTime}>0:{String(post.voiceSeconds ?? 0).padStart(2, "0")}</Text>
+              <Text style={styles.voiceTime}>
+                0:{String(post.voiceSeconds ?? 0).padStart(2, "0")}
+              </Text>
             </View>
           ) : null}
         </View>
@@ -147,34 +221,79 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
             const total = post.poll!.options.reduce((a, b) => a + b.votes, 0);
             const pct = total ? opt.votes / total : 0;
             return (
-              <View key={i} style={[styles.pollRow, { borderColor: colors.border }]}>
-                <View style={[styles.pollFill, { width: `${pct * 100}%` as any, backgroundColor: colors.primary + "2A" }]} />
-                <Text style={[styles.pollLabel, { color: colors.text }]}>{opt.label}</Text>
-                <Text style={[styles.pollPct, { color: colors.primary }]}>{Math.round(pct * 100)}%</Text>
+              <View
+                key={i}
+                style={[styles.pollRow, { borderColor: colors.border }]}
+              >
+                <View
+                  style={[
+                    styles.pollFill,
+                    {
+                      width: `${pct * 100}%` as any,
+                      backgroundColor: colors.primary + "2A",
+                    },
+                  ]}
+                />
+                <Text style={[styles.pollLabel, { color: colors.text }]}>
+                  {opt.label}
+                </Text>
+                <Text style={[styles.pollPct, { color: colors.primary }]}>
+                  {Math.round(pct * 100)}%
+                </Text>
               </View>
             );
           })}
           <Text style={[styles.pollMeta, { color: colors.subtle }]}>
-            {post.poll.options.reduce((a, b) => a + b.votes, 0).toLocaleString()} votes · 14h left
+            {post.poll.options
+              .reduce((a, b) => a + b.votes, 0)
+              .toLocaleString()}{" "}
+            votes · 14h left
           </Text>
         </View>
       ) : null}
 
       {post.project ? (
-        <View style={[styles.projectBox, { borderColor: colors.teal + "33", backgroundColor: colors.teal + "09" }]}>
+        <View
+          style={[
+            styles.projectBox,
+            {
+              borderColor: colors.teal + "33",
+              backgroundColor: colors.teal + "09",
+            },
+          ]}
+        >
           <View style={styles.projectHeader}>
             <Feather name="layers" size={11} color={colors.teal} />
-            <Text style={[styles.projectTitle, { color: colors.teal }]}>Project</Text>
+            <Text style={[styles.projectTitle, { color: colors.teal }]}>
+              Project
+            </Text>
             <Text style={[styles.projectMeta, { color: colors.subtle }]}>
-              {post.project.tasks.filter((t) => t.done).length}/{post.project.tasks.length} done
+              {post.project.tasks.filter((t) => t.done).length}/
+              {post.project.tasks.length} done
             </Text>
           </View>
           {post.project.tasks.map((t, i) => (
             <View key={i} style={styles.taskRow}>
-              <View style={[styles.taskDot, { borderColor: t.done ? colors.teal : colors.border }, t.done && { backgroundColor: colors.teal }]}>
-                {t.done ? <Feather name="check" size={9} color="#0E0524" /> : null}
+              <View
+                style={[
+                  styles.taskDot,
+                  { borderColor: t.done ? colors.teal : colors.border },
+                  t.done && { backgroundColor: colors.teal },
+                ]}
+              >
+                {t.done ? (
+                  <Feather name="check" size={9} color="#0E0524" />
+                ) : null}
               </View>
-              <Text style={[styles.taskLabel, { color: t.done ? colors.subtle : colors.text, textDecorationLine: t.done ? "line-through" : "none" }]}>
+              <Text
+                style={[
+                  styles.taskLabel,
+                  {
+                    color: t.done ? colors.subtle : colors.text,
+                    textDecorationLine: t.done ? "line-through" : "none",
+                  },
+                ]}
+              >
                 {t.label}
               </Text>
             </View>
@@ -184,7 +303,9 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
 
       {nestedPosts.length > 0 ? (
         <View style={styles.nestedWrap}>
-          <View style={[styles.nestedLine, { backgroundColor: colors.border }]} />
+          <View
+            style={[styles.nestedLine, { backgroundColor: colors.border }]}
+          />
           <View style={{ flex: 1 }}>
             {nestedPosts.map((np) => (
               <PostCard key={np.id} post={np} nested />
@@ -219,7 +340,11 @@ export function PostCard({ post, nested = false }: { post: Post; nested?: boolea
 }
 
 function FooterBtn({
-  icon, label, active, activeColor, onPress,
+  icon,
+  label,
+  active,
+  activeColor,
+  onPress,
 }: {
   icon: React.ComponentProps<typeof Feather>["name"];
   label: string;
@@ -231,11 +356,22 @@ function FooterBtn({
   const c = active ? (activeColor ?? colors.primary) : colors.mutedForeground;
   return (
     <Pressable
-      onPress={(e) => { e.stopPropagation?.(); onPress?.(); }}
+      onPress={(e) => {
+        e.stopPropagation?.();
+        onPress?.();
+      }}
       style={styles.footerBtn}
     >
       <Feather name={icon} size={14} color={c} />
-      <Text style={[styles.footerLabel, { color: c, fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular" }]}>
+      <Text
+        style={[
+          styles.footerLabel,
+          {
+            color: c,
+            fontFamily: active ? "Inter_600SemiBold" : "Inter_400Regular",
+          },
+        ]}
+      >
         {label}
       </Text>
     </Pressable>
@@ -315,7 +451,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginTop: 2,
   },
-  kindText: { fontSize: 9, fontFamily: "Inter_700Bold", letterSpacing: 0.6, textTransform: "uppercase" },
+  kindText: {
+    fontSize: 9,
+    fontFamily: "Inter_700Bold",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
+  },
   body: { fontFamily: "Inter_400Regular", fontSize: 15, lineHeight: 22 },
   destRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
   hashtag: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
@@ -340,8 +481,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 6,
   },
-  projectHeader: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 2 },
-  projectTitle: { fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 0.8, textTransform: "uppercase", flex: 1 },
+  projectHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 2,
+  },
+  projectTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    flex: 1,
+  },
   projectMeta: { fontFamily: "Inter_500Medium", fontSize: 10 },
   taskRow: { flexDirection: "row", alignItems: "center", gap: 9 },
   taskDot: {

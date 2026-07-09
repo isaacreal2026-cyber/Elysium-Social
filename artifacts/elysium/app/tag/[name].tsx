@@ -12,18 +12,39 @@ export default function TagScreen() {
   const { name } = useLocalSearchParams<{ name: string }>();
   const colors = useColors();
   const { posts, trending } = useResonance();
-  const tagInfo = trending.find((t) => t.tag.toLowerCase() === (name ?? "").toLowerCase());
+  const tagInfo = trending.find(
+    (t) => t.tag.toLowerCase() === (name ?? "").toLowerCase(),
+  );
   const matched = useMemo(
-    () => posts.filter((p) => p.destinations?.some((d) => d.toLowerCase() === (name ?? "").toLowerCase())),
+    () =>
+      posts.filter((p) =>
+        p.destinations?.some(
+          (d) => d.toLowerCase() === (name ?? "").toLowerCase(),
+        ),
+      ),
     [posts, name],
   );
 
   return (
-    <ScreenShell title={`#${name}`} subtitle={tagInfo ? `${tagInfo.posts.toLocaleString()} posts · trending ↑${Math.round(tagInfo.delta * 100)}%` : "destination feed"}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 130 }}>
+    <ScreenShell
+      title={`#${name}`}
+      subtitle={
+        tagInfo
+          ? `${tagInfo.posts.toLocaleString()} posts · trending ↑${Math.round(tagInfo.delta * 100)}%`
+          : "destination feed"
+      }
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 130 }}
+      >
         {matched.length === 0 ? (
           <View style={styles.empty}>
-            <Feather name="navigation" size={28} color={colors.mutedForeground} />
+            <Feather
+              name="navigation"
+              size={28}
+              color={colors.mutedForeground}
+            />
             <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
               no echoes here yet — be the first
             </Text>
@@ -38,5 +59,9 @@ export default function TagScreen() {
 
 const styles = StyleSheet.create({
   empty: { paddingTop: 80, alignItems: "center", gap: 10 },
-  emptyText: { fontFamily: "Inter_500Medium", fontSize: 14, textAlign: "center" },
+  emptyText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 14,
+    textAlign: "center",
+  },
 });

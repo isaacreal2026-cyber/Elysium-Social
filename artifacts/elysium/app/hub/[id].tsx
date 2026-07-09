@@ -31,7 +31,15 @@ export default function HubDetailScreen() {
 
   if (!hub) {
     return (
-      <ScreenShell title="Hub not found" subtitle="this hub drifted away" />
+      <ScreenShell title="Hub not found" subtitle="this hub drifted away">
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text style={{ color: colors.text }}>
+            This hub has drifted into the void.
+          </Text>
+        </View>
+      </ScreenShell>
     );
   }
 
@@ -44,35 +52,71 @@ export default function HubDetailScreen() {
       rightAction={
         <Pressable
           onPress={() => toggleHubProjectMode(hub.id)}
-          style={[styles.modeBtn, { borderColor: hub.projectMode ? colors.teal : colors.border }]}
+          style={[
+            styles.modeBtn,
+            { borderColor: hub.projectMode ? colors.teal : colors.border },
+          ]}
         >
-          <Feather name="layers" size={14} color={hub.projectMode ? colors.teal : colors.mutedForeground} />
+          <Feather
+            name="layers"
+            size={14}
+            color={hub.projectMode ? colors.teal : colors.mutedForeground}
+          />
         </Pressable>
       }
     >
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 80 }}
+      >
         <View style={styles.spatial}>
-          <Image source={NEBULAS[hub.toneIndex]} style={StyleSheet.absoluteFill} contentFit="cover" />
-          <LinearGradient colors={["rgba(7,2,26,0.4)", "rgba(7,2,26,0.95)"]} style={StyleSheet.absoluteFill} />
+          <Image
+            source={NEBULAS[hub.toneIndex]}
+            style={StyleSheet.absoluteFill}
+            contentFit="cover"
+          />
+          <LinearGradient
+            colors={["rgba(7,2,26,0.4)", "rgba(7,2,26,0.95)"]}
+            style={StyleSheet.absoluteFill}
+          />
           <View style={styles.orbiters}>
             {hub.online.slice(0, 6).map((uid, i) => {
               const u = userById(uid);
               if (!u) return null;
-              return <Orbiter key={uid} color={u.avatarColor} glyph={u.avatarGlyph} index={i} total={hub.online.length} />;
+              return (
+                <Orbiter
+                  key={uid}
+                  color={u.avatarColor}
+                  glyph={u.avatarGlyph}
+                  index={i}
+                  total={hub.online.length}
+                />
+              );
             })}
             <View style={[styles.center, { borderColor: colors.gold }]}>
-              <Text style={styles.centerText}>{Math.round(hub.pulse * 100)}</Text>
+              <Text style={styles.centerText}>
+                {Math.round(hub.pulse * 100)}
+              </Text>
               <Text style={styles.centerLabel}>PULSE</Text>
             </View>
           </View>
         </View>
 
         {hub.projectMode ? (
-          <View style={[styles.projectBanner, { borderColor: colors.teal, backgroundColor: colors.teal + "11" }]}>
+          <View
+            style={[
+              styles.projectBanner,
+              { borderColor: colors.teal, backgroundColor: colors.teal + "11" },
+            ]}
+          >
             <Feather name="layers" size={14} color={colors.teal} />
             <View style={{ flex: 1 }}>
-              <Text style={[styles.projectTitle, { color: colors.teal }]}>PROJECT MODE — collaborative canvas</Text>
-              <Text style={[styles.projectMeta, { color: colors.mutedForeground }]}>
+              <Text style={[styles.projectTitle, { color: colors.teal }]}>
+                PROJECT MODE — collaborative canvas
+              </Text>
+              <Text
+                style={[styles.projectMeta, { color: colors.mutedForeground }]}
+              >
                 shared moodboard · 12 tasks open · 3 voice notes pinned
               </Text>
             </View>
@@ -81,7 +125,11 @@ export default function HubDetailScreen() {
         ) : null}
 
         <View style={[styles.windowsRow]}>
-          <Window label="Recent" value={`${hubPosts.length} posts`} color={colors.primary} />
+          <Window
+            label="Recent"
+            value={`${hubPosts.length} posts`}
+            color={colors.primary}
+          />
           <Window label="Voice" value="2 rooms live" color={colors.teal} />
           <Window label="Files" value="14 shared" color={colors.gold} />
         </View>
@@ -96,7 +144,17 @@ export default function HubDetailScreen() {
   );
 }
 
-function Orbiter({ color, glyph, index, total }: { color: string; glyph: string; index: number; total: number }) {
+function Orbiter({
+  color,
+  glyph,
+  index,
+  total,
+}: {
+  color: string;
+  glyph: string;
+  index: number;
+  total: number;
+}) {
   const angle = (Math.PI * 2 * index) / total;
   const r = 110;
   const rotate = useSharedValue(0);
@@ -123,7 +181,15 @@ function Orbiter({ color, glyph, index, total }: { color: string; glyph: string;
   );
 }
 
-function Window({ label, value, color }: { label: string; value: string; color: string }) {
+function Window({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
   return (
     <View style={[styles.window, { borderColor: color + "55" }]}>
       <Text style={[styles.windowLabel, { color }]}>{label.toUpperCase()}</Text>
@@ -169,8 +235,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgba(7,2,26,0.7)",
   },
-  centerText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 26, letterSpacing: -0.5 },
-  centerLabel: { color: "#FFD56B", fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 1.2 },
+  centerText: {
+    color: "#fff",
+    fontFamily: "Inter_700Bold",
+    fontSize: 26,
+    letterSpacing: -0.5,
+  },
+  centerLabel: {
+    color: "#FFD56B",
+    fontFamily: "Inter_700Bold",
+    fontSize: 9,
+    letterSpacing: 1.2,
+  },
   projectBanner: {
     marginHorizontal: 16,
     marginBottom: 16,
@@ -181,10 +257,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  projectTitle: { fontFamily: "Inter_700Bold", fontSize: 11, letterSpacing: 0.6 },
+  projectTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 11,
+    letterSpacing: 0.6,
+  },
   projectMeta: { fontFamily: "Inter_400Regular", fontSize: 12, marginTop: 2 },
-  windowsRow: { flexDirection: "row", gap: 8, paddingHorizontal: 16, marginBottom: 14 },
-  window: { flex: 1, padding: 12, borderRadius: 14, borderWidth: 1, backgroundColor: "rgba(245,240,255,0.04)" },
-  windowLabel: { fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 1, marginBottom: 4 },
-  windowValue: { color: "#F5F0FF", fontFamily: "Inter_600SemiBold", fontSize: 13 },
+  windowsRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 16,
+    marginBottom: 14,
+  },
+  window: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    backgroundColor: "rgba(245,240,255,0.04)",
+  },
+  windowLabel: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 9,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  windowValue: {
+    color: "#F5F0FF",
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 13,
+  },
 });

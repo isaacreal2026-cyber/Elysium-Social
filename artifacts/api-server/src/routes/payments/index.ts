@@ -13,7 +13,11 @@ function getStripe() {
 }
 
 router.post("/payments/create-intent", async (req, res) => {
-  const { amount, currency = "usd", description } = req.body as {
+  const {
+    amount,
+    currency = "usd",
+    description,
+  } = req.body as {
     amount: number;
     currency?: string;
     description?: string;
@@ -56,7 +60,11 @@ router.post("/payments/webhook", async (req, res) => {
     const stripe = getStripe();
     let event: Stripe.Event;
     try {
-      event = stripe.webhooks.constructEvent(req.body as Buffer, sig, webhookSecret);
+      event = stripe.webhooks.constructEvent(
+        req.body as Buffer,
+        sig,
+        webhookSecret,
+      );
     } catch {
       res.status(400).json({ error: "Invalid webhook signature" });
       return;
@@ -75,7 +83,10 @@ router.post("/payments/webhook", async (req, res) => {
 });
 
 router.get("/payments/history", async (_req, res) => {
-  const history = await db.select().from(payments).orderBy(desc(payments.createdAt));
+  const history = await db
+    .select()
+    .from(payments)
+    .orderBy(desc(payments.createdAt));
   res.json(history);
 });
 

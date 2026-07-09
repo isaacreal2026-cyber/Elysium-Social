@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) scale(1);
     opacity: 0.3;
   }
@@ -14,7 +15,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 10px 0px rgba(139, 92, 246, 0.4);
   }
   50% {
@@ -23,7 +25,8 @@
 }
 
 @keyframes twinkle {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.1;
   }
   50% {
@@ -44,8 +47,9 @@
 }
 
 .cosmic-bg {
-  background: radial-gradient(circle at top right, #1e0b36, #000000 70%),
-              radial-gradient(circle at bottom left, #290d4f, transparent 60%);
+  background:
+    radial-gradient(circle at top right, #1e0b36, #000000 70%),
+    radial-gradient(circle at bottom left, #290d4f, transparent 60%);
   background-size: 200% 200%;
   animation: nebula-drift 30s ease infinite;
 }
@@ -68,44 +72,97 @@
 }
 
 @keyframes aura-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes aura-pulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes waveform-pulse {
-  0%, 100% { transform: scaleY(0.5); }
-  50% { transform: scaleY(1); }
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
 
 .story-ring-gold {
-  background: conic-gradient(from 0deg, transparent 0%, rgba(250, 204, 21, 0.1) 20%, rgba(250, 204, 21, 0.6) 50%, rgba(250, 204, 21, 0.1) 80%, transparent 100%);
-  animation: aura-spin 10s linear infinite, aura-pulse 4s ease-in-out infinite;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(250, 204, 21, 0.1) 20%,
+    rgba(250, 204, 21, 0.6) 50%,
+    rgba(250, 204, 21, 0.1) 80%,
+    transparent 100%
+  );
+  animation:
+    aura-spin 10s linear infinite,
+    aura-pulse 4s ease-in-out infinite;
 }
 
 .story-ring-cyan {
-  background: conic-gradient(from 0deg, transparent 0%, rgba(34, 211, 238, 0.1) 20%, rgba(34, 211, 238, 0.6) 50%, rgba(34, 211, 238, 0.1) 80%, transparent 100%);
-  animation: aura-spin 12s linear infinite reverse, aura-pulse 5s ease-in-out infinite;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(34, 211, 238, 0.1) 20%,
+    rgba(34, 211, 238, 0.6) 50%,
+    rgba(34, 211, 238, 0.1) 80%,
+    transparent 100%
+  );
+  animation:
+    aura-spin 12s linear infinite reverse,
+    aura-pulse 5s ease-in-out infinite;
 }
 
 .story-ring-violet {
-  background: conic-gradient(from 0deg, transparent 0%, rgba(167, 139, 250, 0.1) 20%, rgba(167, 139, 250, 0.6) 50%, rgba(167, 139, 250, 0.1) 80%, transparent 100%);
-  animation: aura-spin 15s linear infinite, aura-pulse 6s ease-in-out infinite;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(167, 139, 250, 0.1) 20%,
+    rgba(167, 139, 250, 0.6) 50%,
+    rgba(167, 139, 250, 0.1) 80%,
+    transparent 100%
+  );
+  animation:
+    aura-spin 15s linear infinite,
+    aura-pulse 6s ease-in-out infinite;
 }
 
-
 @keyframes freq-scan {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes signal-pulse {
-  0%, 100% { opacity: 0.3; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }
 
 .tuner-scroll::-webkit-scrollbar {
@@ -118,21 +175,29 @@
 
 .constellation-starfield {
   background-color: #080815;
-  background-image: 
-    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0,0,0,0));
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 50px 160px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0, 0, 0, 0));
   background-repeat: repeat;
   background-size: 200px 200px;
 }
 
 @keyframes pulse-glow {
-  0% { box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(139, 92, 246, 0.4); }
-  100% { box-shadow: 0 0 10px rgba(139, 92, 246, 0.4); }
+  0% {
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(139, 92, 246, 0.8),
+      0 0 40px rgba(139, 92, 246, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+  }
 }
 
 .animate-pulse-glow {
@@ -140,13 +205,20 @@
 }
 
 @keyframes float-node {
-  0% { transform: translate(0, 0); }
-  33% { transform: translate(2px, -3px); }
-  66% { transform: translate(-2px, 2px); }
-  100% { transform: translate(0, 0); }
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(2px, -3px);
+  }
+  66% {
+    transform: translate(-2px, 2px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 
 .animate-float-node {
   animation: float-node 6s infinite ease-in-out;
 }
-

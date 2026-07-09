@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Animated, {
   Easing,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -30,7 +31,10 @@ export default function StoryViewer() {
   const { stories, userById, markStoryViewed, resonate } = useResonance();
   const [reply, setReply] = useState("");
 
-  const startIndex = Math.max(0, stories.findIndex((s) => s.id === id));
+  const startIndex = Math.max(
+    0,
+    stories.findIndex((s) => s.id === id),
+  );
   const [index, setIndex] = useState(startIndex);
   const story = stories[index];
 
@@ -39,12 +43,16 @@ export default function StoryViewer() {
   useEffect(() => {
     if (!story) return;
     progress.value = 0;
-    progress.value = withTiming(1, { duration: STORY_DURATION, easing: Easing.linear }, (finished) => {
-      "worklet";
-      if (finished) {
-        // advance handled by setTimeout below
-      }
-    });
+    progress.value = withTiming(
+      1,
+      { duration: STORY_DURATION, easing: Easing.linear },
+      (finished) => {
+        "worklet";
+        if (finished) {
+          // advance handled by setTimeout below
+        }
+      },
+    );
     markStoryViewed(story.id);
     const t = setTimeout(() => {
       if (index < stories.length - 1) {
@@ -58,7 +66,16 @@ export default function StoryViewer() {
 
   if (!story) {
     return (
-      <View style={[styles.root, { backgroundColor: colors.background, alignItems: "center", justifyContent: "center" }]}>
+      <View
+        style={[
+          styles.root,
+          {
+            backgroundColor: colors.background,
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        ]}
+      >
         <Text style={{ color: colors.text }}>Story not found</Text>
       </View>
     );
@@ -76,7 +93,11 @@ export default function StoryViewer() {
 
   return (
     <View style={[styles.root, { backgroundColor: "#000" }]}>
-      <Image source={NEBULAS[story.toneIndex]} style={StyleSheet.absoluteFill} contentFit="cover" />
+      <Image
+        source={NEBULAS[story.toneIndex]}
+        style={StyleSheet.absoluteFill}
+        contentFit="cover"
+      />
       <LinearGradient
         colors={["rgba(7,2,26,0.85)", "rgba(7,2,26,0.1)", "rgba(7,2,26,0.95)"]}
         style={StyleSheet.absoluteFill}
@@ -91,17 +112,30 @@ export default function StoryViewer() {
       <View style={[styles.top, { paddingTop: insets.top + 10 }]}>
         <View style={styles.progressRow}>
           {stories.map((_, i) => (
-            <ProgressBar key={i} active={i === index} done={i < index} progress={progress} />
+            <ProgressBar
+              key={i}
+              active={i === index}
+              done={i < index}
+              progress={progress}
+            />
           ))}
         </View>
         <View style={styles.headerRow}>
-          <Pressable onPress={() => router.push(`/profile/${author?.id}` as never)} style={styles.authorRow}>
-            <View style={[styles.avatar, { backgroundColor: author?.avatarColor }]}>
+          <Pressable
+            onPress={() => router.push(`/profile/${author?.id}` as never)}
+            style={styles.authorRow}
+          >
+            <View
+              style={[styles.avatar, { backgroundColor: author?.avatarColor }]}
+            >
               <Text style={styles.avatarText}>{author?.avatarGlyph}</Text>
             </View>
             <View>
               <Text style={styles.authorName}>{author?.name}</Text>
-              <Text style={styles.authorMeta}>{Math.floor((Date.now() - story.createdAt) / 60000)}m · {story.viewers.toLocaleString()} viewers</Text>
+              <Text style={styles.authorMeta}>
+                {Math.floor((Date.now() - story.createdAt) / 60000)}m ·{" "}
+                {story.viewers.toLocaleString()} viewers
+              </Text>
             </View>
           </Pressable>
           <Pressable onPress={() => router.back()} style={styles.closeBtn}>
@@ -136,14 +170,26 @@ export default function StoryViewer() {
           <ReactionBtn icon="zap" color="#FFD56B" onPress={() => {}} />
           <ReactionBtn icon="heart" color="#FB7185" onPress={() => {}} />
           <ReactionBtn icon="mic" color="#5EEAD4" onPress={() => {}} />
-          <ReactionBtn icon="send" color="#B57BFF" onPress={() => router.push(`/post/${story.id}` as never)} />
+          <ReactionBtn
+            icon="send"
+            color="#B57BFF"
+            onPress={() => router.push(`/post/${story.id}` as never)}
+          />
         </View>
       </View>
     </View>
   );
 }
 
-function ProgressBar({ active, done, progress }: { active: boolean; done: boolean; progress: Animated.SharedValue<number> }) {
+function ProgressBar({
+  active,
+  done,
+  progress,
+}: {
+  active: boolean;
+  done: boolean;
+  progress: SharedValue<number>;
+}) {
   const style = useAnimatedStyle(() => ({
     width: done ? "100%" : active ? `${progress.value * 100}%` : "0%",
   }));
@@ -154,9 +200,23 @@ function ProgressBar({ active, done, progress }: { active: boolean; done: boolea
   );
 }
 
-function ReactionBtn({ icon, color, onPress }: { icon: React.ComponentProps<typeof Feather>["name"]; color: string; onPress: () => void }) {
+function ReactionBtn({
+  icon,
+  color,
+  onPress,
+}: {
+  icon: React.ComponentProps<typeof Feather>["name"];
+  color: string;
+  onPress: () => void;
+}) {
   return (
-    <Pressable onPress={onPress} style={[styles.reactBtn, { borderColor: color, backgroundColor: color + "22" }]}>
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.reactBtn,
+        { borderColor: color, backgroundColor: color + "22" },
+      ]}
+    >
       <Feather name={icon} size={18} color={color} />
     </Pressable>
   );
@@ -169,9 +229,20 @@ const styles = StyleSheet.create({
   tapRight: { flex: 2 },
   top: { paddingHorizontal: 12 },
   progressRow: { flexDirection: "row", gap: 4, marginBottom: 12 },
-  progressTrack: { flex: 1, height: 3, backgroundColor: "rgba(255,255,255,0.25)", borderRadius: 2, overflow: "hidden" },
+  progressTrack: {
+    flex: 1,
+    height: 3,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    borderRadius: 2,
+    overflow: "hidden",
+  },
   progressFill: { height: "100%", backgroundColor: "#fff", borderRadius: 2 },
-  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 4 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 4,
+  },
   authorRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   avatar: {
     width: 36,
@@ -184,10 +255,32 @@ const styles = StyleSheet.create({
   },
   avatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 14 },
   authorName: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 14 },
-  authorMeta: { color: "rgba(245,240,255,0.7)", fontFamily: "Inter_400Regular", fontSize: 11 },
-  closeBtn: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center" },
-  middle: { flex: 1, paddingHorizontal: 32, alignItems: "center", justifyContent: "center" },
-  caption: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 26, lineHeight: 36, textAlign: "center", letterSpacing: -0.4 },
+  authorMeta: {
+    color: "rgba(245,240,255,0.7)",
+    fontFamily: "Inter_400Regular",
+    fontSize: 11,
+  },
+  closeBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  middle: {
+    flex: 1,
+    paddingHorizontal: 32,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  caption: {
+    color: "#fff",
+    fontFamily: "Inter_700Bold",
+    fontSize: 26,
+    lineHeight: 36,
+    textAlign: "center",
+    letterSpacing: -0.4,
+  },
   destRow: { flexDirection: "row", gap: 8, marginTop: 18 },
   destChip: {
     flexDirection: "row",
@@ -200,7 +293,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,213,107,0.5)",
   },
-  destChipText: { color: "#FFD56B", fontFamily: "Inter_600SemiBold", fontSize: 12 },
+  destChipText: {
+    color: "#FFD56B",
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 12,
+  },
   bottom: { paddingHorizontal: 16, gap: 12 },
   replyBar: {
     paddingHorizontal: 16,
@@ -212,7 +309,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  replyInput: { flex: 1, color: "#fff", fontFamily: "Inter_500Medium", fontSize: 14 },
+  replyInput: {
+    flex: 1,
+    color: "#fff",
+    fontFamily: "Inter_500Medium",
+    fontSize: 14,
+  },
   reactRow: { flexDirection: "row", justifyContent: "center", gap: 14 },
   reactBtn: {
     width: 48,

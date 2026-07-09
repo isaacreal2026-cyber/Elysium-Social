@@ -18,7 +18,15 @@ interface Star {
   drift: number;
 }
 
-const STAR_COLORS = ["#B57BFF", "#5EEAD4", "#FFD56B", "#F472B6", "#FFFFFF", "#FFFFFF", "#FFFFFF"];
+const STAR_COLORS = [
+  "#B57BFF",
+  "#5EEAD4",
+  "#FFD56B",
+  "#F472B6",
+  "#FFFFFF",
+  "#FFFFFF",
+  "#FFFFFF",
+];
 
 function generate(seed: number, count: number): Star[] {
   const stars: Star[] = [];
@@ -47,7 +55,10 @@ interface StarFieldProps {
 }
 
 export function StarField({ density = 60, seed = 7 }: StarFieldProps) {
-  const stars = useMemo(() => generate(seed, Math.min(density, 80)), [seed, density]);
+  const stars = useMemo(
+    () => generate(seed, Math.min(density, 80)),
+    [seed, density],
+  );
 
   if (Platform.OS === "web") {
     return (
@@ -80,17 +91,40 @@ function AnimatedStarField({ stars }: { stars: Star[] }) {
   const vc = useSharedValue(0);
 
   React.useEffect(() => {
-    va.value = withRepeat(withTiming(1, { duration: 3400, easing: Easing.inOut(Easing.ease) }), -1, true);
-    vb.value = withRepeat(withTiming(1, { duration: 5000, easing: Easing.inOut(Easing.ease) }), -1, true);
-    vc.value = withRepeat(withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.ease) }), -1, true);
+    va.value = withRepeat(
+      withTiming(1, { duration: 3400, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
+    vb.value = withRepeat(
+      withTiming(1, { duration: 5000, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
+    vc.value = withRepeat(
+      withTiming(1, { duration: 2600, easing: Easing.inOut(Easing.ease) }),
+      -1,
+      true,
+    );
   }, [va, vb, vc]);
 
-  const styleA = useAnimatedStyle(() => ({ opacity: 0.5 + va.value * 0.5, transform: [{ translateY: va.value * 4 - 2 }] }));
-  const styleB = useAnimatedStyle(() => ({ opacity: 0.4 + vb.value * 0.6, transform: [{ translateY: vb.value * 6 - 3 }] }));
-  const styleC = useAnimatedStyle(() => ({ opacity: 0.6 + vc.value * 0.4, transform: [{ translateY: vc.value * 3 - 1.5 }] }));
+  const styleA = useAnimatedStyle(() => ({
+    opacity: 0.5 + va.value * 0.5,
+    transform: [{ translateY: va.value * 4 - 2 }],
+  }));
+  const styleB = useAnimatedStyle(() => ({
+    opacity: 0.4 + vb.value * 0.6,
+    transform: [{ translateY: vb.value * 6 - 3 }],
+  }));
+  const styleC = useAnimatedStyle(() => ({
+    opacity: 0.6 + vc.value * 0.4,
+    transform: [{ translateY: vc.value * 3 - 1.5 }],
+  }));
 
   const [groupA, groupB, groupC] = useMemo(() => {
-    const a: Star[] = [], b: Star[] = [], c: Star[] = [];
+    const a: Star[] = [],
+      b: Star[] = [],
+      c: Star[] = [];
     stars.forEach((st) => {
       if (st.group === 0) a.push(st);
       else if (st.group === 1) b.push(st);

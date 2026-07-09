@@ -29,29 +29,47 @@ export default function PostDetailScreen() {
   const post = posts.find((p) => p.id === id);
   const tree = useMemo(() => {
     const rel = comments.filter((c) => c.postId === id);
-    const mainComments = rel.filter((c) => !c.laughThread && c.parentId === null);
-    const laughComments = rel.filter((c) => c.laughThread && c.parentId === null);
+    const mainComments = rel.filter(
+      (c) => !c.laughThread && c.parentId === null,
+    );
+    const laughComments = rel.filter(
+      (c) => c.laughThread && c.parentId === null,
+    );
     return { rel, mainComments, laughComments };
   }, [comments, id]);
 
   if (!post) {
     return (
       <ScreenShell title="Lost orbit" subtitle="this post drifted away">
-        <Text style={{ color: colors.mutedForeground, padding: 24 }}>The post you're looking for is no longer here.</Text>
+        <Text style={{ color: colors.mutedForeground, padding: 24 }}>
+          The post you're looking for is no longer here.
+        </Text>
       </ScreenShell>
     );
   }
 
   const send = () => {
     if (!draft.trim()) return;
-    addComment({ postId: id, parentId: replyTo, body: draft.trim(), laughThread: laughMode });
+    addComment({
+      postId: id,
+      parentId: replyTo,
+      body: draft.trim(),
+      laughThread: laughMode,
+    });
     setDraft("");
     setReplyTo(null);
   };
 
   return (
-    <ScreenShell title="Resonance" subtitle="fractal threads · go as deep as you like">
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={0}>
+    <ScreenShell
+      title="Resonance"
+      subtitle="fractal threads · go as deep as you like"
+    >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0}
+      >
         <ScrollView
           contentContainerStyle={{ padding: 16, paddingBottom: 30 }}
           keyboardShouldPersistTaps="handled"
@@ -59,8 +77,17 @@ export default function PostDetailScreen() {
           <PostCard post={post} />
 
           <View style={styles.threadHeader}>
-            <Feather name="message-circle" size={14} color={colors.mutedForeground} />
-            <Text style={[styles.threadHeaderText, { color: colors.mutedForeground }]}>
+            <Feather
+              name="message-circle"
+              size={14}
+              color={colors.mutedForeground}
+            />
+            <Text
+              style={[
+                styles.threadHeaderText,
+                { color: colors.mutedForeground },
+              ]}
+            >
               {tree.rel.length} resonance threads
             </Text>
           </View>
@@ -77,11 +104,25 @@ export default function PostDetailScreen() {
           ))}
 
           {tree.laughComments.length > 0 ? (
-            <View style={[styles.laughBox, { borderColor: colors.gold + "55", backgroundColor: colors.gold + "0F" }]}>
+            <View
+              style={[
+                styles.laughBox,
+                {
+                  borderColor: colors.gold + "55",
+                  backgroundColor: colors.gold + "0F",
+                },
+              ]}
+            >
               <View style={styles.laughHeader}>
                 <Feather name="zap" size={14} color={colors.gold} />
-                <Text style={[styles.laughHeaderText, { color: colors.gold }]}>LAUGHING THREAD</Text>
-                <Text style={[styles.laughMeta, { color: colors.mutedForeground }]}>going viral on its own</Text>
+                <Text style={[styles.laughHeaderText, { color: colors.gold }]}>
+                  LAUGHING THREAD
+                </Text>
+                <Text
+                  style={[styles.laughMeta, { color: colors.mutedForeground }]}
+                >
+                  going viral on its own
+                </Text>
               </View>
               {tree.laughComments.map((c) => (
                 <CommentNode
@@ -89,7 +130,10 @@ export default function PostDetailScreen() {
                   comment={c}
                   all={tree.rel}
                   depth={0}
-                  onReply={(cid) => { setReplyTo(cid); setLaughMode(true); }}
+                  onReply={(cid) => {
+                    setReplyTo(cid);
+                    setLaughMode(true);
+                  }}
                   activeReply={replyTo}
                   laugh
                 />
@@ -98,7 +142,15 @@ export default function PostDetailScreen() {
           ) : null}
         </ScrollView>
 
-        <View style={[styles.inputBar, { borderTopColor: colors.border, backgroundColor: colors.background }]}>
+        <View
+          style={[
+            styles.inputBar,
+            {
+              borderTopColor: colors.border,
+              backgroundColor: colors.background,
+            },
+          ]}
+        >
           <Pressable
             onPress={() => setLaughMode((v) => !v)}
             style={[
@@ -109,16 +161,41 @@ export default function PostDetailScreen() {
               },
             ]}
           >
-            <Feather name="zap" size={16} color={laughMode ? colors.gold : colors.mutedForeground} />
+            <Feather
+              name="zap"
+              size={16}
+              color={laughMode ? colors.gold : colors.mutedForeground}
+            />
           </Pressable>
           <TextInput
             value={draft}
             onChangeText={setDraft}
-            placeholder={replyTo ? "reply to thread…" : laughMode ? "drop a one-liner…" : "add to the resonance…"}
+            placeholder={
+              replyTo
+                ? "reply to thread…"
+                : laughMode
+                  ? "drop a one-liner…"
+                  : "add to the resonance…"
+            }
             placeholderTextColor={colors.subtle}
-            style={[styles.input, { color: colors.text, backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                backgroundColor: colors.card,
+                borderColor: colors.border,
+              },
+            ]}
           />
-          <Pressable onPress={send} style={[styles.sendBtn, { backgroundColor: draft.trim() ? colors.primary : colors.border }]}>
+          <Pressable
+            onPress={send}
+            style={[
+              styles.sendBtn,
+              {
+                backgroundColor: draft.trim() ? colors.primary : colors.border,
+              },
+            ]}
+          >
             <Feather name="arrow-up" size={18} color="#fff" />
           </Pressable>
         </View>
@@ -149,37 +226,93 @@ function CommentNode({
 
   return (
     <View style={{ marginLeft: depth === 0 ? 0 : 14, marginTop: 10 }}>
-      <View style={[styles.comment, { borderColor: laugh ? colors.gold + "33" : colors.border, backgroundColor: laugh ? "transparent" : colors.card }]}>
+      <View
+        style={[
+          styles.comment,
+          {
+            borderColor: laugh ? colors.gold + "33" : colors.border,
+            backgroundColor: laugh ? "transparent" : colors.card,
+          },
+        ]}
+      >
         <View style={styles.commentHeader}>
-          <View style={[styles.cAvatar, { backgroundColor: author?.avatarColor }]}>
+          <View
+            style={[styles.cAvatar, { backgroundColor: author?.avatarColor }]}
+          >
             <Text style={styles.cAvatarText}>{author?.avatarGlyph}</Text>
           </View>
-          <Text style={[styles.cName, { color: colors.text }]}>{author?.name}</Text>
+          <Text style={[styles.cName, { color: colors.text }]}>
+            {author?.name}
+          </Text>
           {comment.voiceSeconds ? (
             <View style={[styles.voiceTag, { borderColor: colors.teal }]}>
               <Feather name="mic" size={10} color={colors.teal} />
-              <Text style={[styles.voiceTagText, { color: colors.teal }]}>{comment.voiceSeconds}s</Text>
+              <Text style={[styles.voiceTagText, { color: colors.teal }]}>
+                {comment.voiceSeconds}s
+              </Text>
             </View>
           ) : null}
         </View>
-        <Text style={[styles.cBody, { color: colors.text }]}>{comment.body}</Text>
+        <Text style={[styles.cBody, { color: colors.text }]}>
+          {comment.body}
+        </Text>
         <View style={styles.cFooter}>
-          <Pressable onPress={() => onReply(comment.id)} style={styles.cFooterBtn}>
-            <Feather name="corner-down-right" size={12} color={activeReply === comment.id ? colors.primary : colors.mutedForeground} />
-            <Text style={[styles.cFooterText, { color: activeReply === comment.id ? colors.primary : colors.mutedForeground }]}>
+          <Pressable
+            onPress={() => onReply(comment.id)}
+            style={styles.cFooterBtn}
+          >
+            <Feather
+              name="corner-down-right"
+              size={12}
+              color={
+                activeReply === comment.id
+                  ? colors.primary
+                  : colors.mutedForeground
+              }
+            />
+            <Text
+              style={[
+                styles.cFooterText,
+                {
+                  color:
+                    activeReply === comment.id
+                      ? colors.primary
+                      : colors.mutedForeground,
+                },
+              ]}
+            >
               reply
             </Text>
           </Pressable>
           <View style={styles.cFooterBtn}>
             <Feather name="zap" size={12} color={colors.gold} />
-            <Text style={[styles.cFooterText, { color: colors.mutedForeground }]}>{comment.resonance}</Text>
+            <Text
+              style={[styles.cFooterText, { color: colors.mutedForeground }]}
+            >
+              {comment.resonance}
+            </Text>
           </View>
         </View>
       </View>
       {children.length > 0 ? (
-        <View style={{ borderLeftWidth: 1, borderLeftColor: colors.border + "55", paddingLeft: 6, marginTop: 4 }}>
+        <View
+          style={{
+            borderLeftWidth: 1,
+            borderLeftColor: colors.border + "55",
+            paddingLeft: 6,
+            marginTop: 4,
+          }}
+        >
           {children.map((c) => (
-            <CommentNode key={c.id} comment={c} all={all} depth={depth + 1} onReply={onReply} activeReply={activeReply} laugh={laugh} />
+            <CommentNode
+              key={c.id}
+              comment={c}
+              all={all}
+              depth={depth + 1}
+              onReply={onReply}
+              activeReply={activeReply}
+              laugh={laugh}
+            />
           ))}
         </View>
       ) : null}
@@ -201,11 +334,30 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
   },
-  commentHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
-  cAvatar: { width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  commentHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
+  cAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   cAvatarText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 11 },
   cName: { fontFamily: "Inter_600SemiBold", fontSize: 13 },
-  voiceTag: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 999, borderWidth: 1 },
+  voiceTag: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
   voiceTagText: { fontFamily: "Inter_600SemiBold", fontSize: 10 },
   cBody: { fontFamily: "Inter_400Regular", fontSize: 14, lineHeight: 20 },
   cFooter: { flexDirection: "row", gap: 14, marginTop: 8 },
@@ -217,8 +369,17 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
   },
-  laughHeader: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 8 },
-  laughHeaderText: { fontFamily: "Inter_700Bold", fontSize: 10, letterSpacing: 1 },
+  laughHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+  },
+  laughHeaderText: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    letterSpacing: 1,
+  },
   laughMeta: { fontFamily: "Inter_400Regular", fontSize: 10 },
   inputBar: {
     flexDirection: "row",

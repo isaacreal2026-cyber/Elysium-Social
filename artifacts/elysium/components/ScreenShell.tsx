@@ -30,17 +30,30 @@ export function ScreenShell({
 }: ScreenShellProps) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const topPad = (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 10;
+  const topPad =
+    (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 10;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={["#160B30", "#07021A"]} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={["#160B30", "#07021A"]}
+        style={StyleSheet.absoluteFill}
+      />
       <StarField density={density} seed={title.charCodeAt(0) || 7} />
 
       <View style={[styles.header, { paddingTop: topPad }]}>
         <View style={styles.row}>
           {showBack ? (
-            <Pressable onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: "rgba(245,240,255,0.06)", borderColor: colors.border }]}>
+            <Pressable
+              onPress={() => router.back()}
+              style={[
+                styles.backBtn,
+                {
+                  backgroundColor: "rgba(245,240,255,0.06)",
+                  borderColor: colors.border,
+                },
+              ]}
+            >
               <Feather name="chevron-left" size={20} color={colors.text} />
             </Pressable>
           ) : (
@@ -49,10 +62,14 @@ export function ScreenShell({
           <View style={{ flex: 1 }}>
             <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
             {subtitle ? (
-              <Text style={[styles.subtitle, { color: colors.subtle }]}>{subtitle}</Text>
+              <Text style={[styles.subtitle, { color: colors.subtle }]}>
+                {subtitle}
+              </Text>
             ) : null}
           </View>
-          <View style={styles.right}>{rightAction ?? <View style={{ width: 36 }} />}</View>
+          <View style={styles.right}>
+            {rightAction ?? <View style={{ width: 36 }} />}
+          </View>
         </View>
       </View>
 

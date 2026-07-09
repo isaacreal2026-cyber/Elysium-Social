@@ -30,12 +30,48 @@ interface OrbDef {
 }
 
 const ORBS: OrbDef[] = [
-  { key: "feed", label: "Feed", icon: "globe", route: "/feed", colors: ["#B57BFF", "#7C3AED"] },
-  { key: "discover", label: "Discover", icon: "compass", route: "/discover", colors: ["#5EEAD4", "#0EA5E9"] },
-  { key: "connect", label: "Connect", icon: "users", route: "/connections", colors: ["#F472B6", "#FB7185"] },
-  { key: "groups", label: "Hubs", icon: "hexagon", route: "/groups", colors: ["#FFD56B", "#F97316"] },
-  { key: "ai", label: "AI", icon: "cpu", route: "/ai-chat", colors: ["#B57BFF", "#5EEAD4"] },
-  { key: "me", label: "Me", icon: "user", route: "/me", colors: ["#A78BFA", "#F472B6"] },
+  {
+    key: "feed",
+    label: "Feed",
+    icon: "globe",
+    route: "/feed",
+    colors: ["#B57BFF", "#7C3AED"],
+  },
+  {
+    key: "discover",
+    label: "Discover",
+    icon: "compass",
+    route: "/discover",
+    colors: ["#5EEAD4", "#0EA5E9"],
+  },
+  {
+    key: "connect",
+    label: "Connect",
+    icon: "users",
+    route: "/connections",
+    colors: ["#F472B6", "#FB7185"],
+  },
+  {
+    key: "groups",
+    label: "Hubs",
+    icon: "hexagon",
+    route: "/groups",
+    colors: ["#FFD56B", "#F97316"],
+  },
+  {
+    key: "ai",
+    label: "AI",
+    icon: "cpu",
+    route: "/ai-chat",
+    colors: ["#B57BFF", "#5EEAD4"],
+  },
+  {
+    key: "me",
+    label: "Me",
+    icon: "user",
+    route: "/me",
+    colors: ["#A78BFA", "#F472B6"],
+  },
 ];
 
 const RADIUS = 128;
@@ -55,31 +91,55 @@ export default function OrbitConstellation() {
     );
   }, [expanded, expand]);
 
-  const livePost = posts.reduce((a, b) => (a.energy > b.energy ? a : b), posts[0]!);
+  const livePost = posts.reduce(
+    (a, b) => (a.energy > b.energy ? a : b),
+    posts[0]!,
+  );
   const liveAuthor = userById(livePost?.authorId ?? "");
   const liveRoom = voiceRooms.find((v) => v.live);
 
-  const topPad = (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 8;
+  const topPad =
+    (Platform.OS === "web" ? Math.max(insets.top, 16) : insets.top) + 8;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={["#150A2E", "#07021A"]} style={StyleSheet.absoluteFill} />
+      <LinearGradient
+        colors={["#150A2E", "#07021A"]}
+        style={StyleSheet.absoluteFill}
+      />
       <StarField density={90} seed={11} />
 
       {/* Header */}
       <View style={[styles.topRow, { paddingTop: topPad }]}>
-        <Pressable onPress={() => router.back()} style={[styles.iconBtn, { backgroundColor: "rgba(245,240,255,0.06)", borderColor: colors.border }]}>
+        <Pressable
+          onPress={() => router.back()}
+          style={[
+            styles.iconBtn,
+            {
+              backgroundColor: "rgba(245,240,255,0.06)",
+              borderColor: colors.border,
+            },
+          ]}
+        >
           <Feather name="chevron-down" size={20} color={colors.text} />
         </Pressable>
         <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={[styles.tinyLabel, { color: colors.gold }]}>ORBITAL LAUNCHER</Text>
+          <Text style={[styles.tinyLabel, { color: colors.gold }]}>
+            ORBITAL LAUNCHER
+          </Text>
           <Text style={[styles.greetName, { color: colors.text }]}>
             {me?.name?.split(" ")[0]?.toLowerCase() ?? "you"}'s cosmos
           </Text>
         </View>
         <Pressable
           onPress={() => router.push("/composer" as never)}
-          style={[styles.iconBtn, { backgroundColor: colors.primary + "22", borderColor: colors.primary + "44" }]}
+          style={[
+            styles.iconBtn,
+            {
+              backgroundColor: colors.primary + "22",
+              borderColor: colors.primary + "44",
+            },
+          ]}
         >
           <Feather name="plus" size={20} color={colors.primary} />
         </Pressable>
@@ -93,8 +153,16 @@ export default function OrbitConstellation() {
           ))}
 
           {/* Center orb */}
-          <Pressable onPress={() => setExpanded((e) => !e)} style={styles.centerPressable}>
-            <GlowOrb size={104} colors={[colors.primary, "#5EEAD4"]} glyph="✦" intensity={1.3} />
+          <Pressable
+            onPress={() => setExpanded((e) => !e)}
+            style={styles.centerPressable}
+          >
+            <GlowOrb
+              size={104}
+              colors={[colors.primary, "#5EEAD4"]}
+              glyph="✦"
+              intensity={1.3}
+            />
           </Pressable>
         </View>
 
@@ -108,13 +176,23 @@ export default function OrbitConstellation() {
         {livePost ? (
           <Pressable
             onPress={() => router.push(`/post/${livePost.id}` as never)}
-            style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.deckCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
           >
             <View style={styles.deckHead}>
-              <View style={[styles.deckDot, { backgroundColor: colors.gold }]} />
-              <Text style={[styles.deckTag, { color: colors.gold }]}>MOMENT</Text>
+              <View
+                style={[styles.deckDot, { backgroundColor: colors.gold }]}
+              />
+              <Text style={[styles.deckTag, { color: colors.gold }]}>
+                MOMENT
+              </Text>
             </View>
-            <Text style={[styles.deckBody, { color: colors.text }]} numberOfLines={2}>
+            <Text
+              style={[styles.deckBody, { color: colors.text }]}
+              numberOfLines={2}
+            >
               {liveAuthor?.name} — {livePost.body.slice(0, 64)}
             </Text>
           </Pressable>
@@ -123,13 +201,21 @@ export default function OrbitConstellation() {
         {liveRoom ? (
           <Pressable
             onPress={() => router.push("/voice-party" as never)}
-            style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.deckCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
           >
             <View style={styles.deckHead}>
-              <View style={[styles.deckDot, { backgroundColor: colors.rose }]} />
+              <View
+                style={[styles.deckDot, { backgroundColor: colors.rose }]}
+              />
               <Text style={[styles.deckTag, { color: colors.rose }]}>LIVE</Text>
             </View>
-            <Text style={[styles.deckBody, { color: colors.text }]} numberOfLines={2}>
+            <Text
+              style={[styles.deckBody, { color: colors.text }]}
+              numberOfLines={2}
+            >
               {liveRoom.topic}
             </Text>
             <Text style={[styles.deckMeta, { color: colors.mutedForeground }]}>
@@ -141,13 +227,21 @@ export default function OrbitConstellation() {
         {hubs[0] ? (
           <Pressable
             onPress={() => router.push("/groups" as never)}
-            style={[styles.deckCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.deckCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
           >
             <View style={styles.deckHead}>
-              <View style={[styles.deckDot, { backgroundColor: colors.teal }]} />
+              <View
+                style={[styles.deckDot, { backgroundColor: colors.teal }]}
+              />
               <Text style={[styles.deckTag, { color: colors.teal }]}>HUB</Text>
             </View>
-            <Text style={[styles.deckBody, { color: colors.text }]} numberOfLines={2}>
+            <Text
+              style={[styles.deckBody, { color: colors.text }]}
+              numberOfLines={2}
+            >
               {hubs[0].name}
             </Text>
             <Text style={[styles.deckMeta, { color: colors.mutedForeground }]}>
@@ -183,12 +277,15 @@ function FloatingOrb({
         withTiming(0, { duration: dur, easing: Easing.inOut(Easing.ease) }),
       ),
     );
-    const id = setInterval(() => {
-      float.value = withSequence(
-        withTiming(1, { duration: dur, easing: Easing.inOut(Easing.ease) }),
-        withTiming(0, { duration: dur, easing: Easing.inOut(Easing.ease) }),
-      );
-    }, dur * 2 + 80);
+    const id = setInterval(
+      () => {
+        float.value = withSequence(
+          withTiming(1, { duration: dur, easing: Easing.inOut(Easing.ease) }),
+          withTiming(0, { duration: dur, easing: Easing.inOut(Easing.ease) }),
+        );
+      },
+      dur * 2 + 80,
+    );
     return () => clearInterval(id);
   }, [index, float]);
 
@@ -297,7 +394,12 @@ const styles = StyleSheet.create({
     minHeight: 88,
     gap: 4,
   },
-  deckHead: { flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 3 },
+  deckHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: 3,
+  },
   deckDot: { width: 5, height: 5, borderRadius: 3 },
   deckTag: { fontFamily: "Inter_700Bold", fontSize: 9, letterSpacing: 1.1 },
   deckBody: { fontFamily: "Inter_500Medium", fontSize: 12, lineHeight: 17 },

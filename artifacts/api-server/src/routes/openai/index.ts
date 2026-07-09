@@ -11,7 +11,10 @@ const openai = new OpenAI({
 });
 
 router.get("/openai/conversations", async (req, res) => {
-  const all = await db.select().from(conversations).orderBy(conversations.createdAt);
+  const all = await db
+    .select()
+    .from(conversations)
+    .orderBy(conversations.createdAt);
   res.json(all);
 });
 
@@ -21,24 +24,37 @@ router.post("/openai/conversations", async (req, res) => {
     res.status(400).json({ error: "title is required" });
     return;
   }
-  const [created] = await db.insert(conversations).values({ title }).returning();
+  const [created] = await db
+    .insert(conversations)
+    .values({ title })
+    .returning();
   res.status(201).json(created);
 });
 
 router.get("/openai/conversations/:id", async (req, res) => {
   const id = Number(req.params.id);
-  const [conv] = await db.select().from(conversations).where(eq(conversations.id, id));
+  const [conv] = await db
+    .select()
+    .from(conversations)
+    .where(eq(conversations.id, id));
   if (!conv) {
     res.status(404).json({ error: "Conversation not found" });
     return;
   }
-  const msgs = await db.select().from(messages).where(eq(messages.conversationId, id)).orderBy(messages.createdAt);
+  const msgs = await db
+    .select()
+    .from(messages)
+    .where(eq(messages.conversationId, id))
+    .orderBy(messages.createdAt);
   res.json({ ...conv, messages: msgs });
 });
 
 router.delete("/openai/conversations/:id", async (req, res) => {
   const id = Number(req.params.id);
-  const [conv] = await db.select().from(conversations).where(eq(conversations.id, id));
+  const [conv] = await db
+    .select()
+    .from(conversations)
+    .where(eq(conversations.id, id));
   if (!conv) {
     res.status(404).json({ error: "Conversation not found" });
     return;
@@ -49,7 +65,11 @@ router.delete("/openai/conversations/:id", async (req, res) => {
 
 router.get("/openai/conversations/:id/messages", async (req, res) => {
   const id = Number(req.params.id);
-  const msgs = await db.select().from(messages).where(eq(messages.conversationId, id)).orderBy(messages.createdAt);
+  const msgs = await db
+    .select()
+    .from(messages)
+    .where(eq(messages.conversationId, id))
+    .orderBy(messages.createdAt);
   res.json(msgs);
 });
 
@@ -61,15 +81,24 @@ router.post("/openai/conversations/:id/messages", async (req, res) => {
     return;
   }
 
-  const [conv] = await db.select().from(conversations).where(eq(conversations.id, id));
+  const [conv] = await db
+    .select()
+    .from(conversations)
+    .where(eq(conversations.id, id));
   if (!conv) {
     res.status(404).json({ error: "Conversation not found" });
     return;
   }
 
-  await db.insert(messages).values({ conversationId: id, role: "user", content });
+  await db
+    .insert(messages)
+    .values({ conversationId: id, role: "user", content });
 
-  const history = await db.select().from(messages).where(eq(messages.conversationId, id)).orderBy(messages.createdAt);
+  const history = await db
+    .select()
+    .from(messages)
+    .where(eq(messages.conversationId, id))
+    .orderBy(messages.createdAt);
   const chatMessages = history.map((m) => ({
     role: m.role as "user" | "assistant" | "system",
     content: m.content,
@@ -102,7 +131,9 @@ router.post("/openai/conversations/:id/messages", async (req, res) => {
     }
   }
 
-  await db.insert(messages).values({ conversationId: id, role: "assistant", content: fullResponse });
+  await db
+    .insert(messages)
+    .values({ conversationId: id, role: "assistant", content: fullResponse });
   res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   res.end();
 });
