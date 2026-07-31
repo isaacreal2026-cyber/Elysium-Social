@@ -60,6 +60,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const [selfBio, setSelfBio] = useState("");
   const [selfCity, setSelfCity] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
   const [importedFriendIds, setImportedFriendIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -79,8 +80,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const toggleDestination = useCallback((d: string) => {
-    // Use resonance context destinations state
-    // handled in the onboarding screen
+    setSelectedDestinations((cur) =>
+      cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d],
+    );
   }, []);
 
   const importFriend = useCallback((id: string) => {
@@ -100,10 +102,11 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       bio: selfBio || resonance.userById(resonance.selfId)?.bio || "",
       city: selfCity || resonance.userById(resonance.selfId)?.city || "",
       tags: selectedTags,
+      destinations: selectedDestinations,
     });
     setCompleted(true);
     void saveJSON(STORAGE_KEY, true);
-  }, [resonance, selfName, selfBio, selfCity, selectedTags]);
+  }, [resonance, selfName, selfBio, selfCity, selectedTags, selectedDestinations]);
 
   const skip = useCallback(() => {
     setCompleted(true);
@@ -122,7 +125,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     selfBio,
     selfCity,
     selectedTags,
-    selectedDestinations: [],
+    selectedDestinations,
     importedFriendIds,
     setStep,
     setSelfName,

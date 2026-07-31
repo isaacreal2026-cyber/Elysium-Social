@@ -41,12 +41,14 @@ export default function OnboardingScreen() {
     selfBio,
     selfCity,
     selectedTags,
+    selectedDestinations,
     importedFriendIds,
     setStep,
     setSelfName,
     setSelfBio,
     setSelfCity,
     toggleTag,
+    toggleDestination,
     importFriend,
     removeImportedFriend,
     complete,
@@ -132,6 +134,8 @@ export default function OnboardingScreen() {
           <DestinationsStep
             colors={colors}
             resonance={resonance}
+            selected={selectedDestinations}
+            toggle={toggleDestination}
           />
         )}
         {step === 4 && (
@@ -335,9 +339,13 @@ function TagsStep({
 function DestinationsStep({
   colors,
   resonance,
+  selected,
+  toggle,
 }: {
   colors: ReturnType<typeof useColors>;
   resonance: ReturnType<typeof useResonance>;
+  selected: string[];
+  toggle: (d: string) => void;
 }) {
   return (
     <View style={styles.stepContent}>
@@ -347,25 +355,24 @@ function DestinationsStep({
       </Text>
       <View style={styles.chipGrid}>
         {ALL_DESTINATIONS.map((dest) => {
-          const isFollowing = resonance.isFollowing(dest); // not a real user, but we use tags
+          const active = selected.includes(dest);
           return (
             <Pressable
               key={dest}
-              onPress={() => {
-                // For now, follow/seed-user destinations via tag
-                // This is handled through the tag system
-              }}
+              onPress={() => toggle(dest)}
               style={[
                 styles.chip,
                 {
-                  borderColor: colors.gold + "55",
-                  backgroundColor: colors.gold + "12",
+                  borderColor: active ? colors.gold : colors.border,
+                  backgroundColor: active ? colors.gold + "22" : colors.card,
                 },
               ]}
-              accessibilityLabel={`Destination ${dest}`}
+              accessibilityLabel={`Destination ${dest}${active ? " selected" : ""}`}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: active }}
             >
-              <Feather name="navigation" size={10} color={colors.gold} />
-              <Text style={[styles.chipText, { color: colors.gold }]}>
+              <Feather name="navigation" size={10} color={active ? colors.gold : colors.mutedForeground} />
+              <Text style={[styles.chipText, { color: active ? colors.gold : colors.mutedForeground }]}>
                 {dest}
               </Text>
             </Pressable>

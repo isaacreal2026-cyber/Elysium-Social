@@ -273,6 +273,9 @@ class MediaPickerServiceImpl {
   }
 
   private webFilePicker(type: MediaType): Promise<MediaResult | null> {
+    if (typeof document === "undefined") {
+      return Promise.resolve(this.simulatedResult(type));
+    }
     return new Promise((resolve) => {
       const input = document.createElement("input");
       input.type = "file";

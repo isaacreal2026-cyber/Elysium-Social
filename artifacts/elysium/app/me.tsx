@@ -361,7 +361,7 @@ export default function MeScreen() {
                       <View>
                         <Text style={[styles.settingsLabel, { color: colors.text }]}>Theme</Text>
                         <Text style={[styles.settingsDesc, { color: colors.mutedForeground }]}>
-                          {theme.mode === "light" ? "Dark mode (default)" : theme.mode === "dark" ? "Light mode" : "System default"}
+                          {theme.mode === "light" ? "Dark mode (default)" : theme.mode === "dark" ? "Light mode" : "Auto"}
                         </Text>
                       </View>
                     </View>

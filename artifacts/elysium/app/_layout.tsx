@@ -32,11 +32,11 @@ function RootLayoutNav() {
   // Show onboarding if not completed
   const showOnboarding = onboarding && !onboarding.completed;
 
-  const bgColor = resolved === "dark" ? "#F5F3FF" : "#07021A";
+  const bgColor = resolved === "dark" ? "#07021A" : "#F5F3FF";
 
   return (
     <>
-      <StatusBar style={resolved === "dark" ? "dark" : "light"} />
+      <StatusBar style={resolved === "dark" ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerShown: false,

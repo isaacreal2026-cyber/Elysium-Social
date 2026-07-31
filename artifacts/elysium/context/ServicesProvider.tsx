@@ -22,7 +22,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 
@@ -47,7 +46,6 @@ import type { ContactMatch } from "@/services/contact-import";
 import type { ModerationResult } from "@/services/content-moderation";
 import type { AuthUser } from "@/services/auth";
 import type { ConnectionStatus } from "@/services/realtime";
-import type { NotificationPreferences } from "@/services/notifications";
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -101,7 +99,6 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
   const resonance = useResonance();
   const [realtimeStatus, setRealtimeStatus] = useState<ConnectionStatus>("disconnected");
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
-  const realtimeListenerRef = useRef<(() => void) | null>(null);
 
   // ── Expanded data ──────────────────────────────────────────
   const allUsers = useMemo(
@@ -122,7 +119,7 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
   // ── Resonance Engine ───────────────────────────────────────
   const selfUser = useMemo(
     () => resonance.userById(resonance.selfId),
-    [resonance, resonance.selfId],
+    [resonance.userById, resonance.selfId],
   );
 
   const rankedPosts = useMemo(() => {
@@ -158,12 +155,11 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen for real-time events and update resonance
-    const unsubNewPost = RealtimeService.on("new_post", (post) => {
+    const unsubNewPost = RealtimeService.on("new_post", () => {
       // In a real app, this would add the post to the state
-      // For now, we just log it
     });
 
-    const unsubResonance = RealtimeService.on("resonance", (data) => {
+    const unsubResonance = RealtimeService.on("resonance", () => {
       // In a real app, this would update resonance counts
     });
 
@@ -178,7 +174,8 @@ export function ServicesProvider({ children }: { children: React.ReactNode }) {
       unsubNewPost();
       unsubResonance();
     };
-  }, [resonance.selfId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Convenience methods ─────────────────────────────────────
 

@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   AccessibilityInfo,
   Alert,
@@ -189,6 +189,18 @@ export default function ComposerScreen() {
       setRecordingSeconds(0);
       AccessibilityInfo.announceForAccessibility("Voice recording started");
     }
+  }, [isRecording]);
+
+  // Recording timer — ticks every second while recording
+  useEffect(() => {
+    if (!isRecording) {
+      setRecordingSeconds(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setRecordingSeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(interval);
   }, [isRecording]);
 
   const canSubmit = body.trim().length > 0 || mediaAttachments.length > 0;

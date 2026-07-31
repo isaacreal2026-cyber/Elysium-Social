@@ -262,10 +262,19 @@ class PerformanceServiceImpl {
         this.slowFrameCount++;
       }
 
-      requestAnimationFrame(measureFrame);
+      // Use requestAnimationFrame on web, setTimeout on native
+      if (typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(measureFrame);
+      } else {
+        setTimeout(measureFrame, 16);
+      }
     };
 
-    requestAnimationFrame(measureFrame);
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(measureFrame);
+    } else {
+      setTimeout(measureFrame, 16);
+    }
   }
 
   private getMemoryUsage(): number | null {

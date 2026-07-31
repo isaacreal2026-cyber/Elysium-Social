@@ -96,7 +96,7 @@ interface ResonanceCtx extends State {
   toggleHubProjectMode: (hubId: string) => void;
   togglePathProgress: (pathId: string) => void;
   sharePost: (postId: string) => void;
-  updateSelfProfile: (input: { name?: string; bio?: string; city?: string; tags?: string[] }) => void;
+  updateSelfProfile: (input: { name?: string; bio?: string; city?: string; tags?: string[]; destinations?: string[] }) => void;
   joinVoiceRoom: (roomId: string) => void;
   leaveVoiceRoom: (roomId: string) => void;
   createVoiceRoom: (input: { topic: string; vibe: string }) => string;
@@ -473,6 +473,7 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
                 bio: input.bio ?? u.bio,
                 city: input.city ?? u.city,
                 tags: input.tags ?? u.tags,
+                destinations: input.destinations ?? u.destinations,
               }
             : u,
         ),

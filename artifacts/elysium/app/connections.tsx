@@ -209,7 +209,7 @@ export default function ConnectionsScreen() {
               {services.allUsers
               .filter((u) => u.id !== selfId)
               .map((u) => {
-                const following = userById(u.id) && isFollowing(u.id);
+                const following = isFollowing(u.id);
                 return (
                   <View
                     key={u.id}
