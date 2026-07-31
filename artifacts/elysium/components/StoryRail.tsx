@@ -45,6 +45,9 @@ export function StoryRail() {
                 } as never)
               }
               style={styles.cell}
+              accessibilityLabel="Create your story"
+              accessibilityHint="Open composer to create a destiny story"
+              accessibilityRole="button"
             >
               <View style={[styles.createRing, { borderColor: colors.border }]}>
                 <View
@@ -85,6 +88,9 @@ export function StoryRail() {
           <Pressable
             onPress={() => router.push(`/story/${story.id}` as never)}
             style={styles.cell}
+            accessible
+            accessibilityLabel={`${author?.name ?? "Unknown"}'s story${viewed ? " (viewed)" : ""}`}
+            accessibilityHint="Double tap to view story"
           >
             <View style={styles.ringWrap}>
               {!viewed ? (

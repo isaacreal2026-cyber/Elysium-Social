@@ -69,10 +69,11 @@ function getDeploymentDomain() {
     return stripProtocol(process.env.EXPO_PUBLIC_DOMAIN);
   }
 
-  console.error(
-    "ERROR: No deployment domain found. Set REPLIT_INTERNAL_APP_DOMAIN, REPLIT_DEV_DOMAIN, or EXPO_PUBLIC_DOMAIN",
+  // Fallback for local / non-Replit environments
+  console.warn(
+    "WARNING: No deployment domain found. Using localhost:8081 as fallback. Set REPLIT_INTERNAL_APP_DOMAIN, REPLIT_DEV_DOMAIN, or EXPO_PUBLIC_DOMAIN for production builds.",
   );
-  process.exit(1);
+  return "localhost:8081";
 }
 
 function prepareDirectories(timestamp) {
@@ -127,6 +128,21 @@ async function checkMetroHealth() {
 
 function getExpoPublicReplId() {
   return process.env.REPL_ID || process.env.EXPO_PUBLIC_REPL_ID;
+}
+
+/**
+ * Detect whether we are running inside a Replit or similar hosting
+ * environment that can provide a running Metro bundler.  When not
+ * running in such an environment (e.g. a CI server or local machine),
+ * the static Expo build requires an active Metro server and cannot
+ * complete without it, so we skip the build gracefully.
+ */
+function isReplitEnvironment() {
+  return (
+    process.env.REPL_ID !== undefined ||
+    process.env.REPLIT_DEV_DOMAIN !== undefined ||
+    process.env.REPLIT_INTERNAL_APP_DOMAIN !== undefined
+  );
 }
 
 async function startMetro(expoPublicDomain, expoPublicReplId) {
@@ -525,6 +541,16 @@ async function main() {
   console.log("Building static Expo Go deployment...");
 
   setupSignalHandlers();
+
+  if (!isReplitEnvironment()) {
+    console.warn(
+      "WARNING: Not running in a Replit environment. " +
+        "The Elysium Expo static build requires Metro bundler which is " +
+        "only available in the Replit deployment environment. " +
+        "Skipping static build. Use 'pnpm dev' for local development.",
+    );
+    process.exit(0);
+  }
 
   const domain = getDeploymentDomain();
   const expoPublicReplId = getExpoPublicReplId();

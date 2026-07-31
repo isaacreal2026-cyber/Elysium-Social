@@ -20,6 +20,7 @@ import { StarField } from "@/components/StarField";
 import { StoryRail } from "@/components/StoryRail";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
+import { useServices } from "@/context/ServicesProvider";
 
 const FILTERS = [
   { key: "for-you", label: "For You" },
@@ -34,6 +35,7 @@ export default function HomeFeed() {
   const insets = useSafeAreaInsets();
   const { posts, following, unreadNotifications, unreadMessages, voiceRooms } =
     useResonance();
+  const services = useServices();
   const [filter, setFilter] = useState("for-you");
   const [refreshing, setRefreshing] = useState(false);
   const scrollY = useRef(new RNAnimated.Value(0)).current;
@@ -58,13 +60,17 @@ export default function HomeFeed() {
         .sort((a, b) => b.energy - a.energy);
     if (filter === "near")
       return list.sort((a, b) => b.resonance.spark - a.resonance.spark);
+    // "For You" — use Resonance Engine for smart ranking
+    if (filter === "for-you" && services.rankedPosts.length > 0) {
+      return services.rankedPosts.map((r) => r.post);
+    }
     return list.sort(
       (a, b) =>
         b.energy * 1.5 +
         b.createdAt / 1e10 -
         (a.energy * 1.5 + a.createdAt / 1e10),
     );
-  }, [posts, filter, following]);
+  }, [posts, filter, following, services.rankedPosts]);
 
   const onRefresh = () => {
     setRefreshing(true);

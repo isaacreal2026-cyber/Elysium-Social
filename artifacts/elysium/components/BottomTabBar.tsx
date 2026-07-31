@@ -112,6 +112,10 @@ export function BottomTabBar() {
               key={tab.key}
               onPress={() => router.push(tab.route as never)}
               style={styles.tabBtn}
+              accessibilityLabel={tab.label}
+              accessibilityHint={`Navigate to ${tab.label}`}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: active }}
             >
               {isCompose ? (
                 <LinearGradient

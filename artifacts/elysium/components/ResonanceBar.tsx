@@ -91,6 +91,7 @@ export function ResonanceBar({
               icon={meta.icon}
               count={post.resonance[k]}
               onPress={() => resonate(postId, k)}
+              label={meta.label}
             />
           );
         })}
@@ -105,12 +106,14 @@ function ResonanceButton({
   icon,
   count,
   onPress,
+  label,
 }: {
   active: boolean;
   color: string;
   icon: React.ReactNode;
   count: number;
   onPress: () => void;
+  label: string;
 }) {
   const scale = useSharedValue(1);
   const ring = useSharedValue(0);
@@ -138,7 +141,14 @@ function ResonanceButton({
   }));
 
   return (
-    <Pressable onPress={handlePress} style={styles.btnWrap}>
+    <Pressable
+      onPress={handlePress}
+      style={styles.btnWrap}
+      accessible
+      accessibilityLabel={`${label}: ${count}${active ? " (active)" : ""}`}
+      accessibilityHint={`Double tap to ${active ? "remove" : "add"} ${label.toLowerCase()}`}
+      accessibilityRole="button"
+    >
       <Animated.View
         style={[
           styles.btn,

@@ -9,11 +9,14 @@ import { PostCard } from "@/components/PostCard";
 import { ScreenShell } from "@/components/ScreenShell";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
+import { useTheme } from "@/context/ThemeProvider";
+import { useServices } from "@/context/ServicesProvider";
 
 const TABS = [
   { key: "moments", label: "Moments", icon: "feather" as const },
   { key: "saved", label: "Saved", icon: "bookmark" as const },
   { key: "profile", label: "Profile", icon: "user" as const },
+  { key: "settings", label: "Settings", icon: "settings" as const },
 ];
 
 export default function MeScreen() {
@@ -22,7 +25,9 @@ export default function MeScreen() {
   const me = userById(selfId)!;
   const myMoments = posts.filter((p) => p.authorId === selfId);
   const savedPosts = posts.filter((p) => bookmarks[p.id]);
-  const [tab, setTab] = useState<"moments" | "saved" | "profile">("moments");
+  const [tab, setTab] = useState<"moments" | "saved" | "profile" | "settings">("moments");
+  const theme = useTheme();
+  const services = useServices();
 
   const totalResonance = myMoments.reduce((acc, p) => {
     return acc + Object.values(p.resonance).reduce((a, b) => a + b, 0);
@@ -264,7 +269,7 @@ export default function MeScreen() {
             ) : (
               savedPosts.map((p) => <PostCard key={p.id} post={p} />)
             )
-          ) : (
+          ) : tab === "profile" ? (
             /* Profile tab */
             <View style={{ gap: 16, paddingTop: 16 }}>
               <Section title="Personality" icon="smile">
@@ -345,7 +350,187 @@ export default function MeScreen() {
                 </View>
               </Section>
             </View>
-          )}
+          ) : tab === "settings" ? (
+            /* Settings tab */
+            <View style={{ gap: 16, paddingTop: 16 }}>
+              <Section title="Appearance" icon="sun">
+                <View style={[styles.settingsCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <View style={styles.settingsRow}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="moon" size={16} color={colors.primary} />
+                      <View>
+                        <Text style={[styles.settingsLabel, { color: colors.text }]}>Theme</Text>
+                        <Text style={[styles.settingsDesc, { color: colors.mutedForeground }]}>
+                          {theme.mode === "light" ? "Dark mode (default)" : theme.mode === "dark" ? "Light mode" : "System default"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.themeBtns}>
+                      {(["light", "dark", "system"] as const).map((m) => {
+                        const active = theme.mode === m;
+                        const label = m === "light" ? "Dark" : m === "dark" ? "Light" : "Auto";
+                        return (
+                          <Pressable
+                            key={m}
+                            onPress={() => theme.setMode(m)}
+                            style={[
+                              styles.themeBtn,
+                              {
+                                borderColor: active ? colors.primary : colors.border,
+                                backgroundColor: active ? colors.primary + "22" : "transparent",
+                              },
+                            ]}
+                            accessibilityRole="radio"
+                            accessibilityState={{ checked: active }}
+                            accessibilityLabel={`${label} theme`}
+                          >
+                            <Text
+                              style={[
+                                styles.themeBtnText,
+                                { color: active ? colors.primary : colors.mutedForeground },
+                              ]}
+                            >
+                              {label}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                </View>
+              </Section>
+
+              <Section title="Accessibility" icon="eye">
+                <View style={[styles.settingsCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <View style={styles.settingsRow}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="type" size={16} color={colors.teal} />
+                      <View>
+                        <Text style={[styles.settingsLabel, { color: colors.text }]}>High contrast</Text>
+                        <Text style={[styles.settingsDesc, { color: colors.mutedForeground }]}>
+                          WCAG-compliant text contrast
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: colors.teal + "22" }]}>
+                      <Text style={[styles.badgeText, { color: colors.teal }]}>ON</Text>
+                    </View>
+                  </View>
+                  <View style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="volume-2" size={16} color={colors.teal} />
+                      <View>
+                        <Text style={[styles.settingsLabel, { color: colors.text }]}>Screen reader</Text>
+                        <Text style={[styles.settingsDesc, { color: colors.mutedForeground }]}>
+                          All interactive elements have labels
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: colors.teal + "22" }]}>
+                      <Text style={[styles.badgeText, { color: colors.teal }]}>ON</Text>
+                    </View>
+                  </View>
+                </View>
+              </Section>
+
+              <Section title="Account" icon="user">
+                <View style={[styles.settingsCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <Pressable style={styles.settingsRow} onPress={() => services.signInWithGoogle()}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="edit" size={16} color={colors.mutedForeground} />
+                      <Text style={[styles.settingsLabel, { color: colors.text }]}>Edit profile</Text>
+                    </View>
+                    <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                  </Pressable>
+                  <Pressable style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="shield" size={16} color={colors.mutedForeground} />
+                      <Text style={[styles.settingsLabel, { color: colors.text }]}>Privacy</Text>
+                    </View>
+                    <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                  </Pressable>
+                  <Pressable style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="download" size={16} color={colors.mutedForeground} />
+                      <Text style={[styles.settingsLabel, { color: colors.text }]}>Download my data</Text>
+                    </View>
+                    <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                  </Pressable>
+                  <Pressable style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]} onPress={() => services.signInWithGoogle()}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="log-in" size={16} color={colors.primary} />
+                      <Text style={[styles.settingsLabel, { color: colors.text }]}>Sign in with Google</Text>
+                    </View>
+                    <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                  </Pressable>
+                  <Pressable style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]} onPress={() => services.signInWithApple()}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="log-in" size={16} color={colors.text} />
+                      <Text style={[styles.settingsLabel, { color: colors.text }]}>Sign in with Apple</Text>
+                    </View>
+                    <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                  </Pressable>
+                </View>
+              </Section>
+
+              <Section title="Notifications" icon="bell">
+                <View style={[styles.settingsCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <View style={styles.settingsRow}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="bell" size={16} color={colors.gold} />
+                      <View>
+                        <Text style={[styles.settingsLabel, { color: colors.text }]}>Push notifications</Text>
+                        <Text style={[styles.settingsDesc, { color: colors.mutedForeground }]}>
+                          Resonance, comments, voice rooms
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={[styles.badge, { backgroundColor: colors.gold + "22" }]}>
+                      <Text style={[styles.badgeText, { color: colors.gold }]}>ON</Text>
+                    </View>
+                  </View>
+                  <View style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <Feather name="moon" size={16} color={colors.mutedForeground} />
+                      <View>
+                        <Text style={[styles.settingsLabel, { color: colors.text }]}>Quiet hours</Text>
+                        <Text style={[styles.settingsDesc, { color: colors.mutedForeground }]}>
+                          11pm – 7am (default)
+                        </Text>
+                      </View>
+                    </View>
+                    <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+                  </View>
+                </View>
+              </Section>
+
+              <Section title="About" icon="info">
+                <View style={[styles.settingsCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                  <View style={styles.settingsRow}>
+                    <Text style={[styles.settingsLabel, { color: colors.mutedForeground }]}>Version</Text>
+                    <Text style={[styles.settingsLabel, { color: colors.text }]}>1.1.0</Text>
+                  </View>
+                  <View style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <Text style={[styles.settingsLabel, { color: colors.mutedForeground }]}>Build</Text>
+                    <Text style={[styles.settingsLabel, { color: colors.text }]}>elysium-social-2026-v2</Text>
+                  </View>
+                  <View style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <Text style={[styles.settingsLabel, { color: colors.mutedForeground }]}>Real-time</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                      <View style={[styles.onlineDot, { backgroundColor: services.realtimeStatus === "connected" ? colors.emerald : colors.rose, width: 8, height: 8, borderRadius: 4, borderWidth: 0, position: "relative", bottom: 0, right: 0 }]} />
+                      <Text style={[styles.settingsLabel, { color: services.realtimeStatus === "connected" ? colors.emerald : colors.rose }]}>
+                        {services.realtimeStatus === "connected" ? "Connected" : "Disconnected"}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={[styles.settingsRow, { borderTopWidth: 1, borderTopColor: colors.border }]}>
+                    <Text style={[styles.settingsLabel, { color: colors.mutedForeground }]}>Network</Text>
+                    <Text style={[styles.settingsLabel, { color: colors.text }]}>{services.allUsers.length} users</Text>
+                  </View>
+                </View>
+              </Section>
+            </View>
+          ) : null}
         </View>
       </ScrollView>
     </ScreenShell>
@@ -586,5 +771,50 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     alignItems: "center",
     gap: 8,
+  },
+  settingsCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  settingsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  settingsLabel: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 13,
+  },
+  settingsDesc: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 11,
+    marginTop: 1,
+  },
+  themeBtns: {
+    flexDirection: "row",
+    gap: 6,
+  },
+  themeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  themeBtnText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 11,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+  },
+  badgeText: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 9,
+    letterSpacing: 0.5,
   },
 });

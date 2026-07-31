@@ -96,6 +96,10 @@ interface ResonanceCtx extends State {
   toggleHubProjectMode: (hubId: string) => void;
   togglePathProgress: (pathId: string) => void;
   sharePost: (postId: string) => void;
+  updateSelfProfile: (input: { name?: string; bio?: string; city?: string; tags?: string[] }) => void;
+  joinVoiceRoom: (roomId: string) => void;
+  leaveVoiceRoom: (roomId: string) => void;
+  createVoiceRoom: (input: { topic: string; vibe: string }) => string;
 }
 
 const Ctx = createContext<ResonanceCtx | null>(null);
@@ -457,6 +461,85 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
     [lightHaptic],
   );
 
+  const updateSelfProfile = useCallback<ResonanceCtx["updateSelfProfile"]>(
+    (input) => {
+      setState((s) => ({
+        ...s,
+        users: s.users.map((u) =>
+          u.id === s.selfId
+            ? {
+                ...u,
+                name: input.name ?? u.name,
+                bio: input.bio ?? u.bio,
+                city: input.city ?? u.city,
+                tags: input.tags ?? u.tags,
+              }
+            : u,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const joinVoiceRoom = useCallback<ResonanceCtx["joinVoiceRoom"]>(
+    (roomId) => {
+      setState((s) => ({
+        ...s,
+        voiceRooms: s.voiceRooms.map((vr) =>
+          vr.id === roomId
+            ? {
+                ...vr,
+                speakers: [...vr.speakers, s.selfId],
+                listeners: vr.listeners + 1,
+              }
+            : vr,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const leaveVoiceRoom = useCallback<ResonanceCtx["leaveVoiceRoom"]>(
+    (roomId) => {
+      setState((s) => ({
+        ...s,
+        voiceRooms: s.voiceRooms.map((vr) =>
+          vr.id === roomId
+            ? {
+                ...vr,
+                speakers: vr.speakers.filter((id) => id !== s.selfId),
+                listeners: Math.max(0, vr.listeners - 1),
+              }
+            : vr,
+        ),
+      }));
+    },
+    [],
+  );
+
+  const createVoiceRoom = useCallback<ResonanceCtx["createVoiceRoom"]>(
+    (input) => {
+      const id = makeId("vr");
+      setState((s) => ({
+        ...s,
+        voiceRooms: [
+          ...s.voiceRooms,
+          {
+            id,
+            topic: input.topic,
+            vibe: input.vibe,
+            hostId: s.selfId,
+            speakers: [s.selfId],
+            listeners: 0,
+            live: true,
+          },
+        ],
+      }));
+      return id;
+    },
+    [],
+  );
+
   // garbage collect old pulses
   useEffect(() => {
     if (state.pulses.length === 0) return;
@@ -491,6 +574,10 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
       toggleHubProjectMode,
       togglePathProgress,
       sharePost,
+      updateSelfProfile,
+      joinVoiceRoom,
+      leaveVoiceRoom,
+      createVoiceRoom,
     }),
     [
       state,
@@ -513,6 +600,10 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
       toggleHubProjectMode,
       togglePathProgress,
       sharePost,
+      updateSelfProfile,
+      joinVoiceRoom,
+      leaveVoiceRoom,
+      createVoiceRoom,
     ],
   );
 

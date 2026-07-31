@@ -1,8 +1,16 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import React, { useEffect } from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  AccessibilityInfo,
+  Animated as RNAnimated,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -17,28 +25,129 @@ import { StarField } from "@/components/StarField";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
 
+type MicState = "idle" | "requesting" | "recording" | "muted";
+
 export default function VoicePartyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { voiceRooms, userById } = useResonance();
-  const room = voiceRooms.find((v) => v.live) ?? voiceRooms[0]!;
-  const speakers = room.speakers.map((id) => userById(id)).filter(Boolean);
+  const params = useLocalSearchParams<{ roomId?: string }>();
+  const { voiceRooms, userById, joinVoiceRoom, leaveVoiceRoom, createVoiceRoom, selfId } = useResonance();
+
+  // Find the room — either from params or the first live one
+  const room = params.roomId
+    ? voiceRooms.find((v) => v.id === params.roomId)
+    : voiceRooms.find((v) => v.live) ?? voiceRooms[0];
+  const speakers = room ? room.speakers.map((id) => userById(id)).filter(Boolean) : [];
+  const isSpeaker = room ? room.speakers.includes(selfId) : false;
+
+  const [micState, setMicState] = useState<MicState>("idle");
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [isJoined, setIsJoined] = useState(false);
+  const pulseAnim = useRef(new RNAnimated.Value(1)).current;
+
+  // Animate mic pulse when recording
+  useEffect(() => {
+    if (micState === "recording") {
+      RNAnimated.loop(
+        RNAnimated.sequence([
+          RNAnimated.timing(pulseAnim, {
+            toValue: 1.15,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          RNAnimated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [micState, pulseAnim]);
+
+  // Recording timer
+  useEffect(() => {
+    if (micState !== "recording") {
+      setRecordingSeconds(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setRecordingSeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [micState]);
+
+  const handleMicToggle = useCallback(() => {
+    if (micState === "idle" || micState === "muted") {
+      setMicState("requesting");
+      // Simulate permission request
+      setTimeout(() => {
+        setMicState("recording");
+        AccessibilityInfo.announceForAccessibility("Microphone on, you are now speaking");
+      }, 400);
+    } else if (micState === "recording") {
+      setMicState("muted");
+      AccessibilityInfo.announceForAccessibility("Microphone muted");
+    }
+  }, [micState]);
+
+  const handleJoin = useCallback(() => {
+    if (room) {
+      joinVoiceRoom(room.id);
+      setIsJoined(true);
+      AccessibilityInfo.announceForAccessibility(`Joined ${room.topic}`);
+    }
+  }, [room, joinVoiceRoom]);
+
+  const handleLeave = useCallback(() => {
+    if (room) {
+      leaveVoiceRoom(room.id);
+      router.back();
+    }
+  }, [room, leaveVoiceRoom]);
+
+  if (!room) {
+    return (
+      <View style={[styles.root, { backgroundColor: colors.background }]}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ color: colors.text, fontFamily: "Inter_500Medium", fontSize: 16 }}>
+            No voice rooms available
+          </Text>
+          <Pressable
+            onPress={() => {
+              createVoiceRoom({ topic: "New room", vibe: "Warm" });
+            }}
+            style={[styles.createBtn, { backgroundColor: colors.primary }]}
+          >
+            <Feather name="plus" size={16} color="#fff" />
+            <Text style={styles.createBtnText}>Create a room</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <LinearGradient
-        colors={["#1A0B3A", "#07021A"]}
+        colors={[colors.background === "#F5F3FF" ? "#E4DEF0" : "#1A0B3A", colors.background]}
         style={StyleSheet.absoluteFill}
       />
       <StarField density={140} seed={43} />
 
       <View style={[styles.header, { marginTop: insets.top + 8 }]}>
-        <Pressable onPress={() => router.back()} style={styles.iconBtn}>
+        <Pressable
+          onPress={handleLeave}
+          style={styles.iconBtn}
+          accessibilityLabel="Leave voice room"
+        >
           <Feather name="chevron-down" size={22} color={colors.text} />
         </Pressable>
         <View style={{ flex: 1, alignItems: "center" }}>
           <Text style={[styles.label, { color: colors.gold }]}>
-            VOICE ROOM · LIVE
+            VOICE ROOM · {room.live ? "LIVE" : "ENDED"}
           </Text>
           <Text
             style={[styles.topic, { color: colors.text }]}
@@ -47,12 +156,13 @@ export default function VoicePartyScreen() {
             {room.topic}
           </Text>
         </View>
-        <Pressable style={styles.iconBtn}>
+        <Pressable style={styles.iconBtn} accessibilityLabel="More options">
           <Feather name="more-horizontal" size={22} color={colors.text} />
         </Pressable>
       </View>
 
-      <View style={styles.stage}>
+      {/* Speaker stage */}
+      <View style={styles.stage} accessibilityLabel={`${speakers.length} speakers`}>
         {speakers.map((u, i) => (
           <SpeakingOrb
             key={u!.id}
@@ -61,11 +171,36 @@ export default function VoicePartyScreen() {
             name={u!.name}
             index={i}
             total={speakers.length}
+            isSpeaking={micState === "recording" && u!.id === selfId}
           />
         ))}
       </View>
 
+      {/* Waveform visualization when recording */}
+      {micState === "recording" ? (
+        <View style={styles.waveformSection}>
+          <View style={styles.waveformRow}>
+            {Array.from({ length: 40 }).map((_, i) => (
+              <RNAnimated.View
+                key={i}
+                style={[
+                  styles.wavebar,
+                  {
+                    height: 4 + Math.abs(Math.sin(i * 0.5 + recordingSeconds * 0.3)) * 22,
+                    backgroundColor: colors.primary,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+          <Text style={[styles.recordingTime, { color: colors.rose }]}>
+            ● {formatTime(recordingSeconds)}
+          </Text>
+        </View>
+      ) : null}
+
       <View style={styles.bottom}>
+        {/* Listener count */}
         <View style={[styles.metaPill, { borderColor: colors.border }]}>
           <View style={[styles.dot, { backgroundColor: colors.rose }]} />
           <Text style={[styles.metaText, { color: colors.text }]}>
@@ -77,22 +212,57 @@ export default function VoicePartyScreen() {
           </Text>
         </View>
 
+        {/* Controls */}
         <View style={styles.controls}>
+          {/* React button */}
           <Pressable
-            style={[
-              styles.ctrl,
-              { borderColor: colors.border, backgroundColor: colors.card },
-            ]}
+            style={[styles.ctrl, { borderColor: colors.border, backgroundColor: colors.card }]}
+            accessibilityLabel="Send reaction"
           >
             <Feather name="thumbs-up" size={20} color={colors.text} />
           </Pressable>
+
+          {/* Mic toggle */}
+          <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
+            <Pressable
+              onPress={isJoined ? handleMicToggle : handleJoin}
+              style={[
+                styles.ctrlMain,
+                {
+                  backgroundColor:
+                    micState === "recording"
+                      ? colors.rose
+                      : micState === "muted"
+                        ? colors.border
+                        : colors.primary,
+                },
+              ]}
+              accessibilityLabel={
+                isJoined
+                  ? micState === "recording"
+                    ? "Mute microphone"
+                    : "Unmute microphone"
+                  : "Join voice room"
+              }
+              accessibilityRole="button"
+            >
+              <Feather
+                name={
+                  !isJoined
+                    ? "phone"
+                    : micState === "recording"
+                      ? "mic"
+                      : "mic-off"
+                }
+                size={26}
+                color="#fff"
+              />
+            </Pressable>
+          </RNAnimated.View>
+
+          {/* Leave button */}
           <Pressable
-            style={[styles.ctrlMain, { backgroundColor: colors.primary }]}
-          >
-            <Feather name="mic" size={26} color="#fff" />
-          </Pressable>
-          <Pressable
-            onPress={() => router.back()}
+            onPress={handleLeave}
             style={[
               styles.ctrl,
               {
@@ -100,17 +270,31 @@ export default function VoicePartyScreen() {
                 backgroundColor: colors.destructive + "22",
               },
             ]}
+            accessibilityLabel="Leave voice room"
           >
             <Feather name="log-out" size={20} color={colors.destructive} />
           </Pressable>
         </View>
 
+        {/* Status indicator */}
         <Text style={[styles.exitHelp, { color: colors.mutedForeground }]}>
-          gentle exit · ramp out anytime · the room continues
+          {!isJoined
+            ? "tap the center button to join the room"
+            : micState === "recording"
+              ? "you're speaking — tap to mute"
+              : micState === "muted"
+                ? "muted — tap to unmute"
+                : "gentle exit · ramp out anytime · the room continues"}
         </Text>
       </View>
     </View>
   );
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 function SpeakingOrb({
@@ -119,12 +303,14 @@ function SpeakingOrb({
   name,
   index,
   total,
+  isSpeaking,
 }: {
   color: string;
   glyph: string;
   name: string;
   index: number;
   total: number;
+  isSpeaking?: boolean;
 }) {
   const angle = (Math.PI * 2 * index) / total - Math.PI / 2;
   const r = 110;
@@ -153,14 +339,27 @@ function SpeakingOrb({
         styles.speakerWrap,
         { transform: [{ translateX: x }, { translateY: y }] },
       ]}
+      accessible
+      accessibilityLabel={`${name} is ${isSpeaking ? "speaking" : "in the room"}`}
     >
       <Animated.View
         style={[styles.speakerRing, { borderColor: color }, ringStyle]}
       />
-      <View style={[styles.speaker, { backgroundColor: color }]}>
+      <View
+        style={[
+          styles.speaker,
+          {
+            backgroundColor: color,
+            ...(isSpeaking ? { borderWidth: 3, borderColor: "#FB7185" } : {}),
+          },
+        ]}
+      >
         <Text style={styles.speakerGlyph}>{glyph}</Text>
       </View>
       <Text style={styles.speakerName}>{name.split(" ")[0]}</Text>
+      {isSpeaking ? (
+        <View style={[styles.speakingIndicator, { backgroundColor: "#FB7185" }]} />
+      ) : null}
     </View>
   );
 }
@@ -217,6 +416,29 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     fontSize: 11,
   },
+  speakingIndicator: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginTop: 3,
+  },
+  waveformSection: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    marginBottom: 8,
+  },
+  waveformRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    height: 30,
+  },
+  wavebar: { width: 3, borderRadius: 2 },
+  recordingTime: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 12,
+    marginTop: 6,
+  },
   bottom: {
     paddingHorizontal: 24,
     paddingBottom: 32,
@@ -260,4 +482,15 @@ const styles = StyleSheet.create({
     fontSize: 11,
     textAlign: "center",
   },
+  createBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 20,
+    paddingVertical: 11,
+    borderRadius: 999,
+    marginTop: 16,
+  },
+  createBtnText: { color: "#fff", fontFamily: "Inter_700Bold", fontSize: 13 },
 });
