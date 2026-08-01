@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ScreenShell } from "@/components/ScreenShell";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
+import { useServices } from "@/context/ServicesProvider";
 
 const TABS = [
   { key: "messages", label: "Messages", icon: "message-circle" as const },
@@ -16,7 +17,8 @@ const TABS = [
 
 export default function ConnectionsScreen() {
   const colors = useColors();
-  const { threads, voiceRooms, users, userById, selfId } = useResonance();
+  const { threads, voiceRooms, users, userById, selfId, toggleFollow, isFollowing } = useResonance();
+  const services = useServices();
   const [tab, setTab] = useState<string>("messages");
 
   return (
@@ -188,75 +190,109 @@ export default function ConnectionsScreen() {
         {tab === "graph" ? <NetworkGraph /> : null}
 
         {tab === "find"
-          ? users
+          ? (
+            <>
+              {/* Friend import banner */}
+              <View style={[styles.importBanner, { borderColor: colors.gold + "55", backgroundColor: colors.gold + "0C" }]}>
+                <Feather name="users" size={16} color={colors.gold} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.importBannerTitle, { color: colors.gold }]}>
+                    Find your people
+                  </Text>
+                  <Text style={[styles.importBannerText, { color: colors.mutedForeground }]}>
+                    Follow people whose energy aligns with yours. The Resonance Engine
+                    will suggest more as you explore.
+                  </Text>
+                </View>
+              </View>
+              {/* Suggested users — now includes expanded users + contact import */}
+              {services.allUsers
               .filter((u) => u.id !== selfId)
-              .map((u) => (
-                <View
-                  key={u.id}
-                  style={[
-                    styles.threadRow,
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                >
+              .map((u) => {
+                const following = isFollowing(u.id);
+                return (
                   <View
-                    style={[styles.avatar, { backgroundColor: u.avatarColor }]}
+                    key={u.id}
+                    style={[
+                      styles.threadRow,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                      },
+                    ]}
                   >
-                    <Text style={styles.avatarText}>{u.avatarGlyph}</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.threadName, { color: colors.text }]}>
-                      {u.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.threadMsg,
-                        { color: colors.mutedForeground },
-                      ]}
+                    <Pressable
+                      onPress={() => router.push(`/profile/${u.id}` as never)}
+                      style={[styles.avatar, { backgroundColor: u.avatarColor }]}
                     >
-                      {u.city} · alignment {Math.round(u.alignmentScore * 100)}
-                    </Text>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: 4,
-                        marginTop: 6,
-                      }}
-                    >
-                      {u.tags.map((t) => (
-                        <View
-                          key={t}
-                          style={[
-                            styles.tagPill,
-                            { borderColor: colors.border },
-                          ]}
-                        >
-                          <Text
+                      <Text style={styles.avatarText}>{u.avatarGlyph}</Text>
+                      {u.online ? (
+                        <View style={[styles.onlineDot, { backgroundColor: colors.emerald }]} />
+                      ) : null}
+                    </Pressable>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.threadName, { color: colors.text }]}>
+                        {u.name}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.threadMsg,
+                          { color: colors.mutedForeground },
+                        ]}
+                      >
+                        {u.city} · alignment {Math.round(u.alignmentScore * 100)}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          gap: 4,
+                          marginTop: 6,
+                        }}
+                      >
+                        {u.tags.map((t) => (
+                          <View
+                            key={t}
                             style={[
-                              styles.tagText,
-                              { color: colors.mutedForeground },
+                              styles.tagPill,
+                              { borderColor: colors.border },
                             ]}
                           >
-                            {t}
-                          </Text>
-                        </View>
-                      ))}
+                            <Text
+                              style={[
+                                styles.tagText,
+                                { color: colors.mutedForeground },
+                              ]}
+                            >
+                              {t}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
+                    <Pressable
+                      onPress={() => toggleFollow(u.id)}
+                      style={[
+                        styles.followBtn,
+                        {
+                          borderColor: following ? colors.emerald : colors.primary,
+                          backgroundColor: following ? colors.emerald + "22" : colors.primary + "22",
+                        },
+                      ]}
+                      accessibilityLabel={following ? `Unfollow ${u.name}` : `Follow ${u.name}`}
+                      accessibilityRole="button"
+                    >
+                      <Feather
+                        name={following ? "check" : "user-plus"}
+                        size={14}
+                        color={following ? colors.emerald : colors.primary}
+                      />
+                    </Pressable>
                   </View>
-                  <Pressable
-                    style={[styles.followBtn, { borderColor: colors.primary }]}
-                  >
-                    <Feather
-                      name="user-plus"
-                      size={14}
-                      color={colors.primary}
-                    />
-                  </Pressable>
-                </View>
-              ))
+                );
+              })}
+            </>
+          )
           : null}
       </ScrollView>
     </ScreenShell>
@@ -387,6 +423,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  importBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  importBannerTitle: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 13,
+    letterSpacing: 0.3,
+  },
+  importBannerText: {
+    fontFamily: "Inter_400Regular",
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 2,
+  },
+  onlineDot: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: "#170A2E",
   },
   graphBox: { padding: 16, borderRadius: 20, borderWidth: 1, marginBottom: 16 },
   graphLabel: {

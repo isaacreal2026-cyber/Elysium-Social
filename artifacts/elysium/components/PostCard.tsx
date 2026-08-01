@@ -82,6 +82,9 @@ export function PostCard({
   return (
     <Pressable
       onPress={() => router.push(`/post/${post.id}` as never)}
+      accessible
+      accessibilityLabel={`${author?.name ?? "Unknown"} posted: ${post.body.slice(0, 100)}${post.body.length > 100 ? "..." : ""}. ${KIND_LABELS[post.kind]} post.`}
+      accessibilityHint="Double tap to view post details"
       style={[
         styles.card,
         {

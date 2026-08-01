@@ -13,6 +13,7 @@ import { PostCard } from "@/components/PostCard";
 import { ScreenShell } from "@/components/ScreenShell";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
+import { useServices } from "@/context/ServicesProvider";
 
 const ORBITAL_FEEDS = [
   { key: "vibe", label: "Vibe", icon: "activity" as const },
@@ -27,11 +28,18 @@ const ORBITAL_FEEDS = [
 export default function FeedScreen() {
   const colors = useColors();
   const { posts } = useResonance();
+  const services = useServices();
   const [active, setActive] = useState("vibe");
 
   const ranked = useMemo(() => {
     const sorted = [...posts];
-    if (active === "vibe") sorted.sort((a, b) => b.energy - a.energy);
+    if (active === "vibe") {
+      // Use Resonance Engine for "Vibe" tab — smart ranking
+      if (services.rankedPosts.length > 0) {
+        return services.rankedPosts.map((r) => r.post);
+      }
+      sorted.sort((a, b) => b.energy - a.energy);
+    }
     else if (active === "moments")
       sorted.sort((a, b) => b.createdAt - a.createdAt);
     else if (active === "memories")
@@ -47,7 +55,7 @@ export default function FeedScreen() {
     else if (active === "geo")
       sorted.sort((a, b) => b.resonance.spark - a.resonance.spark);
     return sorted;
-  }, [active, posts]);
+  }, [active, posts, services.rankedPosts]);
 
   return (
     <ScreenShell title="Feed" subtitle="swipe through orbital streams">
