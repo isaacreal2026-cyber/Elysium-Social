@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { PostCard } from "@/components/PostCard";
 import { ScreenShell } from "@/components/ScreenShell";
@@ -23,6 +23,8 @@ export default function MeScreen() {
   const myMoments = posts.filter((p) => p.authorId === selfId);
   const savedPosts = posts.filter((p) => bookmarks[p.id]);
   const [tab, setTab] = useState<"moments" | "saved" | "profile">("moments");
+  const [isEditing, setIsEditing] = useState(false);
+  const [bioInput, setBioInput] = useState(me?.bio ?? "");
 
   const totalResonance = myMoments.reduce((acc, p) => {
     return acc + Object.values(p.resonance).reduce((a, b) => a + b, 0);
@@ -196,23 +198,46 @@ export default function MeScreen() {
             </Text>
           </Pressable>
           <Pressable
-            onPress={() => router.push("/payment" as never)}
+            onPress={() => setIsEditing(!isEditing)}
             style={[
               styles.actionBtn,
               {
-                backgroundColor: "#FFD56B22",
-                borderColor: "#FFD56B55",
+                backgroundColor: isEditing ? colors.primary + "33" : "#FFD56B22",
+                borderColor: isEditing ? colors.primary : "#FFD56B55",
                 borderWidth: 1,
                 flex: 1,
               },
             ]}
           >
-            <Feather name="zap" size={15} color="#FFD56B" />
-            <Text style={[styles.actionBtnText, { color: "#FFD56B" }]}>
-              Upgrade
+            <Feather name={isEditing ? "check" : "edit-3"} size={15} color={isEditing ? colors.primary : "#FFD56B"} />
+            <Text style={[styles.actionBtnText, { color: isEditing ? colors.primary : "#FFD56B" }]}>
+              {isEditing ? "Done" : "Edit Soulprint"}
             </Text>
           </Pressable>
         </View>
+
+        {isEditing ? (
+          <View style={[styles.editCard, { borderColor: colors.primary, backgroundColor: colors.card }]}>
+            <Text style={[styles.editLabel, { color: colors.primary }]}>EDIT SOULPRINT ESSENCE</Text>
+            <TextInput
+              value={bioInput}
+              onChangeText={setBioInput}
+              placeholder="What frequency are you tuned to?"
+              placeholderTextColor={colors.subtle}
+              multiline
+              style={[styles.editInput, { color: colors.text, borderColor: colors.border }]}
+            />
+            <Pressable
+              onPress={() => {
+                me.bio = bioInput.trim() || me.bio;
+                setIsEditing(false);
+              }}
+              style={[styles.saveBtn, { backgroundColor: colors.primary }]}
+            >
+              <Text style={styles.saveBtnText}>Save Soulprint</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         {/* Tabs */}
         <View style={[styles.tabRow, { borderColor: colors.border }]}>
@@ -586,5 +611,39 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     alignItems: "center",
     gap: 8,
+  },
+  editCard: {
+    marginHorizontal: 14,
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    gap: 8,
+  },
+  editLabel: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    letterSpacing: 1.2,
+  },
+  editInput: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 12,
+    fontFamily: "Inter_400Regular",
+    fontSize: 14,
+    lineHeight: 20,
+    minHeight: 60,
+    backgroundColor: "rgba(245,240,255,0.04)",
+  },
+  saveBtn: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+  saveBtnText: {
+    color: "#fff",
+    fontFamily: "Inter_700Bold",
+    fontSize: 12,
   },
 });

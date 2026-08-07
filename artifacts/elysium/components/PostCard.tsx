@@ -2,10 +2,11 @@ import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { ResonanceBar } from "@/components/ResonanceBar";
+import { ShareSheet } from "@/components/ShareSheet";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
 import type { Post } from "@/lib/types";
@@ -59,8 +60,17 @@ export function PostCard({
   nested?: boolean;
 }) {
   const colors = useColors();
-  const { userById, posts, toggleBookmark, isBookmarked, sharePost } =
-    useResonance();
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const {
+    userById,
+    posts,
+    toggleBookmark,
+    isBookmarked,
+    sharePost,
+    toggleTask,
+    votePoll,
+  } = useResonance();
   const author = userById(post.authorId);
   const nestedPosts = (post.nestedPostIds ?? [])
     .map((id) => posts.find((p) => p.id === id))
@@ -187,11 +197,24 @@ export function PostCard({
             style={StyleSheet.absoluteFill}
           />
           {post.kind === "voice" ? (
-            <View style={styles.voiceOverlay}>
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation?.();
+                setIsPlayingVoice((v) => !v);
+              }}
+              style={styles.voiceOverlay}
+            >
               <View
-                style={[styles.voicePlay, { backgroundColor: colors.teal }]}
+                style={[
+                  styles.voicePlay,
+                  { backgroundColor: isPlayingVoice ? colors.gold : colors.teal },
+                ]}
               >
-                <Feather name="play" size={14} color="#0E0524" />
+                <Feather
+                  name={isPlayingVoice ? "pause" : "play"}
+                  size={14}
+                  color="#0E0524"
+                />
               </View>
               <View style={styles.waveform}>
                 {Array.from({ length: 28 }).map((_, i) => (
@@ -200,17 +223,19 @@ export function PostCard({
                     style={[
                       styles.wavebar,
                       {
-                        height: 5 + Math.abs(Math.sin(i * 0.7)) * 18,
-                        backgroundColor: "rgba(255,255,255,0.85)",
+                        height: isPlayingVoice
+                          ? 6 + Math.abs(Math.sin((i + Date.now() / 300) * 0.8)) * 20
+                          : 5 + Math.abs(Math.sin(i * 0.7)) * 18,
+                        backgroundColor: isPlayingVoice ? colors.gold : "rgba(255,255,255,0.85)",
                       },
                     ]}
                   />
                 ))}
               </View>
-              <Text style={styles.voiceTime}>
-                0:{String(post.voiceSeconds ?? 0).padStart(2, "0")}
+              <Text style={[styles.voiceTime, isPlayingVoice && { color: colors.gold }]}>
+                {isPlayingVoice ? "playing · " : ""}0:{String(post.voiceSeconds ?? 0).padStart(2, "0")}
               </Text>
-            </View>
+            </Pressable>
           ) : null}
         </View>
       ) : null}
@@ -221,8 +246,12 @@ export function PostCard({
             const total = post.poll!.options.reduce((a, b) => a + b.votes, 0);
             const pct = total ? opt.votes / total : 0;
             return (
-              <View
+              <Pressable
                 key={i}
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  votePoll(post.id, i);
+                }}
                 style={[styles.pollRow, { borderColor: colors.border }]}
               >
                 <View
@@ -240,14 +269,14 @@ export function PostCard({
                 <Text style={[styles.pollPct, { color: colors.primary }]}>
                   {Math.round(pct * 100)}%
                 </Text>
-              </View>
+              </Pressable>
             );
           })}
           <Text style={[styles.pollMeta, { color: colors.subtle }]}>
             {post.poll.options
               .reduce((a, b) => a + b.votes, 0)
               .toLocaleString()}{" "}
-            votes · 14h left
+            votes · tap option to vote
           </Text>
         </View>
       ) : null}
@@ -265,7 +294,7 @@ export function PostCard({
           <View style={styles.projectHeader}>
             <Feather name="layers" size={11} color={colors.teal} />
             <Text style={[styles.projectTitle, { color: colors.teal }]}>
-              Project
+              Project Tasks
             </Text>
             <Text style={[styles.projectMeta, { color: colors.subtle }]}>
               {post.project.tasks.filter((t) => t.done).length}/
@@ -273,7 +302,14 @@ export function PostCard({
             </Text>
           </View>
           {post.project.tasks.map((t, i) => (
-            <View key={i} style={styles.taskRow}>
+            <Pressable
+              key={i}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                toggleTask(post.id, i);
+              }}
+              style={styles.taskRow}
+            >
               <View
                 style={[
                   styles.taskDot,
@@ -296,7 +332,7 @@ export function PostCard({
               >
                 {t.label}
               </Text>
-            </View>
+            </Pressable>
           ))}
         </View>
       ) : null}
@@ -325,7 +361,10 @@ export function PostCard({
         <FooterBtn
           icon="share-2"
           label={fmt(post.shareCount)}
-          onPress={() => sharePost(post.id)}
+          onPress={() => {
+            sharePost(post.id);
+            setShowShare(true);
+          }}
         />
         <FooterBtn
           icon="bookmark"
@@ -335,6 +374,13 @@ export function PostCard({
           onPress={() => toggleBookmark(post.id)}
         />
       </View>
+
+      <ShareSheet
+        visible={showShare}
+        onClose={() => setShowShare(false)}
+        post={post}
+        author={author}
+      />
     </Pressable>
   );
 }

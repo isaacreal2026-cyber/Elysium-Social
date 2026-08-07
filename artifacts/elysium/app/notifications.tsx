@@ -90,7 +90,19 @@ export default function NotificationsScreen() {
   );
 
   return (
-    <ScreenShell title="Activity" subtitle="resonance from across the cosmos">
+    <ScreenShell
+      title="Activity"
+      subtitle="resonance from across the cosmos"
+      rightAction={
+        <Pressable
+          onPress={() => markAllNotificationsRead()}
+          style={styles.clearBtn}
+        >
+          <Feather name="check" size={14} color={colors.primary} />
+          <Text style={[styles.clearText, { color: colors.primary }]}>all read</Text>
+        </Pressable>
+      }
+    >
       <View style={styles.tabRow}>
         {TABS.map((t) => {
           const active = t.key === tab;
@@ -316,4 +328,17 @@ const styles = StyleSheet.create({
   unreadDot: { width: 8, height: 8, borderRadius: 4 },
   empty: { paddingTop: 80, alignItems: "center", gap: 10 },
   emptyText: { fontFamily: "Inter_500Medium", fontSize: 14 },
+  clearBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: "rgba(181,123,255,0.12)",
+  },
+  clearText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 11,
+  },
 });

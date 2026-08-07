@@ -45,7 +45,10 @@ export default function DiscoverScreen() {
           renderItem={({ item }) => {
             const author = userById(item.authorId);
             return (
-              <Pressable style={[styles.story, { borderColor: colors.border }]}>
+              <Pressable
+                onPress={() => router.push(`/story/${item.id}` as never)}
+                style={[styles.story, { borderColor: colors.border }]}
+              >
                 <Image
                   source={NEBULAS[item.toneIndex]}
                   style={StyleSheet.absoluteFill}

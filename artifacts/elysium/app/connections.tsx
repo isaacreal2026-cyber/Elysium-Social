@@ -16,7 +16,15 @@ const TABS = [
 
 export default function ConnectionsScreen() {
   const colors = useColors();
-  const { threads, voiceRooms, users, userById, selfId } = useResonance();
+  const {
+    threads,
+    voiceRooms,
+    users,
+    userById,
+    selfId,
+    isFollowing,
+    toggleFollow,
+  } = useResonance();
   const [tab, setTab] = useState<string>("messages");
 
   return (
@@ -190,73 +198,89 @@ export default function ConnectionsScreen() {
         {tab === "find"
           ? users
               .filter((u) => u.id !== selfId)
-              .map((u) => (
-                <View
-                  key={u.id}
-                  style={[
-                    styles.threadRow,
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                >
-                  <View
-                    style={[styles.avatar, { backgroundColor: u.avatarColor }]}
+              .map((u) => {
+                const following = isFollowing(u.id);
+                return (
+                  <Pressable
+                    key={u.id}
+                    onPress={() => router.push(`/profile/${u.id}` as never)}
+                    style={[
+                      styles.threadRow,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                      },
+                    ]}
                   >
-                    <Text style={styles.avatarText}>{u.avatarGlyph}</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.threadName, { color: colors.text }]}>
-                      {u.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.threadMsg,
-                        { color: colors.mutedForeground },
-                      ]}
-                    >
-                      {u.city} · alignment {Math.round(u.alignmentScore * 100)}
-                    </Text>
                     <View
-                      style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: 4,
-                        marginTop: 6,
-                      }}
+                      style={[styles.avatar, { backgroundColor: u.avatarColor }]}
                     >
-                      {u.tags.map((t) => (
-                        <View
-                          key={t}
-                          style={[
-                            styles.tagPill,
-                            { borderColor: colors.border },
-                          ]}
-                        >
-                          <Text
+                      <Text style={styles.avatarText}>{u.avatarGlyph}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.threadName, { color: colors.text }]}>
+                        {u.name}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.threadMsg,
+                          { color: colors.mutedForeground },
+                        ]}
+                      >
+                        {u.city} · alignment {Math.round(u.alignmentScore * 100)}%
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          gap: 4,
+                          marginTop: 6,
+                        }}
+                      >
+                        {u.tags.map((t) => (
+                          <View
+                            key={t}
                             style={[
-                              styles.tagText,
-                              { color: colors.mutedForeground },
+                              styles.tagPill,
+                              { borderColor: colors.border },
                             ]}
                           >
-                            {t}
-                          </Text>
-                        </View>
-                      ))}
+                            <Text
+                              style={[
+                                styles.tagText,
+                                { color: colors.mutedForeground },
+                              ]}
+                            >
+                              {t}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
-                  </View>
-                  <Pressable
-                    style={[styles.followBtn, { borderColor: colors.primary }]}
-                  >
-                    <Feather
-                      name="user-plus"
-                      size={14}
-                      color={colors.primary}
-                    />
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        toggleFollow(u.id);
+                      }}
+                      style={[
+                        styles.followBtn,
+                        {
+                          borderColor: following ? colors.border : colors.primary,
+                          backgroundColor: following
+                            ? "transparent"
+                            : colors.primary,
+                        },
+                      ]}
+                    >
+                      <Feather
+                        name={following ? "check" : "user-plus"}
+                        size={14}
+                        color={following ? colors.text : "#fff"}
+                      />
+                    </Pressable>
                   </Pressable>
-                </View>
-              ))
+                );
+              })
           : null}
       </ScrollView>
     </ScreenShell>
@@ -265,7 +289,7 @@ export default function ConnectionsScreen() {
 
 function NetworkGraph() {
   const colors = useColors();
-  const { users, selfId } = useResonance();
+  const { users, selfId, calculateAlignment } = useResonance();
   const others = users.filter((u) => u.id !== selfId);
   const center = { x: 50, y: 50 };
   const RADIUS_PCT = 35;
@@ -282,6 +306,7 @@ function NetworkGraph() {
         </Text>
         <View style={styles.graph}>
           {others.map((u, i) => {
+            const alignment = calculateAlignment(u.id);
             const angle = (Math.PI * 2 * i) / others.length;
             const x = center.x + Math.cos(angle) * RADIUS_PCT;
             const y = center.y + Math.sin(angle) * RADIUS_PCT;
@@ -298,22 +323,24 @@ function NetworkGraph() {
                         { rotate: `${angle * (180 / Math.PI)}deg` },
                       ],
                       width: `${RADIUS_PCT}%`,
-                      opacity: u.alignmentScore,
+                      opacity: alignment,
                     },
                   ]}
                 />
-                <View
+                <Pressable
+                  onPress={() => router.push(`/profile/${u.id}` as never)}
                   style={[
                     styles.graphNode,
                     {
                       left: `${x}%`,
                       top: `${y}%`,
                       backgroundColor: u.avatarColor,
+                      borderColor: colors.gold + "88",
                     },
                   ]}
                 >
                   <Text style={styles.graphNodeText}>{u.avatarGlyph}</Text>
-                </View>
+                </Pressable>
               </React.Fragment>
             );
           })}
@@ -322,7 +349,7 @@ function NetworkGraph() {
           </View>
         </View>
         <Text style={[styles.graphHelp, { color: colors.mutedForeground }]}>
-          line strength reflects alignment over the last 30 days
+          tap any orbiting node to inspect mutual alignment & soulprint
         </Text>
       </View>
     </View>

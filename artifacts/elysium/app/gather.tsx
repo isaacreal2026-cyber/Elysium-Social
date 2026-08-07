@@ -18,6 +18,8 @@ export default function GatherScreen() {
   const colors = useColors();
   const { paths, togglePathProgress } = useResonance();
   const [section, setSection] = useState("paths");
+  const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const [activeBook, setActiveBook] = useState<string | null>(null);
 
   return (
     <ScreenShell title="Gather" subtitle="learn together. think out loud.">
@@ -116,78 +118,100 @@ export default function GatherScreen() {
           : null}
 
         {section === "library"
-          ? LIBRARY.map((item) => (
-              <View
-                key={item.title}
-                style={[
-                  styles.row,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-              >
-                <View
+          ? LIBRARY.map((item) => {
+              const isSelected = activeBook === item.title;
+              return (
+                <Pressable
+                  key={item.title}
+                  onPress={() => setActiveBook(isSelected ? null : item.title)}
                   style={[
-                    styles.libIcon,
-                    { backgroundColor: colors.primary + "22" },
+                    styles.row,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: isSelected ? colors.primary : colors.border,
+                    },
                   ]}
                 >
-                  <Feather name="book-open" size={18} color={colors.primary} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.title, { color: colors.text }]}>
-                    {item.title}
-                  </Text>
-                  <Text
-                    style={[styles.meta, { color: colors.mutedForeground }]}
-                    numberOfLines={2}
+                  <View
+                    style={[
+                      styles.libIcon,
+                      { backgroundColor: colors.primary + "22" },
+                    ]}
                   >
-                    {item.summary}
-                  </Text>
-                  <Text
-                    style={[styles.meta, { color: colors.gold, marginTop: 4 }]}
-                  >
-                    {item.minutes} min read · discussed by {item.discussions}{" "}
-                    people
-                  </Text>
-                </View>
-              </View>
-            ))
+                    <Feather name="book-open" size={18} color={colors.primary} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.title, { color: colors.text }]}>
+                      {item.title}
+                    </Text>
+                    <Text
+                      style={[styles.meta, { color: colors.mutedForeground }]}
+                      numberOfLines={isSelected ? undefined : 2}
+                    >
+                      {item.summary}
+                    </Text>
+                    <Text
+                      style={[styles.meta, { color: colors.gold, marginTop: 4 }]}
+                    >
+                      {item.minutes} min read · discussed by {item.discussions}{" "}
+                      people
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            })
           : null}
 
         {section === "video"
-          ? VIDEOS.map((v) => (
-              <View
-                key={v.title}
-                style={[
-                  styles.row,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                ]}
-              >
-                <View
+          ? VIDEOS.map((v) => {
+              const isPlaying = activeVideo === v.title;
+              return (
+                <Pressable
+                  key={v.title}
+                  onPress={() => setActiveVideo(isPlaying ? null : v.title)}
                   style={[
-                    styles.videoThumb,
-                    { backgroundColor: colors.primaryDeep },
+                    styles.row,
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: isPlaying ? colors.teal : colors.border,
+                    },
                   ]}
                 >
-                  <Feather name="play" size={18} color="#fff" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.title, { color: colors.text }]}>
-                    {v.title}
-                  </Text>
-                  <Text
-                    style={[styles.meta, { color: colors.mutedForeground }]}
+                  <View
+                    style={[
+                      styles.videoThumb,
+                      {
+                        backgroundColor: isPlaying
+                          ? colors.teal
+                          : colors.primaryDeep,
+                      },
+                    ]}
                   >
-                    {v.creator} · {v.duration}
-                  </Text>
-                  <Text
-                    style={[styles.meta, { color: colors.teal, marginTop: 4 }]}
-                  >
-                    {v.live ? "live now · " : ""}
-                    {v.viewers} watching together
-                  </Text>
-                </View>
-              </View>
-            ))
+                    <Feather
+                      name={isPlaying ? "pause" : "play"}
+                      size={18}
+                      color="#fff"
+                    />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.title, { color: colors.text }]}>
+                      {v.title}
+                    </Text>
+                    <Text
+                      style={[styles.meta, { color: colors.mutedForeground }]}
+                    >
+                      {v.creator} · {v.duration}
+                    </Text>
+                    <Text
+                      style={[styles.meta, { color: colors.teal, marginTop: 4 }]}
+                    >
+                      {v.live ? "live now · " : ""}
+                      {v.viewers} watching together
+                    </Text>
+                  </View>
+                </Pressable>
+              );
+            })
           : null}
       </ScrollView>
     </ScreenShell>

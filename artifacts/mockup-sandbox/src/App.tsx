@@ -19,6 +19,41 @@ function _resolveComponent(
   );
 }
 
+const PREVIEWS = [
+  {
+    id: "ConstellationFeed",
+    path: "elysium-feed/ConstellationFeed",
+    title: "Constellation Feed",
+    desc: "Interactive spatial graph with energy connections & modal orbits",
+    icon: "✦",
+    color: "#B57BFF",
+  },
+  {
+    id: "ResonancePulse",
+    path: "elysium-feed/ResonancePulse",
+    title: "Resonance Pulse",
+    desc: "Mobile cosmic device with ambient particles & resonance dock",
+    icon: "⚡",
+    color: "#5EEAD4",
+  },
+  {
+    id: "AmbientLayers",
+    path: "elysium-feed/AmbientLayers",
+    title: "Ambient Layers",
+    desc: "Horizon story stack with ambient gradients & live timeline",
+    icon: "🪐",
+    color: "#FFD56B",
+  },
+  {
+    id: "FrequencyBoard",
+    path: "elysium-feed/FrequencyBoard",
+    title: "Frequency Board",
+    desc: "Live broadcast tuner with frequency scan & masonry tiles",
+    icon: "🎙",
+    color: "#F472B6",
+  },
+];
+
 function PreviewRenderer({
   componentPath,
   modules,
@@ -36,10 +71,15 @@ function PreviewRenderer({
     setError(null);
 
     async function loadComponent(): Promise<void> {
-      const key = `./components/mockups/${componentPath}.tsx`;
-      const loader = modules[key];
+      const key = componentPath.startsWith("./components/mockups/")
+        ? componentPath
+        : componentPath.includes("/")
+          ? `./components/mockups/${componentPath}.tsx`
+          : `./components/mockups/elysium-feed/${componentPath}.tsx`;
+
+      const loader = modules[key] || modules[`./components/mockups/elysium-feed/${componentPath}.tsx`];
       if (!loader) {
-        setError(`No component found at ${componentPath}.tsx`);
+        setError(`No component found for path: ${componentPath}`);
         return;
       }
 
@@ -76,45 +116,25 @@ function PreviewRenderer({
 
   if (error) {
     return (
-      <pre style={{ color: "red", padding: "2rem", fontFamily: "system-ui" }}>
+      <pre style={{ color: "#FB7185", padding: "2rem", fontFamily: "monospace", background: "#07021A" }}>
         {error}
       </pre>
     );
   }
 
-  if (!Component) return null;
+  if (!Component) {
+    return (
+      <div className="min-h-screen bg-[#07021A] flex items-center justify-center text-purple-300 font-mono text-sm animate-pulse">
+        ✦ Tuning to resonance frequency...
+      </div>
+    );
+  }
 
   return <Component />;
 }
 
 function getBasePath(): string {
-  return import.meta.env.BASE_URL.replace(/\/$/, "");
-}
-
-function getPreviewExamplePath(): string {
-  const basePath = getBasePath();
-  return `${basePath}/preview/ComponentName`;
-}
-
-function Gallery() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-3">
-          Component Preview Server
-        </h1>
-        <p className="text-gray-500 mb-4">
-          This server renders individual components for the workspace canvas.
-        </p>
-        <p className="text-sm text-gray-400">
-          Access component previews at{" "}
-          <code className="bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-            {getPreviewExamplePath()}
-          </code>
-        </p>
-      </div>
-    </div>
-  );
+  return (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
 }
 
 function getPreviewPath(): string | null {
@@ -129,18 +149,75 @@ function getPreviewPath(): string | null {
 }
 
 function App() {
-  const previewPath = getPreviewPath();
+  const initialPreview = getPreviewPath() || "elysium-feed/ConstellationFeed";
+  const [activeTab, setActiveTab] = useState<string>(initialPreview);
 
-  if (previewPath) {
-    return (
-      <PreviewRenderer
-        componentPath={previewPath}
-        modules={discoveredModules}
-      />
-    );
-  }
+  const activeDef = PREVIEWS.find(
+    (p) => p.path === activeTab || p.id === activeTab || activeTab.endsWith(p.id)
+  ) || PREVIEWS[0];
 
-  return <Gallery />;
+  return (
+    <div className="min-h-screen bg-[#07021A] text-slate-100 flex flex-col font-sans">
+      {/* Top Elysium Navigation Bar */}
+      <header className="sticky top-0 z-50 bg-[#0E0524]/90 backdrop-blur-md border-b border-purple-900/30 px-4 py-3 flex items-center justify-between shadow-2xl">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center shadow-[0_0_12px_rgba(181,123,255,0.6)] font-bold text-white text-sm">
+            ✦
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-lg tracking-tight text-white">ELYSIUM</span>
+              <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
+                Live UI Preview
+              </span>
+            </div>
+            <p className="text-[11px] text-purple-300/70 hidden sm:block">
+              Original spatial & dynamic social UI components
+            </p>
+          </div>
+        </div>
+
+        {/* View Switcher Tabs */}
+        <div className="flex items-center gap-1.5 bg-[#170A2E] p-1 rounded-full border border-purple-900/40">
+          {PREVIEWS.map((p) => {
+            const isActive =
+              activeTab === p.path ||
+              activeTab === p.id ||
+              activeTab.endsWith(p.id);
+            return (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setActiveTab(p.path);
+                  const basePath = getBasePath();
+                  window.history.replaceState(null, "", `${basePath}/preview/${p.path}`);
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all duration-300 ${
+                  isActive
+                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_12px_rgba(181,123,255,0.4)]"
+                    : "text-purple-200/70 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <span>{p.icon}</span>
+                <span className="hidden md:inline">{p.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </header>
+
+      {/* Main Preview Frame */}
+      <main className="flex-1 relative flex items-center justify-center p-0 md:p-6 overflow-auto">
+        <div className="w-full h-full max-w-6xl flex items-center justify-center">
+          <PreviewRenderer
+            componentPath={activeDef.path}
+            modules={discoveredModules}
+          />
+        </div>
+      </main>
+    </div>
+  );
 }
 
 export default App;
+

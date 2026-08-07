@@ -2,7 +2,8 @@
   "expo": {
     "name": "ELYSIUM",
     "slug": "elysium",
-    "version": "1.0.0",
+    "version": "2.4.0",
+    "description": "Elysium — Next-Generation Spatial & Resonant Social Universe",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "elysium",
