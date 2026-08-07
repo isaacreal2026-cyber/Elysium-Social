@@ -4,6 +4,7 @@ import { router, usePathname } from "expo-router";
 import React from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
@@ -82,6 +83,13 @@ export function BottomTabBar() {
   const pathname = usePathname();
   const { unreadNotifications, unreadMessages } = useResonance();
 
+  const handlePress = (route: string) => {
+    if (Platform.OS !== "web") {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    }
+    router.push(route as never);
+  };
+
   return (
     <View style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 8) }]}>
       <LinearGradient
@@ -110,7 +118,7 @@ export function BottomTabBar() {
           return (
             <Pressable
               key={tab.key}
-              onPress={() => router.push(tab.route as never)}
+              onPress={() => handlePress(tab.route)}
               style={styles.tabBtn}
             >
               {isCompose ? (
@@ -127,12 +135,16 @@ export function BottomTabBar() {
                   <View
                     style={[
                       styles.iconInner,
-                      active && { backgroundColor: colors.primary + "18" },
+                      active && {
+                        backgroundColor: colors.primary + "22",
+                        borderColor: colors.primary + "44",
+                        borderWidth: 1,
+                      },
                     ]}
                   >
                     <Feather
                       name={tab.icon}
-                      size={20}
+                      size={19}
                       color={active ? colors.primary : colors.mutedForeground}
                     />
                   </View>
@@ -151,7 +163,10 @@ export function BottomTabBar() {
                 <Text
                   style={[
                     styles.label,
-                    { color: active ? colors.primary : colors.mutedForeground },
+                    {
+                      color: active ? colors.primary : colors.mutedForeground,
+                      fontFamily: active ? "Inter_700Bold" : "Inter_500Medium",
+                    },
                   ]}
                 >
                   {tab.label}
