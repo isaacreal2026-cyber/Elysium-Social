@@ -59,6 +59,7 @@ export function PostCard({
   nested?: boolean;
 }) {
   const colors = useColors();
+  const [isPlayingVoice, setIsPlayingVoice] = React.useState(false);
   const {
     userById,
     posts,
@@ -194,11 +195,24 @@ export function PostCard({
             style={StyleSheet.absoluteFill}
           />
           {post.kind === "voice" ? (
-            <View style={styles.voiceOverlay}>
+            <Pressable
+              onPress={(e) => {
+                e.stopPropagation?.();
+                setIsPlayingVoice((v) => !v);
+              }}
+              style={styles.voiceOverlay}
+            >
               <View
-                style={[styles.voicePlay, { backgroundColor: colors.teal }]}
+                style={[
+                  styles.voicePlay,
+                  { backgroundColor: isPlayingVoice ? colors.gold : colors.teal },
+                ]}
               >
-                <Feather name="play" size={14} color="#0E0524" />
+                <Feather
+                  name={isPlayingVoice ? "pause" : "play"}
+                  size={14}
+                  color="#0E0524"
+                />
               </View>
               <View style={styles.waveform}>
                 {Array.from({ length: 28 }).map((_, i) => (
@@ -207,17 +221,19 @@ export function PostCard({
                     style={[
                       styles.wavebar,
                       {
-                        height: 5 + Math.abs(Math.sin(i * 0.7)) * 18,
-                        backgroundColor: "rgba(255,255,255,0.85)",
+                        height: isPlayingVoice
+                          ? 6 + Math.abs(Math.sin((i + Date.now() / 300) * 0.8)) * 20
+                          : 5 + Math.abs(Math.sin(i * 0.7)) * 18,
+                        backgroundColor: isPlayingVoice ? colors.gold : "rgba(255,255,255,0.85)",
                       },
                     ]}
                   />
                 ))}
               </View>
-              <Text style={styles.voiceTime}>
-                0:{String(post.voiceSeconds ?? 0).padStart(2, "0")}
+              <Text style={[styles.voiceTime, isPlayingVoice && { color: colors.gold }]}>
+                {isPlayingVoice ? "playing · " : ""}0:{String(post.voiceSeconds ?? 0).padStart(2, "0")}
               </Text>
-            </View>
+            </Pressable>
           ) : null}
         </View>
       ) : null}

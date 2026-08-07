@@ -84,6 +84,8 @@ interface ResonanceCtx extends State {
     kind: Post["kind"];
     destinations?: string[];
     nestedPostId?: string;
+    pollOptions?: string[];
+    projectTasks?: string[];
   }) => string;
   addComment: (input: {
     postId: string;
@@ -338,9 +340,23 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addPost = useCallback<ResonanceCtx["addPost"]>(
-    ({ body, kind, destinations, nestedPostId }) => {
+    ({ body, kind, destinations, nestedPostId, pollOptions, projectTasks }) => {
       const id = makeId("p");
       const tones = ["nebula1", "nebula2", "nebula3"] as const;
+      const poll =
+        kind === "poll" && pollOptions && pollOptions.length > 0
+          ? {
+              options: pollOptions.map((label) => ({ label, votes: 0 })),
+            }
+          : undefined;
+
+      const project =
+        kind === "project" && projectTasks && projectTasks.length > 0
+          ? {
+              tasks: projectTasks.map((label) => ({ label, done: false })),
+            }
+          : undefined;
+
       setState((s) => ({
         ...s,
         posts: [
@@ -355,6 +371,8 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
                 : "none",
             destinations: destinations ?? [],
             voiceSeconds: kind === "voice" ? 14 : undefined,
+            poll,
+            project,
             resonance: {
               spark: 0,
               flame: 0,

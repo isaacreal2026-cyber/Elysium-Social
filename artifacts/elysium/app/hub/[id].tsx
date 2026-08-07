@@ -26,7 +26,8 @@ const NEBULAS = [
 export default function HubDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const colors = useColors();
-  const { hubs, posts, userById, toggleHubProjectMode } = useResonance();
+  const { hubs, posts, userById, toggleHubProjectMode, toggleTask } = useResonance();
+  const [activeTab, setActiveTab] = React.useState<"posts" | "tasks" | "voice">("posts");
   const hub = hubs.find((h) => h.id === id);
 
   if (!hub) {
@@ -44,6 +45,8 @@ export default function HubDetailScreen() {
   }
 
   const hubPosts = posts.filter((p) => hub.postIds.includes(p.id));
+  const projectPosts = hubPosts.filter((p) => p.project && p.project.tasks.length > 0);
+  const voicePosts = hubPosts.filter((p) => p.kind === "voice");
 
   return (
     <ScreenShell
@@ -112,17 +115,45 @@ export default function HubDetailScreen() {
             <Feather name="layers" size={14} color={colors.teal} />
             <View style={{ flex: 1 }}>
               <Text style={[styles.projectTitle, { color: colors.teal }]}>
-                PROJECT MODE — collaborative canvas
+                PROJECT MODE — collaborative workbench
               </Text>
               <Text
                 style={[styles.projectMeta, { color: colors.mutedForeground }]}
               >
-                shared moodboard · 12 tasks open · 3 voice notes pinned
+                active canvas · {projectPosts.length} goal boards · {voicePosts.length} voice dispatches
               </Text>
             </View>
-            <Feather name="chevron-right" size={16} color={colors.teal} />
+            <Feather name="check-circle" size={16} color={colors.teal} />
           </View>
         ) : null}
+
+        <View style={styles.tabPillRow}>
+          {(["posts", "tasks", "voice"] as const).map((t) => {
+            const active = activeTab === t;
+            return (
+              <Pressable
+                key={t}
+                onPress={() => setActiveTab(t)}
+                style={[
+                  styles.tabPill,
+                  {
+                    borderColor: active ? colors.primary : colors.border,
+                    backgroundColor: active ? colors.primary + "22" : "rgba(245,240,255,0.04)",
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.tabPillText,
+                    { color: active ? colors.primary : colors.mutedForeground },
+                  ]}
+                >
+                  {t === "posts" ? "Signals" : t === "tasks" ? "Workbench" : "Voice Dispatches"}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
 
         <View style={[styles.windowsRow]}>
           <Window
@@ -130,14 +161,36 @@ export default function HubDetailScreen() {
             value={`${hubPosts.length} posts`}
             color={colors.primary}
           />
-          <Window label="Voice" value="2 rooms live" color={colors.teal} />
-          <Window label="Files" value="14 shared" color={colors.gold} />
+          <Window label="Voice" value={`${voicePosts.length} dispatches`} color={colors.teal} />
+          <Window label="Tasks" value={`${projectPosts.length} open`} color={colors.gold} />
         </View>
 
         <View style={{ paddingHorizontal: 16 }}>
-          {hubPosts.map((p) => (
-            <PostCard key={p.id} post={p} />
-          ))}
+          {activeTab === "posts" ? (
+            hubPosts.map((p) => <PostCard key={p.id} post={p} />)
+          ) : activeTab === "tasks" ? (
+            projectPosts.length === 0 ? (
+              <View style={styles.emptyBox}>
+                <Feather name="layers" size={24} color={colors.mutedForeground} />
+                <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+                  no open workbench tasks in this hub yet
+                </Text>
+              </View>
+            ) : (
+              projectPosts.map((p) => <PostCard key={p.id} post={p} />)
+            )
+          ) : (
+            voicePosts.length === 0 ? (
+              <View style={styles.emptyBox}>
+                <Feather name="mic" size={24} color={colors.mutedForeground} />
+                <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
+                  no voice dispatches in this hub yet
+                </Text>
+              </View>
+            ) : (
+              voicePosts.map((p) => <PostCard key={p.id} post={p} />)
+            )
+          )}
         </View>
       </ScrollView>
     </ScreenShell>
@@ -285,6 +338,37 @@ const styles = StyleSheet.create({
   windowValue: {
     color: "#F5F0FF",
     fontFamily: "Inter_600SemiBold",
+    fontSize: 13,
+  },
+  tabPillRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  tabPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  tabPillText: {
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 11,
+  },
+  emptyBox: {
+    padding: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: "rgba(245,240,255,0.12)",
+    marginTop: 8,
+  },
+  emptyText: {
+    fontFamily: "Inter_400Regular",
     fontSize: 13,
   },
 });
