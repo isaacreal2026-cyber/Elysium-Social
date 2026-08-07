@@ -59,8 +59,15 @@ export function PostCard({
   nested?: boolean;
 }) {
   const colors = useColors();
-  const { userById, posts, toggleBookmark, isBookmarked, sharePost } =
-    useResonance();
+  const {
+    userById,
+    posts,
+    toggleBookmark,
+    isBookmarked,
+    sharePost,
+    toggleTask,
+    votePoll,
+  } = useResonance();
   const author = userById(post.authorId);
   const nestedPosts = (post.nestedPostIds ?? [])
     .map((id) => posts.find((p) => p.id === id))
@@ -221,8 +228,12 @@ export function PostCard({
             const total = post.poll!.options.reduce((a, b) => a + b.votes, 0);
             const pct = total ? opt.votes / total : 0;
             return (
-              <View
+              <Pressable
                 key={i}
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  votePoll(post.id, i);
+                }}
                 style={[styles.pollRow, { borderColor: colors.border }]}
               >
                 <View
@@ -240,14 +251,14 @@ export function PostCard({
                 <Text style={[styles.pollPct, { color: colors.primary }]}>
                   {Math.round(pct * 100)}%
                 </Text>
-              </View>
+              </Pressable>
             );
           })}
           <Text style={[styles.pollMeta, { color: colors.subtle }]}>
             {post.poll.options
               .reduce((a, b) => a + b.votes, 0)
               .toLocaleString()}{" "}
-            votes · 14h left
+            votes · tap option to vote
           </Text>
         </View>
       ) : null}
@@ -265,7 +276,7 @@ export function PostCard({
           <View style={styles.projectHeader}>
             <Feather name="layers" size={11} color={colors.teal} />
             <Text style={[styles.projectTitle, { color: colors.teal }]}>
-              Project
+              Project Tasks
             </Text>
             <Text style={[styles.projectMeta, { color: colors.subtle }]}>
               {post.project.tasks.filter((t) => t.done).length}/
@@ -273,7 +284,14 @@ export function PostCard({
             </Text>
           </View>
           {post.project.tasks.map((t, i) => (
-            <View key={i} style={styles.taskRow}>
+            <Pressable
+              key={i}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                toggleTask(post.id, i);
+              }}
+              style={styles.taskRow}
+            >
               <View
                 style={[
                   styles.taskDot,
@@ -296,7 +314,7 @@ export function PostCard({
               >
                 {t.label}
               </Text>
-            </View>
+            </Pressable>
           ))}
         </View>
       ) : null}

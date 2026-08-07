@@ -96,6 +96,9 @@ interface ResonanceCtx extends State {
   toggleHubProjectMode: (hubId: string) => void;
   togglePathProgress: (pathId: string) => void;
   sharePost: (postId: string) => void;
+  toggleTask: (postId: string, taskIndex: number) => void;
+  votePoll: (postId: string, optionIndex: number) => void;
+  calculateAlignment: (targetUserId: string) => number;
 }
 
 const Ctx = createContext<ResonanceCtx | null>(null);
@@ -485,6 +488,61 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
     [lightHaptic],
   );
 
+  const toggleTask = useCallback<ResonanceCtx["toggleTask"]>(
+    (postId, taskIndex) => {
+      lightHaptic();
+      setState((s) => ({
+        ...s,
+        posts: s.posts.map((p) => {
+          if (p.id !== postId || !p.project) return p;
+          const nextTasks = p.project.tasks.map((t, idx) =>
+            idx === taskIndex ? { ...t, done: !t.done } : t,
+          );
+          return { ...p, project: { ...p.project, tasks: nextTasks } };
+        }),
+      }));
+    },
+    [lightHaptic],
+  );
+
+  const votePoll = useCallback<ResonanceCtx["votePoll"]>(
+    (postId, optionIndex) => {
+      lightHaptic();
+      setState((s) => ({
+        ...s,
+        posts: s.posts.map((p) => {
+          if (p.id !== postId || !p.poll) return p;
+          const nextOpts = p.poll.options.map((opt, idx) =>
+            idx === optionIndex ? { ...opt, votes: opt.votes + 1 } : opt,
+          );
+          return {
+            ...p,
+            poll: { ...p.poll, options: nextOpts },
+            energy: Math.min(1, p.energy + 0.05),
+          };
+        }),
+      }));
+    },
+    [lightHaptic],
+  );
+
+  const calculateAlignment = useCallback(
+    (targetUserId: string) => {
+      const me = state.users.find((u) => u.id === state.selfId);
+      const target = state.users.find((u) => u.id === targetUserId);
+      if (!me || !target) return 0.5;
+
+      const sharedTags = me.tags.filter((t) => target.tags.includes(t)).length;
+      const sharedDest = me.destinations.filter((d) =>
+        target.destinations.includes(d),
+      ).length;
+      const base = target.alignmentScore;
+      const boost = (sharedTags * 0.1 + sharedDest * 0.15);
+      return Math.min(0.99, Math.max(0.4, (base + boost) / 1.25));
+    },
+    [state.users, state.selfId],
+  );
+
   // garbage collect old pulses
   useEffect(() => {
     if (state.pulses.length === 0) return;
@@ -519,6 +577,9 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
       toggleHubProjectMode,
       togglePathProgress,
       sharePost,
+      toggleTask,
+      votePoll,
+      calculateAlignment,
     }),
     [
       state,
@@ -541,6 +602,9 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
       toggleHubProjectMode,
       togglePathProgress,
       sharePost,
+      toggleTask,
+      votePoll,
+      calculateAlignment,
     ],
   );
 

@@ -49,6 +49,7 @@ export default function ProfileScreen() {
     selfId,
     threads,
     bookmarks,
+    calculateAlignment,
   } = useResonance();
   const user = users.find((u) => u.id === id);
   const [tab, setTab] = useState<"moments" | "voice" | "hubs" | "saved">(
@@ -247,7 +248,7 @@ export default function ProfileScreen() {
             <Stat label="following" value={user.following} />
             <Stat
               label="alignment"
-              value={`${Math.round(user.alignmentScore * 100)}`}
+              value={`${Math.round(calculateAlignment(user.id) * 100)}%`}
             />
             <Stat label="visitors / wk" value={user.weeklyVisitors} />
           </View>
