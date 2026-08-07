@@ -2,10 +2,11 @@ import { Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { ResonanceBar } from "@/components/ResonanceBar";
+import { ShareSheet } from "@/components/ShareSheet";
 import { useColors } from "@/hooks/useColors";
 import { useResonance } from "@/context/ResonanceContext";
 import type { Post } from "@/lib/types";
@@ -59,7 +60,8 @@ export function PostCard({
   nested?: boolean;
 }) {
   const colors = useColors();
-  const [isPlayingVoice, setIsPlayingVoice] = React.useState(false);
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [showShare, setShowShare] = useState(false);
   const {
     userById,
     posts,
@@ -359,7 +361,10 @@ export function PostCard({
         <FooterBtn
           icon="share-2"
           label={fmt(post.shareCount)}
-          onPress={() => sharePost(post.id)}
+          onPress={() => {
+            sharePost(post.id);
+            setShowShare(true);
+          }}
         />
         <FooterBtn
           icon="bookmark"
@@ -369,6 +374,13 @@ export function PostCard({
           onPress={() => toggleBookmark(post.id)}
         />
       </View>
+
+      <ShareSheet
+        visible={showShare}
+        onClose={() => setShowShare(false)}
+        post={post}
+        author={author}
+      />
     </Pressable>
   );
 }

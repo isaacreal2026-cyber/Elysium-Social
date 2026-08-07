@@ -30,6 +30,13 @@ interface Conversation {
   title: string;
 }
 
+const PROMPTS = [
+  "✦ Synthesize my resonance alignment",
+  "🎙 Find live voice rooms for builders",
+  "🪐 Suggest a destiny story topic",
+  "⚡ What makes Elysium anti-fatigue?",
+];
+
 export default function AiChatScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -210,6 +217,26 @@ export default function AiChatScreen() {
           renderItem={renderMessage}
           contentContainerStyle={[styles.list, { paddingBottom: 16 }]}
           showsVerticalScrollIndicator={false}
+          ListFooterComponent={
+            messages.length <= 1 ? (
+              <View style={styles.promptWrap}>
+                <Text style={[styles.promptHeader, { color: colors.subtle }]}>QUICK EXPLORATION</Text>
+                <View style={styles.promptGrid}>
+                  {PROMPTS.map((p) => (
+                    <Pressable
+                      key={p}
+                      onPress={() => {
+                        setInput(p);
+                      }}
+                      style={[styles.promptChip, { borderColor: colors.border, backgroundColor: colors.card }]}
+                    >
+                      <Text style={[styles.promptText, { color: colors.text }]}>{p}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+            ) : null
+          }
         />
 
         {error && (
@@ -355,5 +382,27 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  promptWrap: {
+    marginTop: 16,
+    gap: 8,
+  },
+  promptHeader: {
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    letterSpacing: 1.2,
+  },
+  promptGrid: {
+    gap: 8,
+  },
+  promptChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  promptText: {
+    fontFamily: "Inter_500Medium",
+    fontSize: 13,
   },
 });
