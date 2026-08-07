@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -35,10 +35,16 @@ const SUGGESTED = [
 ];
 
 export default function ComposerScreen() {
+  const params = useLocalSearchParams<{ kind?: string }>();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { addPost, addStory } = useResonance();
-  const [kind, setKind] = useState<Post["kind"]>("classic");
+  const initialKind =
+    params.kind &&
+    KINDS.some((k) => k.key === params.kind)
+      ? (params.kind as Post["kind"])
+      : "classic";
+  const [kind, setKind] = useState<Post["kind"]>(initialKind);
   const [body, setBody] = useState("");
   const [destinations, setDestinations] = useState<string[]>([]);
 

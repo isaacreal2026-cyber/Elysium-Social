@@ -1,6 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const PREFIX = "elysium:v1:";
+export const APP_VERSION = "2.4.0";
+export const SCHEMA_VERSION = 3;
+const PREFIX = `elysium:v${SCHEMA_VERSION}:`;
 
 export async function loadJSON<T>(key: string, fallback: T): Promise<T> {
   try {

@@ -16,7 +16,15 @@ const TABS = [
 
 export default function ConnectionsScreen() {
   const colors = useColors();
-  const { threads, voiceRooms, users, userById, selfId } = useResonance();
+  const {
+    threads,
+    voiceRooms,
+    users,
+    userById,
+    selfId,
+    isFollowing,
+    toggleFollow,
+  } = useResonance();
   const [tab, setTab] = useState<string>("messages");
 
   return (
@@ -190,73 +198,89 @@ export default function ConnectionsScreen() {
         {tab === "find"
           ? users
               .filter((u) => u.id !== selfId)
-              .map((u) => (
-                <View
-                  key={u.id}
-                  style={[
-                    styles.threadRow,
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.border,
-                    },
-                  ]}
-                >
-                  <View
-                    style={[styles.avatar, { backgroundColor: u.avatarColor }]}
+              .map((u) => {
+                const following = isFollowing(u.id);
+                return (
+                  <Pressable
+                    key={u.id}
+                    onPress={() => router.push(`/profile/${u.id}` as never)}
+                    style={[
+                      styles.threadRow,
+                      {
+                        backgroundColor: colors.card,
+                        borderColor: colors.border,
+                      },
+                    ]}
                   >
-                    <Text style={styles.avatarText}>{u.avatarGlyph}</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.threadName, { color: colors.text }]}>
-                      {u.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.threadMsg,
-                        { color: colors.mutedForeground },
-                      ]}
-                    >
-                      {u.city} · alignment {Math.round(u.alignmentScore * 100)}
-                    </Text>
                     <View
-                      style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        gap: 4,
-                        marginTop: 6,
-                      }}
+                      style={[styles.avatar, { backgroundColor: u.avatarColor }]}
                     >
-                      {u.tags.map((t) => (
-                        <View
-                          key={t}
-                          style={[
-                            styles.tagPill,
-                            { borderColor: colors.border },
-                          ]}
-                        >
-                          <Text
+                      <Text style={styles.avatarText}>{u.avatarGlyph}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.threadName, { color: colors.text }]}>
+                        {u.name}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.threadMsg,
+                          { color: colors.mutedForeground },
+                        ]}
+                      >
+                        {u.city} · alignment {Math.round(u.alignmentScore * 100)}%
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          flexWrap: "wrap",
+                          gap: 4,
+                          marginTop: 6,
+                        }}
+                      >
+                        {u.tags.map((t) => (
+                          <View
+                            key={t}
                             style={[
-                              styles.tagText,
-                              { color: colors.mutedForeground },
+                              styles.tagPill,
+                              { borderColor: colors.border },
                             ]}
                           >
-                            {t}
-                          </Text>
-                        </View>
-                      ))}
+                            <Text
+                              style={[
+                                styles.tagText,
+                                { color: colors.mutedForeground },
+                              ]}
+                            >
+                              {t}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
-                  </View>
-                  <Pressable
-                    style={[styles.followBtn, { borderColor: colors.primary }]}
-                  >
-                    <Feather
-                      name="user-plus"
-                      size={14}
-                      color={colors.primary}
-                    />
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation?.();
+                        toggleFollow(u.id);
+                      }}
+                      style={[
+                        styles.followBtn,
+                        {
+                          borderColor: following ? colors.border : colors.primary,
+                          backgroundColor: following
+                            ? "transparent"
+                            : colors.primary,
+                        },
+                      ]}
+                    >
+                      <Feather
+                        name={following ? "check" : "user-plus"}
+                        size={14}
+                        color={following ? colors.text : "#fff"}
+                      />
+                    </Pressable>
                   </Pressable>
-                </View>
-              ))
+                );
+              })
           : null}
       </ScrollView>
     </ScreenShell>

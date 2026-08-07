@@ -167,9 +167,21 @@ export default function StoryViewer() {
           />
         </View>
         <View style={styles.reactRow}>
-          <ReactionBtn icon="zap" color="#FFD56B" onPress={() => {}} />
-          <ReactionBtn icon="heart" color="#FB7185" onPress={() => {}} />
-          <ReactionBtn icon="mic" color="#5EEAD4" onPress={() => {}} />
+          <ReactionBtn
+            icon="zap"
+            color="#FFD56B"
+            onPress={() => resonate(story.id, "spark")}
+          />
+          <ReactionBtn
+            icon="heart"
+            color="#FB7185"
+            onPress={() => resonate(story.id, "flame")}
+          />
+          <ReactionBtn
+            icon="mic"
+            color="#5EEAD4"
+            onPress={() => resonate(story.id, "sync")}
+          />
           <ReactionBtn
             icon="send"
             color="#B57BFF"

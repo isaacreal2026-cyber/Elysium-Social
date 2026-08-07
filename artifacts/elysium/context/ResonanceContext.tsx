@@ -133,7 +133,35 @@ export function ResonanceProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       const stored = await loadJSON<State | null>(STORAGE_KEY, null);
       if (mounted && stored) {
-        setState({ ...initialState, ...stored, pulses: [] });
+        const storedPostIds = new Set(stored.posts?.map((p) => p.id) ?? []);
+        const newSeedPosts = SEED_POSTS.filter((p) => !storedPostIds.has(p.id));
+
+        const storedUserIds = new Set(stored.users?.map((u) => u.id) ?? []);
+        const newSeedUsers = SEED_USERS.filter((u) => !storedUserIds.has(u.id));
+
+        setState({
+          users: [...(stored.users ?? SEED_USERS), ...newSeedUsers],
+          posts: [...(stored.posts ?? SEED_POSTS), ...newSeedPosts],
+          comments: stored.comments ?? SEED_COMMENTS,
+          stories: stored.stories ?? SEED_STORIES,
+          hubs: stored.hubs ?? SEED_HUBS,
+          threads: stored.threads ?? SEED_THREADS,
+          chats: stored.chats ?? SEED_CHATS,
+          voiceRooms: stored.voiceRooms ?? SEED_VOICE_ROOMS,
+          paths: stored.paths ?? SEED_PATHS,
+          notifications: stored.notifications ?? SEED_NOTIFICATIONS,
+          trending: stored.trending ?? SEED_TRENDING,
+          myResonances: stored.myResonances ?? {},
+          bookmarks: stored.bookmarks ?? {},
+          following:
+            stored.following ??
+            Object.fromEntries(
+              SEED_FOLLOWING.map((id) => [id, true as const]),
+            ),
+          viewedStories: stored.viewedStories ?? {},
+          pulses: [],
+          selfId: "u-self",
+        });
       }
       setHydrated(true);
     })();

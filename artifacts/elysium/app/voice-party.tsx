@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
@@ -21,6 +21,8 @@ export default function VoicePartyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { voiceRooms, userById } = useResonance();
+  const [muted, setMuted] = useState(false);
+  const [liked, setLiked] = useState(false);
   const room = voiceRooms.find((v) => v.live) ?? voiceRooms[0]!;
   const speakers = room.speakers.map((id) => userById(id)).filter(Boolean);
 
@@ -79,17 +81,37 @@ export default function VoicePartyScreen() {
 
         <View style={styles.controls}>
           <Pressable
+            onPress={() => setLiked((l) => !l)}
             style={[
               styles.ctrl,
-              { borderColor: colors.border, backgroundColor: colors.card },
+              {
+                borderColor: liked ? colors.gold : colors.border,
+                backgroundColor: liked ? colors.gold + "22" : colors.card,
+              },
             ]}
           >
-            <Feather name="thumbs-up" size={20} color={colors.text} />
+            <Feather
+              name="thumbs-up"
+              size={20}
+              color={liked ? colors.gold : colors.text}
+            />
           </Pressable>
           <Pressable
-            style={[styles.ctrlMain, { backgroundColor: colors.primary }]}
+            onPress={() => setMuted((m) => !m)}
+            style={[
+              styles.ctrlMain,
+              {
+                backgroundColor: muted ? colors.card : colors.primary,
+                borderWidth: muted ? 2 : 0,
+                borderColor: colors.border,
+              },
+            ]}
           >
-            <Feather name="mic" size={26} color="#fff" />
+            <Feather
+              name={muted ? "mic-off" : "mic"}
+              size={26}
+              color={muted ? colors.destructive : "#fff"}
+            />
           </Pressable>
           <Pressable
             onPress={() => router.back()}
